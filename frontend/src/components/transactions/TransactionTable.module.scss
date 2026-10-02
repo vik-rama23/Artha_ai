@@ -1,0 +1,809 @@
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.tableWrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.tableWrapper::-webkit-scrollbar-track {
+  background: #f7f3eb;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #d5cbbb;
+}
+
+/* -------------------------------------------------- */
+/* Header */
+/* -------------------------------------------------- */
+
+.tableHeader,
+.transactionRow {
+  display: grid;
+
+  grid-template-columns:
+    minmax(240px, 2fr)
+    minmax(145px, 1fr)
+    minmax(190px, 1.25fr)
+    125px
+    125px
+    125px;
+
+  align-items: center;
+
+  column-gap: 20px;
+
+  min-width: 1000px;
+
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.tableHeader {
+  min-height: 46px;
+
+  border-top: 1px solid #eee7dc;
+  border-bottom: 1px solid #eee7dc;
+
+  background: #fcfaf5;
+
+  color: #98958c;
+
+  font-size: 10px;
+  font-weight: 750;
+
+  letter-spacing: 0.07em;
+
+  text-transform: uppercase;
+}
+
+.amountHeader,
+.actionsHeader {
+  text-align: right;
+}
+
+/* -------------------------------------------------- */
+/* Row */
+/* -------------------------------------------------- */
+
+.tableBody {
+  width: 100%;
+}
+
+.transactionRow {
+  min-height: 78px;
+
+  padding-top: 11px;
+  padding-bottom: 11px;
+
+  border-bottom: 1px solid #eee8de;
+
+  background: #fffdf9;
+
+  transition:
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.transactionRow:last-child {
+  border-bottom: 0;
+}
+
+.transactionRow:hover {
+  background: #faf7f0;
+}
+
+/* -------------------------------------------------- */
+/* Transaction */
+/* -------------------------------------------------- */
+
+.transactionCell {
+  display: flex;
+
+  min-width: 0;
+
+  align-items: center;
+
+  gap: 12px;
+
+  color: inherit;
+
+  text-decoration: none;
+}
+
+.transactionCell:hover {
+  text-decoration: none;
+}
+
+.transactionCell:focus-visible {
+  outline: 2px solid #b28a2e;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.transactionIcon {
+  display: flex;
+
+  width: 40px;
+  height: 40px;
+
+  flex: 0 0 40px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+}
+
+.expenseIcon {
+  background: #edf3ed;
+  color: #1f5a43;
+}
+
+.incomeIcon {
+  background: #edf5ef;
+  color: #2d7657;
+}
+
+.transactionDetails {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.transactionDetails strong {
+  overflow: hidden;
+
+  color: #203f34;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transactionDetails span {
+  overflow: hidden;
+
+  color: #aaa39a;
+
+  font-size: 11px;
+  font-weight: 450;
+
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------- */
+/* Category */
+/* -------------------------------------------------- */
+
+.categoryCell {
+  min-width: 0;
+}
+
+.categoryBadge {
+  display: inline-flex;
+
+  max-width: 100%;
+
+  align-items: center;
+
+  padding: 6px 10px;
+
+  border-radius: 8px;
+
+  background: #f3f5ef;
+
+  color: #52645a;
+
+  font-size: 11px;
+  font-weight: 650;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------- */
+/* Account */
+/* -------------------------------------------------- */
+
+.accountCell {
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.accountCell strong {
+  overflow: hidden;
+
+  color: #526057;
+
+  font-size: 12px;
+  font-weight: 650;
+
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountCell span {
+  overflow: hidden;
+
+  color: #aaa39a;
+
+  font-size: 10px;
+
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------- */
+/* Date */
+/* -------------------------------------------------- */
+
+.dateCell {
+  color: #777f79;
+
+  font-size: 11px;
+  font-weight: 550;
+
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------- */
+/* Amount */
+/* -------------------------------------------------- */
+
+.amountCell {
+  text-align: right;
+
+  font-size: 13px;
+  font-weight: 750;
+
+  white-space: nowrap;
+}
+
+.expenseAmount {
+  color: #ad5b31;
+}
+
+.incomeAmount {
+  color: #1f5a43;
+}
+
+/* -------------------------------------------------- */
+/* Actions */
+/* -------------------------------------------------- */
+
+.actions {
+  display: flex;
+
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 5px;
+}
+
+.actionButton {
+  display: inline-flex;
+
+  width: 32px;
+  height: 32px;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid transparent;
+
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #64716a;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.actionButton:hover {
+  border-color: #d8e4d8;
+
+  background: #edf3ed;
+
+  color: #1f5a43;
+
+  text-decoration: none;
+
+  transform: translateY(-1px);
+}
+
+.actionButton:focus-visible {
+  outline: 2px solid #b28a2e;
+  outline-offset: 2px;
+}
+
+.actionButton:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.5;
+
+  transform: none;
+}
+
+.deleteButton {
+  color: #a75a31;
+}
+
+.deleteButton:hover {
+  border-color: #ead1c4;
+
+  background: #faeee8;
+
+  color: #9a4525;
+}
+
+/* -------------------------------------------------- */
+/* Empty */
+/* -------------------------------------------------- */
+
+.emptyState {
+  display: flex;
+
+  min-height: 180px;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  color: #99958d;
+
+  font-size: 13px;
+
+  text-align: center;
+}
+
+/* -------------------------------------------------- */
+/* Delete Modal */
+/* -------------------------------------------------- */
+
+.modalOverlay {
+  position: fixed;
+
+  z-index: 1000;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(28, 39, 33, 0.42);
+
+  backdrop-filter: blur(3px);
+
+  animation: modalOverlayIn 0.18s ease-out;
+}
+
+.modal {
+  position: relative;
+
+  width: min(100%, 460px);
+
+  border: 1px solid #e6dfd3;
+
+  border-radius: 20px;
+
+  background: #fffdf9;
+
+  box-shadow:
+    0 24px 70px rgba(30, 45, 37, 0.18),
+    0 8px 24px rgba(30, 45, 37, 0.08);
+
+  overflow: hidden;
+
+  animation: modalIn 0.2s ease-out;
+}
+
+.modalCloseButton {
+  position: absolute;
+
+  top: 16px;
+  right: 16px;
+
+  display: inline-flex;
+
+  width: 32px;
+  height: 32px;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid transparent;
+
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #7d857f;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.modalCloseButton:hover {
+  border-color: #e2ddd3;
+
+  background: #f5f1e9;
+
+  color: #34483e;
+}
+
+.modalCloseButton:focus-visible {
+  outline: 2px solid #b28a2e;
+  outline-offset: 2px;
+}
+
+.modalCloseButton:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.5;
+}
+
+/* -------------------------------------------------- */
+/* Modal Content */
+/* -------------------------------------------------- */
+
+.modalContent {
+  padding: 30px;
+}
+
+.modalIcon {
+  display: flex;
+
+  width: 46px;
+  height: 46px;
+
+  align-items: center;
+  justify-content: center;
+
+  margin: 30px 30px 0;
+
+  border-radius: 13px;
+
+  background: #faeee8;
+
+  color: #a75a31;
+}
+
+.modalContent h2 {
+  margin: 20px 0 8px;
+
+  color: #203f34;
+
+  font-size: 20px;
+  font-weight: 750;
+
+  letter-spacing: -0.25px;
+}
+
+.modalContent > p {
+  margin: 0;
+
+  color: #747c76;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+/* -------------------------------------------------- */
+/* Delete Preview */
+/* -------------------------------------------------- */
+
+.deletePreview {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 0;
+
+  margin-top: 20px;
+
+  border: 1px solid #ebe5db;
+
+  border-radius: 12px;
+
+  background: #faf8f3;
+
+  overflow: hidden;
+}
+
+.deletePreview > div {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 12px 14px;
+}
+
+.deletePreview > div + div {
+  border-top: 1px solid #ebe5db;
+}
+
+.deletePreview span {
+  color: #8a918b;
+
+  font-size: 11px;
+  font-weight: 550;
+}
+
+.deletePreview strong {
+  max-width: 65%;
+
+  overflow: hidden;
+
+  color: #34483e;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-align: right;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.previewExpense {
+  color: #ad5b31 !important;
+}
+
+.previewIncome {
+  color: #1f5a43 !important;
+}
+
+/* -------------------------------------------------- */
+/* Modal Error */
+/* -------------------------------------------------- */
+
+.modalError {
+  margin-top: 14px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #ead1c4;
+
+  border-radius: 9px;
+
+  background: #faeee8;
+
+  color: #914624;
+
+  font-size: 12px;
+
+  line-height: 1.45;
+}
+
+/* -------------------------------------------------- */
+/* Modal Actions */
+/* -------------------------------------------------- */
+
+.modalActions {
+  display: flex;
+
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 24px;
+}
+
+.cancelButton,
+.confirmDeleteButton {
+  display: inline-flex;
+
+  min-height: 40px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 15px;
+
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.cancelButton {
+  border: 1px solid #ddd7cd;
+
+  background: #fffdf9;
+
+  color: #59655e;
+}
+
+.cancelButton:hover {
+  border-color: #cfc8bc;
+
+  background: #f7f3eb;
+
+  color: #34483e;
+}
+
+.cancelButton:focus-visible,
+.confirmDeleteButton:focus-visible {
+  outline: 2px solid #b28a2e;
+  outline-offset: 2px;
+}
+
+.cancelButton:disabled,
+.confirmDeleteButton:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+
+  transform: none;
+}
+
+.confirmDeleteButton {
+  border: 1px solid #a75a31;
+
+  background: #a75a31;
+
+  color: #fffdf9;
+}
+
+.confirmDeleteButton:hover {
+  border-color: #914624;
+
+  background: #914624;
+
+  transform: translateY(-1px);
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+/* -------------------------------------------------- */
+/* Animations */
+/* -------------------------------------------------- */
+
+@keyframes modalOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* -------------------------------------------------- */
+/* Responsive */
+/* -------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .tableHeader,
+  .transactionRow {
+    min-width: 950px;
+
+    padding-left: 18px;
+    padding-right: 18px;
+
+    column-gap: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .modalOverlay {
+    align-items: flex-end;
+
+    padding: 12px;
+  }
+
+  .modal {
+    width: 100%;
+
+    border-radius: 18px;
+  }
+
+  .modalIcon {
+    margin-top: 24px;
+    margin-left: 24px;
+  }
+
+  .modalContent {
+    padding: 24px;
+  }
+
+  .modalContent h2 {
+    margin-top: 16px;
+
+    font-size: 18px;
+  }
+
+  .modalActions {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+  }
+
+  .cancelButton,
+  .confirmDeleteButton {
+    width: 100%;
+  }
+}

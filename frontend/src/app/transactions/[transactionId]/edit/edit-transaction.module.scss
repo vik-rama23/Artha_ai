@@ -1,0 +1,99 @@
+.page {
+  min-height: 100vh;
+  padding: 32px;
+  background: #f7f3ea;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #7d745f;
+}
+
+.header h1 {
+  margin: 0;
+  color: #203b2b;
+  font-size: 32px;
+  line-height: 1.15;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: #77705f;
+}
+
+.card {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 28px;
+  background: #fffdf8;
+  border: 1px solid #e9e1d2;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(48, 40, 25, 0.07);
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 11px;
+  color: #31563d;
+  background: #edf2eb;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.state {
+  max-width: 700px;
+  margin: 80px auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  background: #fffdf8;
+  border: 1px solid #e9e1d2;
+  border-radius: 18px;
+}
+
+.state strong {
+  color: #2c4033;
+}
+
+.state span {
+  color: #756f62;
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header h1 {
+    font-size: 27px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+}

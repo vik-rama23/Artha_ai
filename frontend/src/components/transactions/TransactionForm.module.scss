@@ -1,0 +1,507 @@
+.form {
+  width: 100%;
+  max-width: 920px;
+  padding: 28px;
+
+  border: 1px solid #e8e2d7;
+  border-radius: 18px;
+
+  background: #fffdf8;
+
+  box-shadow:
+    0 8px 24px rgba(40, 55, 45, 0.05);
+}
+
+/* ---------------------------------
+   Form layout
+---------------------------------- */
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+/* ---------------------------------
+   Transaction type
+---------------------------------- */
+
+.field label {
+  display: block;
+  margin-bottom: 8px;
+
+  color: #56635b;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.typeToggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px;
+
+  padding: 5px;
+
+  border-radius: 12px;
+
+  background: #f0ece3;
+}
+
+.typeButton {
+  min-height: 42px;
+
+  border: 0;
+  border-radius: 9px;
+
+  padding: 10px 14px;
+
+  background: transparent;
+
+  color: #657068;
+
+  font-family: inherit;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.typeButton:hover:not(:disabled) {
+  background: rgba(255, 253, 248, 0.75);
+  color: #31463a;
+}
+
+.typeButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.expenseActive {
+  background: #f8eee5;
+  color: #a75a31;
+
+  box-shadow:
+    0 2px 6px rgba(167, 90, 49, 0.08);
+}
+
+.incomeActive {
+  background: #edf5e8;
+  color: #46752f;
+
+  box-shadow:
+    0 2px 6px rgba(70, 117, 47, 0.08);
+}
+
+.typeButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------------------------------
+   Fields
+---------------------------------- */
+
+.field {
+  min-width: 0;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 46px;
+
+  border: 1px solid #ded8cd;
+  border-radius: 10px;
+
+  outline: 0;
+
+  padding: 12px 13px;
+
+  background: #fffefa;
+  color: #19352a;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: #8a8e8a;
+  opacity: 1;
+}
+
+.field input:hover,
+.field select:hover,
+.field textarea:hover {
+  border-color: #c9c1b4;
+  background: #fffdf9;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: #6f947f;
+
+  box-shadow:
+    0 0 0 3px rgba(31, 90, 67, 0.08);
+
+  background: #fffefa;
+}
+
+.field input:disabled,
+.field select:disabled,
+.field textarea:disabled {
+  background: #f3f1eb;
+  color: #8a8e8a;
+
+  cursor: not-allowed;
+
+  opacity: 0.8;
+}
+
+/* ---------------------------------
+   Select
+---------------------------------- */
+
+.field select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  padding-right: 42px;
+
+  background-color: #fffefa;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #66736b 50%
+    ),
+    linear-gradient(
+      135deg,
+      #66736b 50%,
+      transparent 50%
+    );
+
+  background-position:
+    calc(100% - 17px) 20px,
+    calc(100% - 12px) 20px;
+
+  background-size:
+    5px 5px,
+    5px 5px;
+
+  background-repeat: no-repeat;
+
+  cursor: pointer;
+}
+
+.field select:disabled {
+  background-color: #f3f1eb;
+}
+
+/* ---------------------------------
+   Amount
+---------------------------------- */
+
+.field input[type="number"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Remove number spinner */
+
+.field input[type="number"]::-webkit-inner-spin-button,
+.field input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+
+  appearance: none;
+}
+
+.field input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ---------------------------------
+   Textarea
+---------------------------------- */
+
+.field textarea {
+  min-height: 110px;
+
+  resize: vertical;
+
+  line-height: 1.5;
+}
+
+/* ---------------------------------
+   Helper text
+---------------------------------- */
+
+.helperText {
+  margin: 7px 0 0;
+
+  color: #8a918b;
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* ---------------------------------
+   Account information
+---------------------------------- */
+
+.accountInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  margin-top: 4px;
+  margin-bottom: 20px;
+
+  padding: 14px 15px;
+
+  border: 1px solid #e1e7dc;
+  border-radius: 11px;
+
+  background: #f1f4ed;
+}
+
+.accountInfo strong {
+  color: #315744;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.accountInfo span {
+  color: #707b74;
+
+  font-size: 12px;
+}
+
+/* ---------------------------------
+   Error
+---------------------------------- */
+
+.error {
+  margin-bottom: 18px;
+
+  padding: 12px 14px;
+
+  border: 1px solid #eed8c9;
+  border-radius: 10px;
+
+  background: #f8eee5;
+
+  color: #a75a31;
+
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* ---------------------------------
+   Action buttons
+---------------------------------- */
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 24px;
+  padding-top: 20px;
+
+  border-top: 1px solid #eee9df;
+}
+
+/* Shared button styles */
+
+.secondaryButton,
+.primaryButton {
+  min-height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border-radius: 11px;
+
+  padding: 0 17px;
+
+  font-family: inherit;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease,
+    opacity 0.18s ease;
+}
+
+/* Cancel */
+
+.secondaryButton {
+  min-width: 105px;
+
+  border: 1px solid #d8d2c6;
+
+  background: #fffdf8;
+
+  color: #536158;
+
+  box-shadow:
+    0 2px 5px rgba(40, 55, 45, 0.04);
+}
+
+.secondaryButton:hover:not(:disabled) {
+  border-color: #bdb5a7;
+
+  background: #f5f1e9;
+
+  color: #33483b;
+
+  box-shadow:
+    0 4px 9px rgba(40, 55, 45, 0.07);
+
+  transform: translateY(-1px);
+}
+
+.secondaryButton:active:not(:disabled) {
+  transform: translateY(0);
+
+  box-shadow:
+    0 2px 5px rgba(40, 55, 45, 0.04);
+}
+
+/* Save Changes / Save Transaction */
+
+.primaryButton {
+  min-width: 150px;
+
+  border: 1px solid #1f5a43;
+
+  background: #1f5a43;
+
+  color: #fffdf7;
+
+  box-shadow:
+    0 4px 10px rgba(31, 90, 67, 0.12);
+}
+
+.primaryButton:hover:not(:disabled) {
+  border-color: #174735;
+
+  background: #174735;
+
+  box-shadow:
+    0 6px 14px rgba(31, 90, 67, 0.18);
+
+  transform: translateY(-1px);
+}
+
+.primaryButton:active:not(:disabled) {
+  transform: translateY(0);
+
+  box-shadow:
+    0 3px 8px rgba(31, 90, 67, 0.12);
+}
+
+/* Focus */
+
+.secondaryButton:focus-visible,
+.primaryButton:focus-visible {
+  outline: 0;
+
+  box-shadow:
+    0 0 0 3px rgba(31, 90, 67, 0.12);
+}
+
+/* Disabled */
+
+.secondaryButton:disabled,
+.primaryButton:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+
+  transform: none;
+}
+
+/* ---------------------------------
+   Mobile
+---------------------------------- */
+
+@media (max-width: 700px) {
+  .form {
+    padding: 20px;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+
+    gap: 0;
+  }
+
+  .fullWidth {
+    grid-column: auto;
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  .typeToggle {
+    margin-bottom: 2px;
+  }
+
+  .accountInfo {
+    margin-top: 0;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+
+    gap: 9px;
+  }
+
+  .secondaryButton,
+  .primaryButton {
+    width: 100%;
+    min-height: 46px;
+  }
+}

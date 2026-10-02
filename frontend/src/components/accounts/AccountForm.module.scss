@@ -1,0 +1,250 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.formSection {
+  padding: 24px;
+  border: 1px solid #e8e2d7;
+  border-radius: 18px;
+  background: #fffdf8;
+  box-shadow: 0 8px 24px rgba(40, 55, 45, 0.04);
+}
+
+.sectionHeading {
+  margin-bottom: 20px;
+}
+
+.sectionHeading h2 {
+  margin: 0;
+  color: #19352a;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.sectionHeading p {
+  margin: 5px 0 0;
+  color: #777e79;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field label {
+  color: #3f4c44;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.field label span {
+  margin-left: 3px;
+  color: #b2873d;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ddd7ca;
+  border-radius: 11px;
+  outline: none;
+  background: #fffefa;
+  color: #19352a;
+  font: inherit;
+  font-size: 14px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.field input,
+.field select {
+  height: 44px;
+  padding: 0 13px;
+}
+
+.field textarea {
+  min-height: 110px;
+  padding: 12px 13px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: #a1a69f;
+}
+
+.field input:hover,
+.field select:hover,
+.field textarea:hover {
+  border-color: #cfc8ba;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: #70917e;
+  box-shadow: 0 0 0 3px rgba(31, 90, 67, 0.08);
+  background: #fffefa;
+}
+
+.field small {
+  color: #858c86;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.inputWithPrefix {
+  position: relative;
+}
+
+.inputWithPrefix > span {
+  position: absolute;
+  top: 50%;
+  left: 13px;
+  color: #707872;
+  font-size: 14px;
+  font-weight: 700;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.inputWithPrefix input {
+  padding-left: 30px;
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 13px 15px;
+  border: 1px solid #ead5cf;
+  border-radius: 11px;
+  background: #fff7f4;
+  color: #7f5146;
+  font-size: 13px;
+}
+
+.error strong {
+  color: #713f35;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 10px;
+}
+
+.secondaryButton,
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 11px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.secondaryButton {
+  border: 1px solid #d8d1c4;
+  background: #fffdf8;
+  color: #536058;
+}
+
+.secondaryButton:hover:not(:disabled) {
+  border-color: #c9c1b4;
+  background: #f3f0e9;
+  color: #36443c;
+  transform: translateY(-1px);
+}
+
+.secondaryButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.primaryButton {
+  min-width: 150px;
+  border: 1px solid #1f5a43;
+  background: #1f5a43;
+  color: #fffdf7;
+  box-shadow: 0 7px 18px rgba(31, 90, 67, 0.15);
+}
+
+.primaryButton:hover:not(:disabled) {
+  border-color: #194b38;
+  background: #194b38;
+  box-shadow: 0 9px 20px rgba(31, 90, 67, 0.2);
+  transform: translateY(-1px);
+}
+
+.primaryButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 5px 12px rgba(31, 90, 67, 0.15);
+}
+
+.secondaryButton:focus-visible,
+.primaryButton:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(31, 90, 67, 0.1),
+    0 5px 14px rgba(31, 90, 67, 0.12);
+}
+
+.secondaryButton:disabled,
+.primaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 700px) {
+  .formSection {
+    padding: 18px;
+  }
+
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 10px;
+    padding-top: 6px;
+  }
+
+  .secondaryButton,
+  .primaryButton {
+    width: 100%;
+  }
+}

@@ -1,0 +1,862 @@
+.page {
+  min-height: 100vh;
+  padding: 32px;
+  background: #f7f4ed;
+  color: #19352a;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #b2873d;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  margin: 10px 0 0;
+  max-width: 620px;
+  color: #6c746e;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.addButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 12px;
+  background: #1f5a43;
+  color: #fffdf7;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(31, 90, 67, 0.16);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.addButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(31, 90, 67, 0.2);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.summaryCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 104px;
+  padding: 20px;
+  border: 1px solid #e8e2d7;
+  border-radius: 18px;
+  background: #fffdf8;
+  box-shadow: 0 8px 24px rgba(40, 55, 45, 0.05);
+}
+
+.summaryIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 13px;
+  background: #edf3ed;
+  color: #1f5a43;
+}
+
+.summaryCard span {
+  display: block;
+  margin-bottom: 5px;
+  color: #747b76;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.summaryCard strong {
+  display: block;
+  color: #19352a;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.accountsSection {
+  margin-top: 8px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  color: #19352a;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.sectionHeader p {
+  margin: 5px 0 0;
+  color: #747b76;
+  font-size: 13px;
+}
+
+.accountCount {
+  padding: 7px 11px;
+  border: 1px solid #e8e2d7;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: #667069;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.accountGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.accountCard {
+  padding: 20px;
+  border: 1px solid #e8e2d7;
+  border-radius: 18px;
+  background: #fffdf8;
+  box-shadow: 0 8px 24px rgba(40, 55, 45, 0.05);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.accountCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(40, 55, 45, 0.08);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.accountIdentity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.accountIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  border-radius: 14px;
+  background: #edf3ed;
+  color: #1f5a43;
+}
+
+.accountIdentity h3 {
+  margin: 0;
+  overflow: hidden;
+  color: #19352a;
+  font-size: 16px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountIdentity span {
+  display: block;
+  margin-top: 4px;
+  color: #777e79;
+  font-size: 12px;
+}
+
+.menuButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #747b76;
+  cursor: pointer;
+}
+
+.menuButton:hover {
+  background: #f0ede5;
+  color: #19352a;
+}
+
+.menuButton::after {
+  content: "Edit account";
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: #19352a;
+  color: #fffdf7;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-3px);
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s ease;
+  z-index: 20;
+}
+
+.menuButton:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.institution {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  color: #6f7771;
+  font-size: 12px;
+}
+
+.balanceBlock {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #eee9df;
+}
+
+.balanceBlock span {
+  display: block;
+  margin-bottom: 7px;
+  color: #7b827d;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.balanceBlock strong {
+  display: block;
+  color: #19352a;
+  font-size: 26px;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.cardFooter > div span {
+  display: block;
+  margin-bottom: 4px;
+  color: #8a908b;
+  font-size: 11px;
+}
+
+.cardFooter > div strong {
+  color: #555e58;
+  font-size: 13px;
+}
+
+.deleteButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #a05c4d;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: #f8ece8;
+}
+
+.deleteButton:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  gap: 12px;
+  border: 1px solid #e8e2d7;
+  border-radius: 18px;
+  background: #fffdf8;
+  color: #747b76;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #dfe5de;
+  border-top-color: #1f5a43;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: 40px;
+  border: 1px dashed #d9d2c5;
+  border-radius: 18px;
+  background: #fffdf8;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 16px;
+  border-radius: 18px;
+  background: #edf3ed;
+  color: #1f5a43;
+}
+
+.emptyState h3 {
+  margin: 0;
+  color: #19352a;
+  font-size: 18px;
+}
+
+.emptyState p {
+  max-width: 430px;
+  margin: 8px 0 20px;
+  color: #747b76;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid #ead5cf;
+  border-radius: 12px;
+  background: #fff7f4;
+  color: #7f5146;
+  font-size: 13px;
+}
+
+.error strong {
+  color: #713f35;
+}
+
+.error span {
+  flex: 1;
+}
+
+.error button {
+  padding: 7px 10px;
+  border: 1px solid #d9b9b0;
+  border-radius: 8px;
+  background: #fffdf8;
+  color: #713f35;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* -------------------------------------------------- */
+/* Delete Modal */
+/* -------------------------------------------------- */
+
+.modalOverlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(28, 39, 33, 0.42);
+
+  backdrop-filter: blur(3px);
+
+  animation: modalOverlayIn 0.18s ease-out;
+}
+
+.modal {
+  position: relative;
+
+  width: min(100%, 470px);
+
+  border: 1px solid #e6dfd3;
+  border-radius: 20px;
+
+  background: #fffdf9;
+
+  box-shadow:
+    0 24px 70px rgba(30, 45, 37, 0.18),
+    0 8px 24px rgba(30, 45, 37, 0.08);
+
+  overflow: hidden;
+
+  animation: modalIn 0.2s ease-out;
+}
+
+.modalCloseButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+
+  display: inline-flex;
+
+  width: 32px;
+  height: 32px;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #7d857f;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.modalCloseButton:hover {
+  border-color: #e2ddd3;
+  background: #f5f1e9;
+  color: #34483e;
+}
+
+.modalCloseButton:focus-visible {
+  outline: 2px solid #b28a2e;
+  outline-offset: 2px;
+}
+
+.modalCloseButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.modalIcon {
+  display: flex;
+
+  width: 46px;
+  height: 46px;
+
+  align-items: center;
+  justify-content: center;
+
+  margin: 30px 30px 0;
+
+  border-radius: 13px;
+
+  background: #faeee8;
+
+  color: #a75a31;
+}
+
+.modalContent {
+  padding: 30px;
+}
+
+.modalContent h2 {
+  margin: 0 0 8px;
+
+  color: #203f34;
+
+  font-size: 20px;
+  font-weight: 750;
+
+  letter-spacing: -0.25px;
+}
+
+.modalContent > p {
+  margin: 0;
+
+  color: #747c76;
+
+  font-size: 13px;
+
+  line-height: 1.6;
+}
+
+.deletePreview {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0;
+
+  margin-top: 20px;
+
+  border: 1px solid #ebe5db;
+
+  border-radius: 12px;
+
+  background: #faf8f3;
+
+  overflow: hidden;
+}
+
+.deletePreview > div {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 12px 14px;
+}
+
+.deletePreview > div + div {
+  border-top: 1px solid #ebe5db;
+}
+
+.deletePreview span {
+  color: #8a918b;
+
+  font-size: 11px;
+  font-weight: 550;
+}
+
+.deletePreview strong {
+  max-width: 65%;
+
+  overflow: hidden;
+
+  color: #34483e;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-align: right;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.warning {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 8px;
+
+  margin-top: 14px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #eadfc6;
+
+  border-radius: 9px;
+
+  background: #fff9ed;
+
+  color: #856d3a;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+.warning svg {
+  flex: 0 0 auto;
+
+  margin-top: 1px;
+}
+
+.modalError {
+  margin-top: 14px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #ead1c4;
+
+  border-radius: 9px;
+
+  background: #faeee8;
+
+  color: #914624;
+
+  font-size: 12px;
+
+  line-height: 1.45;
+}
+
+.modalActions {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 24px;
+}
+
+.cancelButton,
+.confirmDeleteButton {
+  display: inline-flex;
+
+  min-height: 40px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 15px;
+
+  border-radius: 10px;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.cancelButton {
+  border: 1px solid #ddd7cd;
+
+  background: #fffdf9;
+
+  color: #59655e;
+}
+
+.cancelButton:hover {
+  border-color: #cfc8bc;
+
+  background: #f7f3eb;
+
+  color: #34483e;
+}
+
+.cancelButton:focus-visible,
+.confirmDeleteButton:focus-visible {
+  outline: 2px solid #b28a2e;
+
+  outline-offset: 2px;
+}
+
+.cancelButton:disabled,
+.confirmDeleteButton:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+
+  transform: none;
+}
+
+.confirmDeleteButton {
+  border: 1px solid #a75a31;
+
+  background: #a75a31;
+
+  color: #fffdf9;
+}
+
+.confirmDeleteButton:hover:not(:disabled) {
+  border-color: #914624;
+
+  background: #914624;
+
+  transform: translateY(-1px);
+}
+
+@keyframes modalOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 24px;
+  }
+
+  .accountGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .addButton {
+    width: 100%;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .accountCount {
+    align-self: flex-start;
+  }
+
+  .accountCard {
+    padding: 17px;
+  }
+
+  .balanceBlock strong {
+    font-size: 23px;
+  }
+
+  .error {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .error span {
+    flex-basis: 100%;
+    order: 3;
+  }
+
+  .modalOverlay {
+    align-items: flex-end;
+    padding: 12px;
+  }
+
+  .modal {
+    width: 100%;
+    border-radius: 18px;
+  }
+
+  .modalIcon {
+    margin-top: 24px;
+    margin-left: 24px;
+  }
+
+  .modalContent {
+    padding: 24px;
+  }
+
+  .modalActions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .cancelButton,
+  .confirmDeleteButton {
+    width: 100%;
+  }
+}

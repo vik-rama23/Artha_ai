@@ -1,0 +1,159 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 28px;
+  background: #fffdf8;
+  border: 1px solid #e7e0d2;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(25, 53, 42, 0.06);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #365344;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #d8d0c1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #19352a;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: #3f765c;
+  box-shadow: 0 0 0 3px rgba(63, 118, 92, 0.12);
+}
+
+.field input::placeholder {
+  color: #9a958b;
+}
+
+.field input:disabled,
+.field select:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.helperText {
+  margin: 0;
+  font-size: 12px;
+  color: #817b70;
+}
+
+.error {
+  padding: 12px 14px;
+  border: 1px solid #e4b9a8;
+  border-radius: 10px;
+  background: #fff3ee;
+  color: #9b4328;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.secondaryButton,
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.secondaryButton {
+  border: 1px solid #d8d0c1;
+  background: #fffdf8;
+  color: #365344;
+}
+
+.secondaryButton:hover:not(:disabled) {
+  background: #f5f0e7;
+}
+
+.primaryButton {
+  border: 1px solid #2f6049;
+  background: #356b50;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(53, 107, 80, 0.18);
+}
+
+.primaryButton:hover:not(:disabled) {
+  background: #2f6049;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(53, 107, 80, 0.22);
+}
+
+.secondaryButton:disabled,
+.primaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+@media (max-width: 700px) {
+  .form {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .fullWidth {
+    grid-column: auto;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .secondaryButton,
+  .primaryButton {
+    width: 100%;
+  }
+}

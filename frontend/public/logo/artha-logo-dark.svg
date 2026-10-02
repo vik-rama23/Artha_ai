@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" role="img" aria-labelledby="title desc">
+  <title id="title">Artha Personal Finance</title>
+  <desc id="desc">Artha logo for dark backgrounds</desc>
+  <rect width="1200" height="400" rx="36" fill="#123F32"/>
+  <g transform="translate(72 72) scale(0.5)">
+  <title>Artha</title>
+  <desc>Artha personal finance icon</desc>
+  <rect width="512" height="512" rx="112" fill="#D7A43B"/>
+  <path fill="#123F32" d="
+    M104 404
+    L205 108
+    C211 91 229 80 248 80
+    C267 80 285 91 291 108
+    L408 404
+    L330 404
+    L302 326
+    L190 326
+    L162 404
+    Z
+    M211 262
+    L281 262
+    L246 162
+    Z"/>
+  <path fill="#D7A43B" d="
+    M244 286
+    C263 246 302 226 340 239
+    C329 278 296 304 250 305
+    C245 300 243 293 244 286
+    Z"/>
+  <path fill="#123F32" d="
+    M249 296
+    C271 275 298 260 330 250
+    C306 274 281 291 251 307
+    Z"/>
+
+  </g>
+  <text x="380" y="218"
+        font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif"
+        font-size="122" font-weight="750" letter-spacing="-4" fill="#FBF8F0">Artha</text>
+  <text x="384" y="286"
+        font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif"
+        font-size="34" font-weight="600" letter-spacing="7" fill="#D8DED9">PERSONAL FINANCE</text>
+</svg>

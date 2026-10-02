@@ -1,0 +1,208 @@
+.filters {
+  padding: 18px 22px;
+  border-bottom: 1px solid #eee9df;
+  background: #fcfaf5;
+}
+
+.filterHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.filterHeader > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.filterHeader strong {
+  color: #19352a;
+  font-size: 13px;
+}
+
+.filterHeader span {
+  color: #8a918b;
+  font-size: 11px;
+}
+
+.clearButton {
+  border: 0;
+  padding: 5px 0;
+  background: transparent;
+  color: #727c75;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clearButton:hover:not(:disabled) {
+  color: #1f5a43;
+}
+
+.clearButton:disabled {
+  color: #b5b9b5;
+  cursor: not-allowed;
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.4fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  color: #56635b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.field select {
+  width: 100%;
+  height: 42px;
+  box-sizing: border-box;
+  border: 1px solid #ddd7ca;
+  border-radius: 10px;
+  outline: none;
+  padding: 0 38px 0 12px;
+  background-color: #fffefa;
+  color: #19352a;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #66736b 50%
+    ),
+    linear-gradient(
+      135deg,
+      #66736b 50%,
+      transparent 50%
+    );
+
+  background-position:
+    calc(100% - 17px) 17px,
+    calc(100% - 12px) 17px;
+
+  background-size:
+    5px 5px,
+    5px 5px;
+
+  background-repeat: no-repeat;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.field select:hover {
+  border-color: #cfc8ba;
+}
+
+.field select:focus {
+  border-color: #70917e;
+  box-shadow:
+    0 0 0 3px rgba(31, 90, 67, 0.08);
+}
+
+.field select:disabled {
+  background-color: #f3f1eb;
+  color: #8a918b;
+  cursor: not-allowed;
+}
+
+.actionField {
+  display: flex;
+  align-items: flex-end;
+}
+
+.applyButton {
+  height: 42px;
+  min-width: 120px;
+  border: 1px solid #1f5a43;
+  border-radius: 10px;
+  padding: 0 15px;
+  background: #1f5a43;
+  color: #fffdf7;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow:
+    0 4px 10px rgba(31, 90, 67, 0.1);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.applyButton:hover {
+  border-color: #174735;
+  background: #174735;
+  box-shadow:
+    0 6px 14px rgba(31, 90, 67, 0.15);
+  transform: translateY(-1px);
+}
+
+.applyButton:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 850px) {
+  .filterGrid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .actionField {
+    grid-column: 1 / -1;
+  }
+
+  .applyButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .filters {
+    padding: 16px;
+  }
+
+  .filterHeader {
+    align-items: flex-start;
+  }
+
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actionField {
+    grid-column: auto;
+  }
+
+  .applyButton {
+    width: 100%;
+  }
+}

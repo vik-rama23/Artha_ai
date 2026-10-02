@@ -1,0 +1,288 @@
+.page {
+  min-height: 100vh;
+  padding: 32px;
+  background: #f7f3ea;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #7d745f;
+}
+
+.header h1 {
+  margin: 0;
+  color: #203b2b;
+  font-size: 32px;
+  line-height: 1.15;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: #77705f;
+}
+
+.card {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px;
+  background: #fffdf8;
+  border: 1px solid #e9e1d2;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(48, 40, 25, 0.07);
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid #ece5d8;
+}
+
+.icon {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+}
+
+.expenseIcon {
+  color: #a74a38;
+  background: #f9e9e4;
+}
+
+.incomeIcon {
+  color: #2f6d45;
+  background: #e5f2e8;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heroContent > span {
+  color: #827966;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.heroContent h2 {
+  margin: 0;
+  color: #263d2e;
+  font-size: 24px;
+}
+
+.expenseAmount,
+.incomeAmount {
+  font-size: 22px;
+}
+
+.expenseAmount {
+  color: #a74a38;
+}
+
+.incomeAmount {
+  color: #2f6d45;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 28px 0;
+}
+
+.detail {
+  display: flex;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #eee7da;
+  border-radius: 14px;
+  background: #fffefa;
+}
+
+.detailIcon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  color: #866b2c;
+  background: #f5ecd6;
+}
+
+.detail > div:last-child {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.detail span {
+  color: #827966;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.detail strong {
+  color: #283d30;
+  font-size: 15px;
+}
+
+.detail small {
+  color: #8b8475;
+  font-size: 12px;
+}
+
+.textSection {
+  padding: 22px 0;
+  border-top: 1px solid #ece5d8;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #334a39;
+  font-weight: 700;
+}
+
+.textSection p {
+  margin: 0;
+  color: #625d51;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid #ece5d8;
+}
+
+.editButton,
+.deleteButton,
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.backButton {
+  color: #31563d;
+  background: #edf2eb;
+}
+
+.editButton {
+  color: #fffdf8;
+  background: #2f6040;
+  border: 1px solid #2f6040;
+}
+
+.deleteButton {
+  color: #a74a38;
+  background: #fff7f3;
+  border: 1px solid #e7c7bd;
+}
+
+.deleteButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: #9b3e2c;
+  background: #fbeae5;
+  border: 1px solid #edc7be;
+}
+
+.state {
+  max-width: 700px;
+  margin: 80px auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  background: #fffdf8;
+  border: 1px solid #e9e1d2;
+  border-radius: 18px;
+}
+
+.state strong {
+  color: #2c4033;
+}
+
+.state span {
+  color: #756f62;
+}
+
+.state .backButton {
+  margin-top: 10px;
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header h1 {
+    font-size: 27px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .detailsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .editButton,
+  .deleteButton {
+    width: 100%;
+  }
+}

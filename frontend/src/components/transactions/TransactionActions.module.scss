@@ -1,0 +1,67 @@
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.iconButton {
+  position: relative;
+
+  width: 34px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid transparent;
+  border-radius: 9px;
+
+  background: transparent;
+  color: #52645a;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.iconButton:hover {
+  background: #edf3ed;
+  border-color: #d8e4d8;
+  color: #1f5a43;
+
+  transform: translateY(-1px);
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid #b28a2e;
+  outline-offset: 2px;
+}
+
+.deleteButton {
+  color: #a75a31;
+}
+
+.deleteButton:hover {
+  background: #faeee8;
+  border-color: #ead1c4;
+  color: #9a4525;
+}
+
+@media (max-width: 700px) {
+  .actions {
+    gap: 4px;
+  }
+
+  .iconButton {
+    width: 32px;
+    height: 32px;
+  }
+}
