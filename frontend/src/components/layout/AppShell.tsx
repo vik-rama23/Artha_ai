@@ -91,7 +91,7 @@ export default function AppShell({
 
     async function loadUser() {
       try {
-        const response = await fetch("/api/auth/me", {
+        const response = await fetch("/api/backend/api/v1/auth/me", {
           method: "GET",
           cache: "no-store",
         });
@@ -141,7 +141,7 @@ export default function AppShell({
     setLoggingOut(true);
 
     try {
-      await fetch("/api/auth/logout", {
+      await fetch("/api/backend/api/v1/auth/logout", {
         method: "POST",
       });
     } catch (error) {
