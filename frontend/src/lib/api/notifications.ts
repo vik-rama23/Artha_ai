@@ -18,7 +18,7 @@ export async function getNotifications(
   params.set("limit", String(limit));
 
   return apiClient<NotificationListResponse>(
-    \`/api/v1/notifications?\${params.toString()}\`,
+    `/api/v1/notifications?${params.toString()}`,
   );
 }
 
@@ -34,7 +34,7 @@ export async function markNotificationRead(
   notificationId: string,
 ): Promise<Notification> {
   return apiClient<Notification>(
-    \`/api/v1/notifications/\${notificationId}/read\`,
+    `/api/v1/notifications/${notificationId}/read`,
     {
       method: "PATCH",
     },
@@ -56,7 +56,7 @@ export async function deleteNotification(
   notificationId: string,
 ): Promise<void> {
   await apiClient<void>(
-    \`/api/v1/notifications/\${notificationId}\`,
+    `/api/v1/notifications/${notificationId}`,
     {
       method: "DELETE",
     },
