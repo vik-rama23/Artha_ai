@@ -761,231 +761,140 @@ def resume_recurring_transaction(
 # GENERATE TRANSACTION
 
 # ============================================================
-
 def generate_recurring_transaction(
-
     db: Session,
-
     user_id: UUID,
-
     recurring_transaction_id: UUID,
-
 ) -> tuple[
-
     RecurringTransaction,
-
     Transaction,
-
 ]:
 
     recurring_transaction = (
-
         get_recurring_transaction(
-
             db=db,
-
             user_id=user_id,
-
             recurring_transaction_id=recurring_transaction_id,
-
         )
-
     )
 
     if not recurring_transaction.is_active:
-
         raise ValueError(
-
             "Recurring transaction is paused."
-
         )
 
     occurrence_date = (
-
         recurring_transaction.next_occurrence
-
     )
 
     # Generate Now is only allowed when the scheduled
-
     # occurrence is due today or is already overdue.
-
     today = date.today()
 
     if occurrence_date > today:
-
         raise ValueError(
-
             f"Recurring transaction is not due yet. "
-
             f"Next occurrence is {occurrence_date.isoformat()}."
-
         )
 
     if (
-
         recurring_transaction.end_date is not None
-
         and occurrence_date
-
         > recurring_transaction.end_date
-
     ):
-
         recurring_transaction.is_active = False
-
         db.commit()
 
         raise ValueError(
-
             "Recurring transaction has reached its end date."
-
         )
 
     # Prevent duplicate generation of the same occurrence.
-
     if (
-
         recurring_transaction.last_generated_date
-
         == occurrence_date
-
     ):
-
         raise ValueError(
-
             "This scheduled occurrence has already been generated."
-
         )
 
     # Validate account and category again at generation time.
-
     account = validate_account(
-
         db=db,
-
         user_id=user_id,
-
         account_id=recurring_transaction.account_id,
-
     )
 
     validate_category(
-
         db=db,
-
         user_id=user_id,
-
         category_id=recurring_transaction.category_id,
-
-        recurring_transaction_id=recurring_transaction.id,
-
         transaction_type=recurring_transaction.transaction_type,
-
     )
 
     transaction = Transaction(
-
         user_id=user_id,
-
         account_id=recurring_transaction.account_id,
-
         category_id=recurring_transaction.category_id,
-
         recurring_transaction_id=recurring_transaction.id,
-
         transaction_type=recurring_transaction.transaction_type,
-
         amount=recurring_transaction.amount,
-
         transaction_date=occurrence_date,
-
-        description=recurring_transaction.description
-
-        or recurring_transaction.name,
-
-        merchant=recurring_transaction.merchant
-
-        or recurring_transaction.name,
-
+        description=(
+            recurring_transaction.description
+            or recurring_transaction.name
+        ),
+        merchant=(
+            recurring_transaction.merchant
+            or recurring_transaction.name
+        ),
         notes=recurring_transaction.notes,
-
     )
 
     db.add(transaction)
 
+    # Flush first so the generated transaction is included
+    # when recalculating the account balance.
     db.flush()
 
     # Recalculate account balance using the same
-
     # source-of-truth logic as normal transactions.
-
     recalculate_account_balance(
-
         db=db,
-
         account_id=account.id,
-
     )
 
     recurring_transaction.last_generated_date = (
-
         occurrence_date
-
     )
 
     next_occurrence = calculate_next_occurrence(
-
         current_date=occurrence_date,
-
         frequency=recurring_transaction.frequency,
-
     )
 
     if (
-
         recurring_transaction.end_date is not None
-
         and next_occurrence
-
         > recurring_transaction.end_date
-
     ):
-
         recurring_transaction.next_occurrence = (
-
             next_occurrence
-
         )
-
         recurring_transaction.is_active = False
-
     else:
-
         recurring_transaction.next_occurrence = (
-
             next_occurrence
-
         )
-
     db.commit()
-
     db.refresh(
-
         recurring_transaction
-
     )
-
     db.refresh(transaction)
-
     return (
-
         recurring_transaction,
-
         transaction,
-
     )
-
 # ============================================================
 
 # PROCESS DUE RECURRING TRANSACTIONS
