@@ -193,21 +193,21 @@ export default function AppShell({
     <div className={styles.shell}>
       <button
         type="button"
-        className={\`\${styles.mobileOverlay} \${
+        className={`${styles.mobileOverlay} ${
           sidebarOpen
             ? styles.mobileOverlayVisible
             : ""
-        }\`}
+        }`}
         aria-label="Close navigation"
         onClick={() => setSidebarOpen(false)}
       />
 
       <aside
-        className={\`\${styles.sidebar} \${
+        className={`${styles.sidebar} ${
           sidebarOpen
             ? styles.sidebarOpen
             : ""
-        }\`}
+        }`}
       >
         <div className={styles.brand}>
           <Link
@@ -255,18 +255,18 @@ export default function AppShell({
                 ? pathname === "/"
                 : pathname === item.href ||
                   pathname.startsWith(
-                    \`\${item.href}/\`
+                    `${item.href}/`
                   );
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={\`\${styles.navItem} \${
+                className={`${styles.navItem} ${
                   isActive
                     ? styles.navItemActive
                     : ""
-                }\`}
+                }`}
                 aria-current={
                   isActive
                     ? "page"
@@ -293,13 +293,13 @@ export default function AppShell({
 
           <Link
             href="/settings"
-            className={\`\${styles.navItem} \${
+            className={`${styles.navItem} ${
               pathname.startsWith(
                 "/settings"
               )
                 ? styles.navItemActive
                 : ""
-            }\`}
+            }`}
             aria-current={
               pathname.startsWith(
                 "/settings"
