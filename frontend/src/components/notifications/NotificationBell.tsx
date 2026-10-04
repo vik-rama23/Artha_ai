@@ -129,7 +129,7 @@ export default function NotificationBell() {
         className={styles.bellButton}
         aria-label={
           unreadCount > 0
-            ? \`Notifications, \${unreadCount} unread\`
+            ? `Notifications, ${unreadCount} unread`
             : "Notifications"
         }
         aria-expanded={open}
@@ -151,7 +151,7 @@ export default function NotificationBell() {
               <strong>Notifications</strong>
               <span>
                 {unreadCount > 0
-                  ? \`\${unreadCount} unread\`
+                  ? `${unreadCount} unread`
                   : "You're all caught up"}
               </span>
             </div>
@@ -179,9 +179,9 @@ export default function NotificationBell() {
                 <Link
                   key={notification.id}
                   href="/notifications"
-                  className={\`\${styles.item} \${
+                  className={`${styles.item} ${
                     !notification.is_read ? styles.itemUnread : ""
-                  }\`}
+                  }`}
                   onClick={() => handleRead(notification)}
                 >
                   <span className={styles.itemIcon}>
