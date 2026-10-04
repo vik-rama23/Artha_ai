@@ -11,6 +11,9 @@ from app.models.users import User
 from app.models.accounts import Account
 from app.models.categories import Category
 from app.models.transactions import Transaction
+from app.models.budgets import Budget
+from app.models.recurring_transactions import RecurringTransaction
+from app.models.notifications import Notification
 
 
 # Alembic Config object
@@ -23,8 +26,6 @@ if config.config_file_name is not None:
 
 
 # SQLAlchemy metadata
-# This will be connected to our Base.metadata
-# after we create the Artha models.
 target_metadata = Base.metadata
 
 
