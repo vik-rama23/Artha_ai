@@ -4,6 +4,7 @@ from app.models.categories import Category
 from app.models.transactions import Transaction
 from app.models.budgets import Budget
 from app.models.recurring_transactions import RecurringTransaction
+from app.models.notifications import Notification
 
 __all__ = [
     "User",
@@ -12,4 +13,5 @@ __all__ = [
     "Transaction",
     "Budget",
     "RecurringTransaction",
+    "Notification",
 ]
