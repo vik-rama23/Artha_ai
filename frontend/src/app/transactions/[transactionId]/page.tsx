@@ -13,6 +13,7 @@ import {
   Store,
   Tag,
   Trash2,
+  Repeat2,
 } from "lucide-react";
 
 import {
@@ -20,7 +21,10 @@ import {
   useState,
 } from "react";
 
-import { useParams, useRouter } from "next/navigation";
+import {
+  useParams,
+  useRouter,
+} from "next/navigation";
 
 import {
   deleteTransaction,
@@ -73,6 +77,7 @@ function formatDate(date: string) {
 
 export default function TransactionDetailsPage() {
   const params = useParams();
+
   const router = useRouter();
 
   const transactionId =
@@ -200,7 +205,9 @@ export default function TransactionDetailsPage() {
 
           <Link
             href="/transactions"
-            className={styles.backButton}
+            className={
+              styles.backButton
+            }
           >
             <ArrowLeft size={17} />
             Back to Transactions
@@ -217,6 +224,11 @@ export default function TransactionDetailsPage() {
   const isExpense =
     transaction.transaction_type ===
     "EXPENSE";
+
+  const isRecurring =
+    Boolean(
+      transaction.recurring_transaction_id
+    );
 
   const title =
     transaction.merchant ||
@@ -271,7 +283,9 @@ export default function TransactionDetailsPage() {
           </div>
 
           <div
-            className={styles.heroContent}
+            className={
+              styles.heroContent
+            }
           >
             <span>
               {isExpense
@@ -288,13 +302,34 @@ export default function TransactionDetailsPage() {
                   : styles.incomeAmount
               }
             >
-              {isExpense
-                ? "-"
-                : "+"}
+              {isExpense ? "-" : "+"}
+
               {formatCurrency(
                 transaction.amount
               )}
             </strong>
+
+            {isRecurring && (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  marginTop: "8px",
+                  width: "fit-content",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                }}
+                title="Generated from a recurring transaction rule"
+              >
+                <Repeat2
+                  size={15}
+                  strokeWidth={2}
+                />
+
+                Recurring Transaction
+              </span>
+            )}
           </div>
         </div>
 
@@ -306,7 +341,11 @@ export default function TransactionDetailsPage() {
 
         <div className={styles.detailsGrid}>
           <div className={styles.detail}>
-            <div className={styles.detailIcon}>
+            <div
+              className={
+                styles.detailIcon
+              }
+            >
               <CalendarDays
                 size={18}
               />
@@ -314,6 +353,7 @@ export default function TransactionDetailsPage() {
 
             <div>
               <span>Date</span>
+
               <strong>
                 {formatDate(
                   transaction.transaction_date
@@ -323,7 +363,11 @@ export default function TransactionDetailsPage() {
           </div>
 
           <div className={styles.detail}>
-            <div className={styles.detailIcon}>
+            <div
+              className={
+                styles.detailIcon
+              }
+            >
               <CreditCard
                 size={18}
               />
@@ -331,6 +375,7 @@ export default function TransactionDetailsPage() {
 
             <div>
               <span>Account</span>
+
               <strong>
                 {transaction.account_name}
               </strong>
@@ -346,12 +391,17 @@ export default function TransactionDetailsPage() {
           </div>
 
           <div className={styles.detail}>
-            <div className={styles.detailIcon}>
+            <div
+              className={
+                styles.detailIcon
+              }
+            >
               <Tag size={18} />
             </div>
 
             <div>
               <span>Category</span>
+
               <strong>
                 {category?.name ??
                   "Uncategorized"}
@@ -360,12 +410,17 @@ export default function TransactionDetailsPage() {
           </div>
 
           <div className={styles.detail}>
-            <div className={styles.detailIcon}>
+            <div
+              className={
+                styles.detailIcon
+              }
+            >
               <Store size={18} />
             </div>
 
             <div>
               <span>Merchant</span>
+
               <strong>
                 {transaction.merchant ??
                   "Not provided"}
@@ -374,9 +429,51 @@ export default function TransactionDetailsPage() {
           </div>
         </div>
 
-        <div className={styles.textSection}>
-          <div className={styles.sectionTitle}>
+        {isRecurring && (
+          <div
+            className={styles.textSection}
+          >
+            <div
+              className={
+                styles.sectionTitle
+              }
+            >
+              <Repeat2 size={18} />
+
+              Recurring Transaction
+            </div>
+
+            <p>
+              This transaction was
+              automatically generated from
+              a recurring transaction rule.
+            </p>
+
+            <small
+              style={{
+                display: "block",
+                marginTop: "8px",
+                wordBreak: "break-all",
+              }}
+            >
+              Recurring Rule ID:{" "}
+              {
+                transaction.recurring_transaction_id
+              }
+            </small>
+          </div>
+        )}
+
+        <div
+          className={styles.textSection}
+        >
+          <div
+            className={
+              styles.sectionTitle
+            }
+          >
             <FileText size={18} />
+
             Description
           </div>
 
@@ -386,9 +483,16 @@ export default function TransactionDetailsPage() {
           </p>
         </div>
 
-        <div className={styles.textSection}>
-          <div className={styles.sectionTitle}>
+        <div
+          className={styles.textSection}
+        >
+          <div
+            className={
+              styles.sectionTitle
+            }
+          >
             <FileText size={18} />
+
             Notes
           </div>
 

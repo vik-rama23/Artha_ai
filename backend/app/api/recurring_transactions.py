@@ -26,7 +26,6 @@ from app.services.recurring_transactions import (
     create_recurring_transaction,
     delete_recurring_transaction,
     generate_recurring_transaction,
-    get_recurring_transaction,
     get_recurring_transaction_details,
     get_recurring_transaction_list,
     pause_recurring_transaction,
@@ -174,14 +173,10 @@ def list_recurring_transactions(
 
 
 # ============================================================
-# GET SINGLE
+# PROCESS DUE
 # ============================================================
 
 
-@router.get(
-    "/{recurring_transaction_id}",
-    response_model=RecurringTransactionResponse,
-)
 @router.post(
     "/process-due",
     response_model=RecurringTransactionProcessDueResponse,
@@ -203,8 +198,18 @@ def process_due(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
-        )
-    
+        ) from exc
+
+
+# ============================================================
+# GET SINGLE
+# ============================================================
+
+
+@router.get(
+    "/{recurring_transaction_id}",
+    response_model=RecurringTransactionResponse,
+)
 def get_one(
     recurring_transaction_id: UUID,
     db: Session = Depends(get_db),

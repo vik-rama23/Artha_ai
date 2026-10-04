@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+
 import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 
 import {
@@ -13,6 +15,7 @@ import {
   X,
   AlertTriangle,
   Loader2,
+  Repeat2,
 } from "lucide-react";
 
 import type { Transaction } from "@/types/transaction";
@@ -171,6 +174,11 @@ export default function TransactionTable({
               transaction.transaction_type ===
               "EXPENSE";
 
+            const isRecurring =
+              Boolean(
+                transaction.recurring_transaction_id
+              );
+
             const title =
               getTitle(transaction);
 
@@ -195,7 +203,9 @@ export default function TransactionTable({
                   }
                 >
                   <div
-                    className={`${styles.transactionIcon} ${
+                    className={`${
+                      styles.transactionIcon
+                    } ${
                       isExpense
                         ? styles.expenseIcon
                         : styles.incomeIcon
@@ -231,6 +241,28 @@ export default function TransactionTable({
                           }
                         </span>
                       )}
+
+                    {isRecurring && (
+                      <span
+                        title="Generated from a recurring transaction rule"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          marginTop: "4px",
+                          width: "fit-content",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        <Repeat2
+                          size={13}
+                          strokeWidth={2}
+                        />
+
+                        Recurring
+                      </span>
+                    )}
                   </div>
                 </Link>
 
@@ -295,7 +327,9 @@ export default function TransactionTable({
                 {/* ---------------------------------------- */}
 
                 <div
-                  className={`${styles.amountCell} ${
+                  className={`${
+                    styles.amountCell
+                  } ${
                     isExpense
                       ? styles.expenseAmount
                       : styles.incomeAmount
@@ -316,6 +350,7 @@ export default function TransactionTable({
                   className={styles.actions}
                 >
                   {/* View */}
+
                   <Link
                     href={`/transactions/${transaction.id}`}
                     className={
@@ -331,6 +366,7 @@ export default function TransactionTable({
                   </Link>
 
                   {/* Edit */}
+
                   <Link
                     href={`/transactions/${transaction.id}/edit`}
                     className={
@@ -346,6 +382,7 @@ export default function TransactionTable({
                   </Link>
 
                   {/* Delete */}
+
                   <button
                     type="button"
                     className={`${styles.actionButton} ${styles.deleteButton}`}
@@ -395,6 +432,7 @@ export default function TransactionTable({
             aria-describedby="delete-transaction-description"
           >
             {/* Close */}
+
             <button
               type="button"
               className={
@@ -408,10 +446,9 @@ export default function TransactionTable({
             </button>
 
             {/* Icon */}
+
             <div
-              className={
-                styles.modalIcon
-              }
+              className={styles.modalIcon}
             >
               <AlertTriangle
                 size={22}
@@ -420,10 +457,9 @@ export default function TransactionTable({
             </div>
 
             {/* Content */}
+
             <div
-              className={
-                styles.modalContent
-              }
+              className={styles.modalContent}
             >
               <h2
                 id="delete-transaction-title"
@@ -483,6 +519,7 @@ export default function TransactionTable({
               </div>
 
               {/* Error */}
+
               {deleteError && (
                 <div
                   className={
@@ -495,6 +532,7 @@ export default function TransactionTable({
               )}
 
               {/* Actions */}
+
               <div
                 className={
                   styles.modalActions

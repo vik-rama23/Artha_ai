@@ -22,6 +22,14 @@ export type Transaction = {
   description: string | null;
   merchant: string | null;
   notes?: string | null;
+
+  /**
+   * ID of the recurring transaction rule
+   * that generated this transaction.
+   *
+   * null means this is a normal/manual transaction.
+   */
+  recurring_transaction_id: string | null;
 };
 
 export type CreateTransactionPayload = {
