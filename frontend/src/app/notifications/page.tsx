@@ -193,9 +193,9 @@ export default function NotificationsPage() {
             {notifications.map((notification) => (
               <article
                 key={notification.id}
-                className={\`\${styles.item} \${
+                className={`${styles.item} ${
                   !notification.is_read ? styles.itemUnread : ""
-                }\`}
+                }`}
               >
                 <div className={styles.icon}>
                   {getIcon(notification)}
