@@ -3,6 +3,7 @@ from datetime import date, datetime
 from decimal import Decimal
 
 from sqlalchemy import (
+    Boolean,
     Date,
     DateTime,
     ForeignKey,
@@ -17,8 +18,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base
 
 
-class Transaction(Base):
-    __tablename__ = "transactions"
+class RecurringTransaction(Base):
+    __tablename__ = "recurring_transactions"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -28,43 +29,33 @@ class Transaction(Base):
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey(
-            "users.id",
-            ondelete="CASCADE",
-        ),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
     account_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey(
-            "accounts.id",
-            ondelete="CASCADE",
-        ),
+        ForeignKey("accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
     category_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey(
-            "categories.id",
-            ondelete="SET NULL",
-        ),
+        ForeignKey("categories.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
 
-    recurring_transaction_id: Mapped[
-        uuid.UUID | None
-    ] = mapped_column(
-        UUID(as_uuid=True),
-        ForeignKey(
-            "recurring_transactions.id",
-            ondelete="SET NULL",
-        ),
-        nullable=True,
+    name: Mapped[str] = mapped_column(
+        String(150),
+        nullable=False,
+    )
+
+    recurring_type: Mapped[str] = mapped_column(
+        String(30),
+        nullable=False,
         index=True,
     )
 
@@ -78,14 +69,29 @@ class Transaction(Base):
         nullable=False,
     )
 
-    transaction_date: Mapped[date] = mapped_column(
+    frequency: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+    )
+
+    start_date: Mapped[date] = mapped_column(
+        Date,
+        nullable=False,
+    )
+
+    end_date: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True,
+    )
+
+    next_occurrence: Mapped[date] = mapped_column(
         Date,
         nullable=False,
         index=True,
     )
 
-    description: Mapped[str | None] = mapped_column(
-        String(255),
+    last_generated_date: Mapped[date | None] = mapped_column(
+        Date,
         nullable=True,
     )
 
@@ -94,9 +100,22 @@ class Transaction(Base):
         nullable=True,
     )
 
+    description: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
     notes: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+        server_default="true",
+        index=True,
     )
 
     created_at: Mapped[datetime] = mapped_column(

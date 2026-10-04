@@ -78,6 +78,8 @@ class TransactionResponse(BaseModel):
     category_id: UUID | None
     category_name: str
 
+    recurring_transaction_id: UUID | None = None
+
     transaction_type: str
     amount: Decimal
     transaction_date: date

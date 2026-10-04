@@ -10,6 +10,7 @@ import {
   Menu,
   PiggyBank,
   Receipt,
+  Repeat,
   Settings,
   Tags,
   Wallet,
@@ -41,6 +42,11 @@ const navigation = [
     label: "Transactions",
     icon: Receipt,
     href: "/transactions",
+  },
+  {
+    label: "Recurring Transactions",
+    icon: Repeat,
+    href: "/recurring-transactions",
   },
   {
     label: "Accounts",
@@ -91,10 +97,13 @@ export default function AppShell({
 
     async function loadUser() {
       try {
-        const response = await fetch("/api/backend/api/v1/auth/me", {
-          method: "GET",
-          cache: "no-store",
-        });
+        const response = await fetch(
+          "/api/backend/api/v1/auth/me",
+          {
+            method: "GET",
+            cache: "no-store",
+          }
+        );
 
         if (!response.ok) {
           if (!cancelled) {
@@ -110,7 +119,10 @@ export default function AppShell({
           setUser(data);
         }
       } catch (error) {
-        console.error("Failed to load authenticated user:", error);
+        console.error(
+          "Failed to load authenticated user:",
+          error
+        );
 
         if (!cancelled) {
           setUser(null);
@@ -141,9 +153,12 @@ export default function AppShell({
     setLoggingOut(true);
 
     try {
-      await fetch("/api/backend/api/v1/auth/logout", {
-        method: "POST",
-      });
+      await fetch(
+        "/api/backend/api/v1/auth/logout",
+        {
+          method: "POST",
+        }
+      );
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
@@ -167,7 +182,9 @@ export default function AppShell({
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
+    .map((part) =>
+      part.charAt(0).toUpperCase()
+    )
     .join("");
 
   return (
@@ -175,7 +192,9 @@ export default function AppShell({
       <button
         type="button"
         className={`${styles.mobileOverlay} ${
-          sidebarOpen ? styles.mobileOverlayVisible : ""
+          sidebarOpen
+            ? styles.mobileOverlayVisible
+            : ""
         }`}
         aria-label="Close navigation"
         onClick={() => setSidebarOpen(false)}
@@ -183,7 +202,9 @@ export default function AppShell({
 
       <aside
         className={`${styles.sidebar} ${
-          sidebarOpen ? styles.sidebarOpen : ""
+          sidebarOpen
+            ? styles.sidebarOpen
+            : ""
         }`}
       >
         <div className={styles.brand}>
@@ -203,16 +224,24 @@ export default function AppShell({
 
           <button
             type="button"
-            className={styles.mobileCloseButton}
+            className={
+              styles.mobileCloseButton
+            }
             aria-label="Close navigation"
-            onClick={() => setSidebarOpen(false)}
+            onClick={() =>
+              setSidebarOpen(false)
+            }
           >
             <X size={20} />
           </button>
         </div>
 
         <nav className={styles.navigation}>
-          <div className={styles.navigationLabel}>
+          <div
+            className={
+              styles.navigationLabel
+            }
+          >
             MONEY
           </div>
 
@@ -223,38 +252,56 @@ export default function AppShell({
               item.href === "/"
                 ? pathname === "/"
                 : pathname === item.href ||
-                  pathname.startsWith(`${item.href}/`);
+                  pathname.startsWith(
+                    `${item.href}/`
+                  );
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`${styles.navItem} ${
-                  isActive ? styles.navItemActive : ""
+                  isActive
+                    ? styles.navItemActive
+                    : ""
                 }`}
                 aria-current={
-                  isActive ? "page" : undefined
+                  isActive
+                    ? "page"
+                    : undefined
                 }
               >
-                <Icon size={19} strokeWidth={1.9} />
+                <Icon
+                  size={19}
+                  strokeWidth={1.9}
+                />
+
                 <span>{item.label}</span>
               </Link>
             );
           })}
 
-          <div className={styles.navigationLabel}>
+          <div
+            className={
+              styles.navigationLabel
+            }
+          >
             ACCOUNT
           </div>
 
           <Link
             href="/settings"
             className={`${styles.navItem} ${
-              pathname.startsWith("/settings")
+              pathname.startsWith(
+                "/settings"
+              )
                 ? styles.navItemActive
                 : ""
             }`}
             aria-current={
-              pathname.startsWith("/settings")
+              pathname.startsWith(
+                "/settings"
+              )
                 ? "page"
                 : undefined
             }
@@ -263,19 +310,36 @@ export default function AppShell({
               size={19}
               strokeWidth={1.9}
             />
+
             <span>Settings</span>
           </Link>
         </nav>
 
-        <div className={styles.sidebarFooter}>
-          <div className={styles.userCard}>
-            <div className={styles.userAvatar}>
-              {userLoading ? "…" : userInitials || "U"}
+        <div
+          className={
+            styles.sidebarFooter
+          }
+        >
+          <div
+            className={styles.userCard}
+          >
+            <div
+              className={
+                styles.userAvatar
+              }
+            >
+              {userLoading
+                ? "…"
+                : userInitials || "U"}
             </div>
 
-            <div className={styles.userInfo}>
+            <div
+              className={styles.userInfo}
+            >
               <strong>
-                {userLoading ? "Loading..." : userName}
+                {userLoading
+                  ? "Loading..."
+                  : userName}
               </strong>
 
               <span>
@@ -288,26 +352,38 @@ export default function AppShell({
 
           <button
             type="button"
-            className={styles.logoutButton}
+            className={
+              styles.logoutButton
+            }
             onClick={handleLogout}
             disabled={loggingOut}
           >
             <LogOut size={17} />
 
             <span>
-              {loggingOut ? "Logging out..." : "Logout"}
+              {loggingOut
+                ? "Logging out..."
+                : "Logout"}
             </span>
           </button>
         </div>
       </aside>
 
       <div className={styles.main}>
-        <header className={styles.mobileHeader}>
+        <header
+          className={
+            styles.mobileHeader
+          }
+        >
           <button
             type="button"
-            className={styles.mobileMenuButton}
+            className={
+              styles.mobileMenuButton
+            }
             aria-label="Open navigation"
-            onClick={() => setSidebarOpen(true)}
+            onClick={() =>
+              setSidebarOpen(true)
+            }
           >
             <Menu size={22} />
           </button>
@@ -327,7 +403,9 @@ export default function AppShell({
           </Link>
         </header>
 
-        <div className={styles.content}>
+        <div
+          className={styles.content}
+        >
           {children}
         </div>
       </div>

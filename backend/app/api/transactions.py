@@ -91,6 +91,7 @@ def build_transaction_response(
             if category is not None
             else "Uncategorized"
         ),
+        recurring_transaction_id=transaction.recurring_transaction_id,
         transaction_type=transaction.transaction_type,
         amount=transaction.amount,
         transaction_date=transaction.transaction_date,
