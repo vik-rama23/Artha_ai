@@ -3,7 +3,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import case, func
+from sqlalchemy import case, func, or_
 from sqlalchemy.orm import Session
 
 from app.db import models
@@ -426,6 +426,7 @@ def get_transactions(
     transaction_type: str | None = None,
     start_date: date | None = None,
     end_date: date | None = None,
+    search: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> tuple[list[Transaction], int]:
@@ -506,6 +507,34 @@ def get_transactions(
         query = query.filter(
             Transaction.transaction_date <= end_date
         )
+
+    # ---------------------------------------------------------
+    # Search filter
+    #
+    # Searches both merchant and description.
+    # ilike() makes the search case-insensitive.
+    # ---------------------------------------------------------
+
+    if search is not None:
+
+        normalized_search = search.strip()
+
+        if normalized_search:
+
+            search_pattern = (
+                f"%{normalized_search}%"
+            )
+
+            query = query.filter(
+                or_(
+                    Transaction.merchant.ilike(
+                        search_pattern
+                    ),
+                    Transaction.description.ilike(
+                        search_pattern
+                    ),
+                )
+            )
 
     # ---------------------------------------------------------
     # Total count BEFORE pagination

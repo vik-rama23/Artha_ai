@@ -2,10 +2,12 @@ import Link from "next/link";
 
 import {
   getAnalyticsComparison,
+  getAnalyticsInsights,
   getCategoryTrends,
   getExpensesByCategory,
   getIncomeExpenseSummary,
   getMonthlyCashFlow,
+  getSavingsTrend,
   getTopTransactions,
 } from "@/lib/api/analytics";
 
@@ -506,6 +508,8 @@ export default async function AnalyticsPage({
     comparison,
     categoryTrends,
     topTransactions,
+    savingsTrend,
+    analyticsInsights,
   ] = await Promise.all([
     getIncomeExpenseSummary(
       analyticsQuery
@@ -546,6 +550,8 @@ export default async function AnalyticsPage({
       ...analyticsQuery,
       limit: 5,
     }),
+    getSavingsTrend(analyticsQuery),
+    getAnalyticsInsights(analyticsQuery),
   ]);
 
   const income =
@@ -605,39 +611,6 @@ export default async function AnalyticsPage({
       )
     );
 
-  const averageMonthlyExpense =
-    monthlyItems.length > 0
-      ? monthlyItems.reduce(
-          (
-            total,
-            item
-          ) =>
-            total +
-            getNumericValue(
-              item.expense
-            ),
-          0
-        ) / monthlyItems.length
-      : expense;
-
-  const highestExpenseMonth =
-    monthlyItems.length > 0
-      ? [...monthlyItems].sort(
-          (a, b) =>
-            getNumericValue(
-              b.expense
-            ) -
-            getNumericValue(
-              a.expense
-            )
-        )[0]
-      : null;
-
-  const highestExpenseCategory =
-    categoryItems.length > 0
-      ? categoryItems[0]
-      : null;
-
   const comparisonIncome =
     comparison?.income;
 
@@ -652,6 +625,12 @@ export default async function AnalyticsPage({
 
   const categoryTrendItems =
     categoryTrends?.items ?? [];
+
+  const savingsTrendItems =
+    savingsTrend.items;
+
+  const insightItems =
+    analyticsInsights.insights;
 
   return (
     <main className={styles.page}>
@@ -1432,141 +1411,144 @@ export default async function AnalyticsPage({
             >
               <div>
                 <h2>
-                  Spending Insights
+                  Financial Insights
                 </h2>
 
                 <p>
-                  Highlights calculated
-                  from your transaction
-                  data.
+                  Highlights generated from your selected period.
                 </p>
               </div>
             </div>
 
-            <div
-              className={
-                styles.insightList
-              }
-            >
+            {insightItems.length === 0 ? (
+              <div className={styles.emptyState}>
+                No financial insights are available for this period.
+              </div>
+            ) : (
               <div
                 className={
-                  styles.insight
+                  styles.insightList
                 }
               >
-                <span
-                  className={
-                    styles.insightNumber
-                  }
-                >
-                  01
-                </span>
+                {insightItems.slice(0, 6).map(
+                  (insight, index) => (
+                    <div
+                      className={
+                        styles.insight
+                      }
+                      key={`${insight.type}-${index}`}
+                    >
+                      <span
+                        className={
+                          styles.insightNumber
+                        }
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
 
-                <div>
-                  <strong>
-                    Average monthly
-                    expense
-                  </strong>
+                      <div>
+                        <strong>
+                          {insight.title}
+                        </strong>
 
-                  <p>
-                    {formatCurrency(
-                      averageMonthlyExpense
-                    )}
-                  </p>
-                </div>
+                        <p>
+                          {insight.message}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                )}
               </div>
-
-              <div
-                className={
-                  styles.insight
-                }
-              >
-                <span
-                  className={
-                    styles.insightNumber
-                  }
-                >
-                  02
-                </span>
-
-                <div>
-                  <strong>
-                    Highest spending
-                    category
-                  </strong>
-
-                  <p>
-                    {highestExpenseCategory
-                      ? `${highestExpenseCategory.category_name} · ${formatCurrency(
-                          highestExpenseCategory.numericAmount
-                        )}`
-                      : "No category data"}
-                  </p>
-                </div>
-              </div>
-
-              <div
-                className={
-                  styles.insight
-                }
-              >
-                <span
-                  className={
-                    styles.insightNumber
-                  }
-                >
-                  03
-                </span>
-
-                <div>
-                  <strong>
-                    Highest expense
-                    month
-                  </strong>
-
-                  <p>
-                    {highestExpenseMonth
-                      ? `${formatMonth(
-                          highestExpenseMonth.month
-                        )} · ${formatCurrency(
-                          highestExpenseMonth.expense
-                        )}`
-                      : "No monthly data"}
-                  </p>
-                </div>
-              </div>
-
-              <div
-                className={
-                  styles.insight
-                }
-              >
-                <span
-                  className={
-                    styles.insightNumber
-                  }
-                >
-                  04
-                </span>
-
-                <div>
-                  <strong>
-                    Money retained
-                  </strong>
-
-                  <p>
-                    {formatCurrency(
-                      net
-                    )}{" "}
-                    ·{" "}
-                    {savingsRate.toFixed(
-                      1
-                    )}
-                    % of income
-                  </p>
-                </div>
-              </div>
-            </div>
+            )}
           </article>
+        </section>
+
+        <section
+          className={styles.card}
+        >
+          <div
+            className={
+              styles.cardHeader
+            }
+          >
+            <div>
+              <h2>
+                Savings Trend
+              </h2>
+
+              <p>
+                Monthly savings and savings rate during the selected period.
+              </p>
+            </div>
+
+            <div>
+              <strong className={styles.totalExpense}>
+                {formatCurrency(savingsTrend.total_savings)}
+              </strong>
+
+              <span>
+                {getNumericValue(
+                  savingsTrend.average_savings_rate
+                ).toFixed(1)}% average savings rate
+              </span>
+            </div>
+          </div>
+
+          {savingsTrendItems.length === 0 ? (
+            <div className={styles.emptyState}>
+              No savings trend data is available for this period.
+            </div>
+          ) : (
+            <div className={styles.trendList}>
+              <div className={styles.trendHeader}>
+                <span>Month</span>
+                <span>Income</span>
+                <span>Expenses</span>
+                <span>Savings</span>
+              </div>
+
+              {savingsTrendItems.map((item) => {
+                const itemSavings = getNumericValue(item.savings);
+                const itemSavingsRate = getNumericValue(
+                  item.savings_rate
+                );
+
+                return (
+                  <div
+                    className={styles.trendRow}
+                    key={item.month}
+                  >
+                    <div>
+                      <strong>
+                        {formatMonth(item.month)}
+                      </strong>
+                      <span>
+                        {itemSavingsRate.toFixed(1)}% savings rate
+                      </span>
+                    </div>
+
+                    <span>
+                      {formatCurrency(item.income)}
+                    </span>
+
+                    <span>
+                      {formatCurrency(item.expense)}
+                    </span>
+
+                    <span
+                      className={
+                        itemSavings >= 0
+                          ? styles.changePositive
+                          : styles.changeNegative
+                      }
+                    >
+                      {formatCurrency(itemSavings)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         <section

@@ -1,168 +1,233 @@
 .filters {
-  padding: 18px 22px;
-  border-bottom: 1px solid #eee9df;
+  padding: 24px 40px 26px;
+  border-bottom: 1px solid #ebe6dc;
   background: #fcfaf5;
 }
 
-.filterHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
+/* ============================================================
+   SEARCH
+   ============================================================ */
+
+.searchWrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
-.filterHeader > div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.searchIcon {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  color: #65756d;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
-.filterHeader strong {
-  color: #19352a;
-  font-size: 13px;
+.searchInput {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px 0 48px;
+
+  border: 1px solid #dcd6c9;
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  color: #243b32;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  outline: none;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+
+  box-sizing: border-box;
 }
 
-.filterHeader span {
-  color: #8a918b;
-  font-size: 11px;
+.searchInput::placeholder {
+  color: #8b938d;
+  font-weight: 400;
 }
 
-.clearButton {
-  border: 0;
-  padding: 5px 0;
-  background: transparent;
-  color: #727c75;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
+.searchInput:hover {
+  border-color: #c8c0b1;
 }
 
-.clearButton:hover:not(:disabled) {
-  color: #1f5a43;
+.searchInput:focus {
+  border-color: #21644f;
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(33, 100, 79, 0.09);
 }
 
-.clearButton:disabled {
-  color: #b5b9b5;
-  cursor: not-allowed;
-}
+/* ============================================================
+   FILTER GRID
+   ============================================================ */
 
 .filterGrid {
   display: grid;
+
   grid-template-columns:
-    minmax(0, 1.4fr)
+    minmax(0, 1.25fr)
+    minmax(0, 1.25fr)
     minmax(0, 1fr)
-    minmax(0, 1fr)
-    auto;
-  gap: 12px;
-  align-items: end;
+    minmax(0, 0.85fr);
+
+  gap: 16px;
 }
+
+/* ============================================================
+   FIELD
+   ============================================================ */
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+
+  min-width: 0;
 }
 
-.field label {
-  color: #56635b;
-  font-size: 11px;
+.field span {
+  color: #34483f;
+
+  font-size: 12px;
   font-weight: 700;
+
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.field select,
+.field input[type="date"] {
+  width: 100%;
+  height: 46px;
+
+  padding: 0 38px 0 14px;
+
+  border: 1px solid #dcd6c9;
+  border-radius: 11px;
+
+  background-color: #ffffff;
+
+  color: #253c33;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+
+  outline: none;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .field select {
-  width: 100%;
-  height: 42px;
-  box-sizing: border-box;
-  border: 1px solid #ddd7ca;
-  border-radius: 10px;
-  outline: none;
-  padding: 0 38px 0 12px;
-  background-color: #fffefa;
-  color: #19352a;
-  font-family: inherit;
-  font-size: 13px;
-  cursor: pointer;
-
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
 
   background-image:
     linear-gradient(
       45deg,
       transparent 50%,
-      #66736b 50%
+      #6f7b74 50%
     ),
     linear-gradient(
       135deg,
-      #66736b 50%,
+      #6f7b74 50%,
       transparent 50%
     );
 
   background-position:
-    calc(100% - 17px) 17px,
-    calc(100% - 12px) 17px;
+    calc(100% - 18px) 19px,
+    calc(100% - 13px) 19px;
 
   background-size:
     5px 5px,
     5px 5px;
 
   background-repeat: no-repeat;
+}
+
+.field input[type="date"] {
+  padding-right: 14px;
+}
+
+.field select:hover,
+.field input[type="date"]:hover {
+  border-color: #c8c0b1;
+}
+
+.field select:focus,
+.field input[type="date"]:focus {
+  border-color: #21644f;
+
+  box-shadow:
+    0 0 0 3px rgba(33, 100, 79, 0.09);
+}
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 20px;
+}
+
+.applyButton,
+.clearButton {
+  height: 42px;
+
+  border-radius: 10px;
+
+  padding: 0 20px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
 
   transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.field select:hover {
-  border-color: #cfc8ba;
-}
-
-.field select:focus {
-  border-color: #70917e;
-  box-shadow:
-    0 0 0 3px rgba(31, 90, 67, 0.08);
-}
-
-.field select:disabled {
-  background-color: #f3f1eb;
-  color: #8a918b;
-  cursor: not-allowed;
-}
-
-.actionField {
-  display: flex;
-  align-items: flex-end;
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    background-color 0.16s ease,
+    border-color 0.16s ease;
 }
 
 .applyButton {
-  height: 42px;
-  min-width: 120px;
-  border: 1px solid #1f5a43;
-  border-radius: 10px;
-  padding: 0 15px;
-  background: #1f5a43;
-  color: #fffdf7;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
+  border: 1px solid #21644f;
+
+  background: #21644f;
+
+  color: #ffffff;
+
   box-shadow:
-    0 4px 10px rgba(31, 90, 67, 0.1);
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease,
-    box-shadow 0.15s ease,
-    transform 0.15s ease;
+    0 4px 10px rgba(33, 100, 79, 0.14);
 }
 
 .applyButton:hover {
-  border-color: #174735;
-  background: #174735;
+  background: #1b5744;
+
   box-shadow:
-    0 6px 14px rgba(31, 90, 67, 0.15);
+    0 6px 14px rgba(33, 100, 79, 0.18);
+
   transform: translateY(-1px);
 }
 
@@ -170,39 +235,124 @@
   transform: translateY(0);
 }
 
-@media (max-width: 850px) {
+.clearButton {
+  border: 1px solid transparent;
+
+  background: transparent;
+
+  color: #65756d;
+}
+
+.clearButton:hover {
+  border-color: #dcd6c9;
+  background: #f5f1e9;
+  color: #243b32;
+}
+
+/* ============================================================
+   CUSTOM DATE RANGE
+   ============================================================ */
+
+.filterGrid
+  .field:nth-last-child(2),
+.filterGrid
+  .field:nth-last-child(1) {
+  min-width: 0;
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 1100px) {
+  .filters {
+    padding: 22px 28px 24px;
+  }
+
   .filterGrid {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
   }
-
-  .actionField {
-    grid-column: 1 / -1;
-  }
-
-  .applyButton {
-    width: 100%;
-  }
 }
 
-@media (max-width: 600px) {
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 700px) {
   .filters {
-    padding: 16px;
+    padding: 18px;
   }
 
-  .filterHeader {
-    align-items: flex-start;
+  .searchWrapper {
+    margin-bottom: 16px;
+  }
+
+  .searchInput {
+    height: 46px;
   }
 
   .filterGrid {
     grid-template-columns: 1fr;
+    gap: 14px;
   }
 
-  .actionField {
-    grid-column: auto;
+  .field select,
+  .field input[type="date"] {
+    height: 44px;
   }
 
-  .applyButton {
-    width: 100%;
+  .actions {
+    justify-content: stretch;
+
+    margin-top: 18px;
   }
+
+  .applyButton,
+  .clearButton {
+    flex: 1;
+  }
+}
+
+.searchClear {
+  position: absolute;
+
+  top: 50%;
+  right: 14px;
+
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: #f1eee7;
+
+  color: #65756d;
+
+  font-size: 20px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transform: translateY(-50%);
+
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.searchClear:hover {
+  background: #e8e3d9;
+  color: #243b32;
+}
+
+.searchInput {
+  padding-right: 52px;
 }

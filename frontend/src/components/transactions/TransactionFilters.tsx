@@ -1,172 +1,281 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import {
+  Search,
+} from "lucide-react";
 
 import {
-  getAccounts,
-  type Account,
-} from "@/lib/api/accounts";
+  useMemo,
+  useState,
+} from "react";
+
+import {
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+
+import type { Account } from "@/lib/api/accounts";
+
+import type { Category } from "@/lib/api/categories";
 
 import styles from "./TransactionFilters.module.scss";
 
-type DateFilter =
-  | ""
-  | "today"
-  | "this_week"
-  | "this_month"
-  | "last_month";
+type TransactionFiltersProps = {
+  accounts: Account[];
+  categories: Category[];
+  search: string;
+  onSearchChange: (
+    value: string
+  ) => void;
+};
 
-function formatDate(
-  date: Date
-): string {
-  const year = date.getFullYear();
-  const month = String(
-    date.getMonth() + 1
-  ).padStart(2, "0");
-  const day = String(
-    date.getDate()
-  ).padStart(2, "0");
+type TransactionType =
+  | "INCOME"
+  | "EXPENSE"
+  | "";
 
-  return `${year}-${month}-${day}`;
-}
-
-function getDateRange(
-  filter: DateFilter
-): {
-  startDate?: string;
-  endDate?: string;
-} {
-  const now = new Date();
-
-  if (filter === "today") {
-    const today = formatDate(now);
-
-    return {
-      startDate: today,
-      endDate: today,
-    };
-  }
-
-  if (filter === "this_week") {
-    const currentDay = now.getDay();
-
-    const mondayOffset =
-      currentDay === 0
-        ? -6
-        : 1 - currentDay;
-
-    const monday = new Date(now);
-    monday.setDate(
-      now.getDate() + mondayOffset
-    );
-
-    return {
-      startDate: formatDate(monday),
-      endDate: formatDate(now),
-    };
-  }
-
-  if (filter === "this_month") {
-    const firstDay = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      1
-    );
-
-    return {
-      startDate: formatDate(firstDay),
-      endDate: formatDate(now),
-    };
-  }
-
-  if (filter === "last_month") {
-    const firstDayLastMonth =
-      new Date(
-        now.getFullYear(),
-        now.getMonth() - 1,
-        1
-      );
-
-    const lastDayLastMonth =
-      new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        0
-      );
-
-    return {
-      startDate: formatDate(
-        firstDayLastMonth
-      ),
-      endDate: formatDate(
-        lastDayLastMonth
-      ),
-    };
-  }
-
-  return {};
-}
-
-export default function TransactionFilters() {
+export default function TransactionFilters({
+  accounts,
+  categories,
+  search,
+  onSearchChange,
+}: TransactionFiltersProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const searchParams =
+    useSearchParams();
 
-  const [accounts, setAccounts] =
-    useState<Account[]>([]);
+  const initialAccount =
+    searchParams.get("account_id") ??
+    "";
+
+  const initialCategory =
+    searchParams.get("category_id") ??
+    "";
+
+  const initialType =
+    (searchParams.get(
+      "transaction_type"
+    ) as TransactionType) ?? "";
+
+  const initialStartDate =
+    searchParams.get("start_date") ??
+    "";
+
+  const initialEndDate =
+    searchParams.get("end_date") ??
+    "";
 
   const [accountId, setAccountId] =
-    useState(
-      searchParams.get("account_id") ?? ""
-    );
+    useState(initialAccount);
+
+  const [categoryId, setCategoryId] =
+    useState(initialCategory);
 
   const [transactionType, setTransactionType] =
-    useState<
-      "" | "INCOME" | "EXPENSE"
-    >(
-      (searchParams.get(
-        "transaction_type"
-      ) as
-        | ""
-        | "INCOME"
-        | "EXPENSE") ?? ""
+    useState<TransactionType>(
+      initialType
     );
 
   const [dateFilter, setDateFilter] =
-    useState<DateFilter>("");
+    useState(() => {
+      if (
+        initialStartDate &&
+        initialEndDate
+      ) {
+        return "custom";
+      }
 
-  const [loadingAccounts, setLoadingAccounts] =
-    useState(true);
+      return "";
+    });
 
-  useEffect(() => {
-    async function loadAccounts() {
-      try {
-        const data = await getAccounts();
-        setAccounts(data);
-      } catch (error) {
-        console.error(
-          "Failed to load accounts:",
-          error
+  const [customStartDate, setCustomStartDate] =
+    useState(initialStartDate);
+
+  const [customEndDate, setCustomEndDate] =
+    useState(initialEndDate);
+
+  const filteredCategories =
+    useMemo(() => {
+      return categories.filter(
+        (category) => {
+          if (!category.is_active) {
+            return false;
+          }
+
+          if (
+            transactionType &&
+            category.category_type !==
+              transactionType
+          ) {
+            return false;
+          }
+
+          return true;
+        }
+      );
+    }, [
+      categories,
+      transactionType,
+    ]);
+
+  function handleTypeChange(
+    value: TransactionType
+  ) {
+    setTransactionType(value);
+
+    if (
+      categoryId &&
+      value
+    ) {
+      const selectedCategory =
+        categories.find(
+          (category) =>
+            category.id ===
+            categoryId
         );
-      } finally {
-        setLoadingAccounts(false);
+
+      if (
+        selectedCategory &&
+        selectedCategory.category_type !==
+          value
+      ) {
+        setCategoryId("");
       }
     }
+  }
 
-    loadAccounts();
-  }, []);
-
-  function handleApply(
-    event: FormEvent<HTMLFormElement>
+  function formatDate(
+    date: Date
   ) {
-    event.preventDefault();
+    return date
+      .toISOString()
+      .split("T")[0];
+  }
 
-    const params = new URLSearchParams();
+  function handleDateChange(
+    value: string
+  ) {
+    setDateFilter(value);
+
+    const today =
+      new Date();
+
+    if (value === "today") {
+      const date =
+        formatDate(today);
+
+      setCustomStartDate(date);
+      setCustomEndDate(date);
+
+      return;
+    }
+
+    if (value === "7d") {
+      const start =
+        new Date(today);
+
+      start.setDate(
+        start.getDate() - 6
+      );
+
+      setCustomStartDate(
+        formatDate(start)
+      );
+
+      setCustomEndDate(
+        formatDate(today)
+      );
+
+      return;
+    }
+
+    if (value === "30d") {
+      const start =
+        new Date(today);
+
+      start.setDate(
+        start.getDate() - 29
+      );
+
+      setCustomStartDate(
+        formatDate(start)
+      );
+
+      setCustomEndDate(
+        formatDate(today)
+      );
+
+      return;
+    }
+
+    if (value === "this_month") {
+      const start =
+        new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          1
+        );
+
+      setCustomStartDate(
+        formatDate(start)
+      );
+
+      setCustomEndDate(
+        formatDate(today)
+      );
+
+      return;
+    }
+
+    if (value === "last_month") {
+      const start =
+        new Date(
+          today.getFullYear(),
+          today.getMonth() - 1,
+          1
+        );
+
+      const end =
+        new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          0
+        );
+
+      setCustomStartDate(
+        formatDate(start)
+      );
+
+      setCustomEndDate(
+        formatDate(end)
+      );
+
+      return;
+    }
+
+    if (value !== "custom") {
+      setCustomStartDate("");
+      setCustomEndDate("");
+    }
+  }
+
+  function handleApply() {
+    const params =
+      new URLSearchParams();
 
     if (accountId) {
       params.set(
         "account_id",
         accountId
+      );
+    }
+
+    if (categoryId) {
+      params.set(
+        "category_id",
+        categoryId
       );
     }
 
@@ -177,184 +286,317 @@ export default function TransactionFilters() {
       );
     }
 
-    const {
-      startDate,
-      endDate,
-    } = getDateRange(dateFilter);
-
-    if (startDate) {
+    if (customStartDate) {
       params.set(
         "start_date",
-        startDate
+        customStartDate
       );
     }
 
-    if (endDate) {
+    if (customEndDate) {
       params.set(
         "end_date",
-        endDate
+        customEndDate
       );
     }
+
+    /*
+     * Search is intentionally NOT added
+     * to the URL because it is a
+     * frontend-only filter.
+     */
+
+    params.delete("page");
 
     const queryString =
       params.toString();
 
     router.push(
       queryString
-        ? `/transactions?${queryString}`
-        : "/transactions"
+        ? `${pathname}?${queryString}`
+        : pathname
     );
   }
 
   function handleClear() {
     setAccountId("");
+    setCategoryId("");
     setTransactionType("");
     setDateFilter("");
+    setCustomStartDate("");
+    setCustomEndDate("");
 
-    router.push("/transactions");
+    onSearchChange("");
+
+    router.push(pathname);
   }
 
   return (
-    <form
-      className={styles.filters}
-      onSubmit={handleApply}
-    >
-      <div className={styles.filterHeader}>
-        <div>
-          <strong>Filter Transactions</strong>
-
-          <span>
-            Narrow transactions by account,
-            type or date.
-          </span>
-        </div>
-
-        <button
-          type="button"
-          className={styles.clearButton}
-          onClick={handleClear}
-          disabled={
-            !accountId &&
-            !transactionType &&
-            !dateFilter
+    <div className={styles.filters}>
+      <div
+        className={
+          styles.searchWrapper
+        }
+      >
+        <Search
+          size={20}
+          className={
+            styles.searchIcon
           }
-        >
-          Clear filters
-        </button>
+        />
+
+        <input
+          type="search"
+          value={search}
+          onChange={(event) =>
+            onSearchChange(
+              event.target.value
+            )
+          }
+          placeholder="Search by merchant or description..."
+          className={
+            styles.searchInput
+          }
+          aria-label="Search transactions"
+        />
+
+        {search && (
+          <button
+            type="button"
+            className={
+              styles.searchClear
+            }
+            onClick={() =>
+              onSearchChange("")
+            }
+            aria-label="Clear search"
+          >
+            ×
+          </button>
+        )}
       </div>
 
-      <div className={styles.filterGrid}>
-        <div className={styles.field}>
-          <label htmlFor="account-filter">
+      <div
+        className={
+          styles.filterGrid
+        }
+      >
+        <label
+          className={styles.field}
+        >
+          <span>
             Account
-          </label>
+          </span>
 
           <select
-            id="account-filter"
             value={accountId}
             onChange={(event) =>
               setAccountId(
                 event.target.value
               )
             }
-            disabled={loadingAccounts}
           >
             <option value="">
-              {loadingAccounts
-                ? "Loading accounts..."
-                : "All Accounts"}
+              All accounts
             </option>
 
-            {accounts.map((account) => (
-              <option
-                key={account.id}
-                value={account.id}
-              >
-                {account.name}
-                {account.institution_name
-                  ? ` · ${account.institution_name}`
-                  : ""}
-              </option>
-            ))}
+            {accounts.map(
+              (account) => (
+                <option
+                  key={account.id}
+                  value={account.id}
+                >
+                  {account.name}
+                </option>
+              )
+            )}
           </select>
-        </div>
+        </label>
 
-        <div className={styles.field}>
-          <label htmlFor="type-filter">
-            Transaction Type
-          </label>
+        <label
+          className={styles.field}
+        >
+          <span>
+            Category
+          </span>
 
           <select
-            id="type-filter"
-            value={transactionType}
+            value={categoryId}
             onChange={(event) =>
-              setTransactionType(
-                event.target.value as
-                  | ""
-                  | "INCOME"
-                  | "EXPENSE"
+              setCategoryId(
+                event.target.value
               )
             }
           >
             <option value="">
-              All Types
+              All categories
+            </option>
+
+            {filteredCategories.map(
+              (category) => (
+                <option
+                  key={category.id}
+                  value={category.id}
+                >
+                  {category.name}
+                </option>
+              )
+            )}
+          </select>
+        </label>
+
+        <label
+          className={styles.field}
+        >
+          <span>
+            Type
+          </span>
+
+          <select
+            value={transactionType}
+            onChange={(event) =>
+              handleTypeChange(
+                event.target
+                  .value as TransactionType
+              )
+            }
+          >
+            <option value="">
+              All types
             </option>
 
             <option value="EXPENSE">
-              Expenses
+              Expense
             </option>
 
             <option value="INCOME">
               Income
             </option>
           </select>
-        </div>
+        </label>
 
-        <div className={styles.field}>
-          <label htmlFor="date-filter">
+        <label
+          className={styles.field}
+        >
+          <span>
             Date
-          </label>
+          </span>
 
           <select
-            id="date-filter"
             value={dateFilter}
             onChange={(event) =>
-              setDateFilter(
-                event.target.value as DateFilter
+              handleDateChange(
+                event.target.value
               )
             }
           >
             <option value="">
-              All Dates
+              All dates
             </option>
 
             <option value="today">
               Today
             </option>
 
-            <option value="this_week">
-              This Week
+            <option value="7d">
+              Last 7 days
+            </option>
+
+            <option value="30d">
+              Last 30 days
             </option>
 
             <option value="this_month">
-              This Month
+              This month
             </option>
 
             <option value="last_month">
-              Last Month
+              Last month
+            </option>
+
+            <option value="custom">
+              Custom range
             </option>
           </select>
-        </div>
+        </label>
 
-        <div className={styles.actionField}>
-          <button
-            type="submit"
-            className={styles.applyButton}
-          >
-            Apply Filters
-          </button>
-        </div>
+        {dateFilter ===
+          "custom" && (
+          <>
+            <label
+              className={
+                styles.field
+              }
+            >
+              <span>
+                Start date
+              </span>
+
+              <input
+                type="date"
+                value={
+                  customStartDate
+                }
+                onChange={(event) =>
+                  setCustomStartDate(
+                    event.target
+                      .value
+                  )
+                }
+              />
+            </label>
+
+            <label
+              className={
+                styles.field
+              }
+            >
+              <span>
+                End date
+              </span>
+
+              <input
+                type="date"
+                value={
+                  customEndDate
+                }
+                onChange={(event) =>
+                  setCustomEndDate(
+                    event.target
+                      .value
+                  )
+                }
+              />
+            </label>
+          </>
+        )}
       </div>
-    </form>
+
+      <div
+        className={
+          styles.actions
+        }
+      >
+        <button
+          type="button"
+          className={
+            styles.clearButton
+          }
+          onClick={handleClear}
+        >
+          Clear
+        </button>
+
+        <button
+          type="button"
+          className={
+            styles.applyButton
+          }
+          onClick={handleApply}
+        >
+          Apply Filters
+        </button>
+      </div>
+    </div>
   );
 }

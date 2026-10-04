@@ -7,23 +7,27 @@ import {
 } from "@/lib/api/transactions";
 
 import { getServerTransactions } from "@/lib/api/serverTransactions";
+import { getServerAccounts } from "@/lib/api/serverAccounts";
+import { getServerCategories } from "@/lib/api/serverCategories";
 
-import TransactionFilters from "@/components/transactions/TransactionFilters";
-
-import TransactionTable from "@/components/transactions/TransactionTable";
+import TransactionResults from "@/components/transactions/TransactionResults";
 
 import type { Transaction } from "@/types/transaction";
 
 import styles from "./transactions.module.scss";
 
+const PAGE_SIZE = 20;
+
 type TransactionsPageProps = {
   searchParams: Promise<{
     account_id?: string;
+    category_id?: string;
     transaction_type?:
       | "INCOME"
       | "EXPENSE";
     start_date?: string;
     end_date?: string;
+    page?: string;
   }>;
 };
 
@@ -32,12 +36,26 @@ export default async function TransactionsPage({
 }: TransactionsPageProps) {
   const params = await searchParams;
 
+  const requestedPage = Number(
+    params.page ?? "1"
+  );
+
+  const currentPage =
+    Number.isFinite(requestedPage) &&
+    requestedPage > 0
+      ? Math.floor(requestedPage)
+      : 1;
+
   const filters: TransactionFilterParams = {
     accountId: params.account_id,
+    categoryId: params.category_id,
     transactionType:
       params.transaction_type,
     startDate: params.start_date,
     endDate: params.end_date,
+    limit: PAGE_SIZE,
+    offset:
+      (currentPage - 1) * PAGE_SIZE,
   };
 
   let transactions: Transaction[] = [];
@@ -61,11 +79,84 @@ export default async function TransactionsPage({
     error = true;
   }
 
+  const [accounts, categories] =
+    await Promise.all([
+      getServerAccounts(),
+      getServerCategories(),
+    ]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(total / PAGE_SIZE)
+  );
+
+  const safeCurrentPage = Math.min(
+    currentPage,
+    totalPages
+  );
+
   const hasFilters =
     Boolean(params.account_id) ||
+    Boolean(params.category_id) ||
     Boolean(params.transaction_type) ||
     Boolean(params.start_date) ||
     Boolean(params.end_date);
+
+  function buildPageUrl(
+    page: number
+  ): string {
+    const query =
+      new URLSearchParams();
+
+    if (params.account_id) {
+      query.set(
+        "account_id",
+        params.account_id
+      );
+    }
+
+    if (params.category_id) {
+      query.set(
+        "category_id",
+        params.category_id
+      );
+    }
+
+    if (params.transaction_type) {
+      query.set(
+        "transaction_type",
+        params.transaction_type
+      );
+    }
+
+    if (params.start_date) {
+      query.set(
+        "start_date",
+        params.start_date
+      );
+    }
+
+    if (params.end_date) {
+      query.set(
+        "end_date",
+        params.end_date
+      );
+    }
+
+    if (page > 1) {
+      query.set(
+        "page",
+        String(page)
+      );
+    }
+
+    const queryString =
+      query.toString();
+
+    return queryString
+      ? `/transactions?${queryString}`
+      : "/transactions";
+  }
 
   return (
     <main className={styles.page}>
@@ -129,8 +220,6 @@ export default async function TransactionsPage({
           )}
         </div>
 
-        <TransactionFilters />
-
         {error ? (
           <div
             className={
@@ -148,37 +237,148 @@ export default async function TransactionsPage({
               port 8001.
             </span>
           </div>
-        ) : transactions.length ===
-          0 ? (
-          <div
-            className={
-              styles.emptyState
-            }
-          >
-            <strong>
-              No transactions found
-            </strong>
-
-            <span>
-              Try changing or
-              clearing your filters.
-            </span>
-
-            <Link
-              href="/transactions"
-              className={
-                styles.emptyButton
-              }
-            >
-              Clear Filters
-            </Link>
-          </div>
         ) : (
-          <TransactionTable
-            transactions={
-              transactions
-            }
-          />
+          <>
+            <TransactionResults
+              transactions={
+                transactions
+              }
+              total={total}
+              accounts={accounts}
+              categories={categories}
+            />
+
+            {transactions.length >
+              0 &&
+              totalPages > 1 && (
+                <div
+                  className={
+                    styles.pagination
+                  }
+                >
+                  <div
+                    className={
+                      styles.paginationSummary
+                    }
+                  >
+                    Page{" "}
+                    <strong>
+                      {safeCurrentPage}
+                    </strong>{" "}
+                    of{" "}
+                    <strong>
+                      {totalPages}
+                    </strong>
+                  </div>
+
+                  <div
+                    className={
+                      styles.paginationControls
+                    }
+                  >
+                    {safeCurrentPage >
+                      1 ? (
+                      <Link
+                        href={buildPageUrl(
+                          safeCurrentPage -
+                            1
+                        )}
+                        className={
+                          styles.paginationButton
+                        }
+                      >
+                        Previous
+                      </Link>
+                    ) : (
+                      <span
+                        className={`${styles.paginationButton} ${styles.paginationDisabled}`}
+                      >
+                        Previous
+                      </span>
+                    )}
+
+                    <div
+                      className={
+                        styles.paginationPages
+                      }
+                    >
+                      {Array.from(
+                        {
+                          length:
+                            totalPages,
+                        },
+                        (_, index) =>
+                          index + 1
+                      )
+                        .filter(
+                          (page) => {
+                            if (
+                              totalPages <=
+                              7
+                            ) {
+                              return true;
+                            }
+
+                            if (
+                              page === 1 ||
+                              page ===
+                                totalPages
+                            ) {
+                              return true;
+                            }
+
+                            return (
+                              Math.abs(
+                                page -
+                                  safeCurrentPage
+                              ) <= 1
+                            );
+                          }
+                        )
+                        .map(
+                          (page) => (
+                            <Link
+                              key={page}
+                              href={buildPageUrl(
+                                page
+                              )}
+                              className={
+                                page ===
+                                safeCurrentPage
+                                  ? `${styles.paginationPage} ${styles.paginationPageActive}`
+                                  : styles.paginationPage
+                              }
+                            >
+                              {page}
+                            </Link>
+                          )
+                        )}
+                    </div>
+
+                    {safeCurrentPage <
+                    totalPages ? (
+                      <Link
+                        href={buildPageUrl(
+                          safeCurrentPage +
+                            1
+                        )}
+                        className={
+                          styles.paginationButton
+                        }
+                      >
+                        Next
+                      </Link>
+                    ) : (
+                      <span
+                        className={`${styles.paginationButton} ${styles.paginationDisabled}`}
+                      >
+                        Next
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+          </>
         )}
       </section>
     </main>

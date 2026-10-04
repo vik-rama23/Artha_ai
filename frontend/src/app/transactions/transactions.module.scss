@@ -357,3 +357,21 @@
     text-align: left;
   }
 }
+
+.searchResultSummary {
+  padding: 14px 40px;
+
+  border-bottom: 1px solid #ebe6dc;
+
+  background: #fcfaf5;
+
+  color: #7a847e;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.searchResultSummary strong {
+  color: #34483f;
+  font-weight: 700;
+}

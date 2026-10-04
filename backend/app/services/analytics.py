@@ -182,6 +182,46 @@ def get_expenses_by_category(
     }
 
 
+def _iter_month_starts(
+    start_date: date | None,
+    end_date: date | None,
+) -> list[date]:
+    """Return every calendar month touched by the requested date range."""
+    if start_date is None or end_date is None:
+        return []
+
+    current = date(
+        start_date.year,
+        start_date.month,
+        1,
+    )
+    end_month = date(
+        end_date.year,
+        end_date.month,
+        1,
+    )
+
+    months: list[date] = []
+
+    while current <= end_month:
+        months.append(current)
+
+        if current.month == 12:
+            current = date(
+                current.year + 1,
+                1,
+                1,
+            )
+        else:
+            current = date(
+                current.year,
+                current.month + 1,
+                1,
+            )
+
+    return months
+
+
 def get_monthly_cash_flow(
     db: Session,
     user_id: UUID,
@@ -247,24 +287,44 @@ def get_monthly_cash_flow(
         .all()
     )
 
+    monthly_map = {
+        row.month.strftime("%Y-%m"): {
+            "income": row.income or Decimal("0.00"),
+            "expense": row.expense or Decimal("0.00"),
+        }
+        for row in rows
+    }
+
     items = []
 
-    for row in rows:
-        income = (
-            row.income
-            or Decimal("0.00")
+    month_starts = _iter_month_starts(
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    if month_starts:
+        month_keys = [
+            month.strftime("%Y-%m")
+            for month in month_starts
+        ]
+    else:
+        month_keys = sorted(monthly_map.keys())
+
+    for month_key in month_keys:
+        month_data = monthly_map.get(
+            month_key,
+            {
+                "income": Decimal("0.00"),
+                "expense": Decimal("0.00"),
+            },
         )
 
-        expense = (
-            row.expense
-            or Decimal("0.00")
-        )
+        income = month_data["income"]
+        expense = month_data["expense"]
 
         items.append(
             {
-                "month": row.month.strftime(
-                    "%Y-%m"
-                ),
+                "month": month_key,
                 "income": income,
                 "expense": expense,
                 "net": income - expense,
@@ -746,76 +806,20 @@ def get_savings_trend(
     start_date: date | None = None,
     end_date: date | None = None,
 ) -> dict:
-    month_expression = func.date_trunc(
-        "month",
-        Transaction.transaction_date,
-    )
-
-    query = db.query(
-        month_expression.label("month"),
-        func.coalesce(
-            func.sum(
-                case(
-                    (
-                        Transaction.transaction_type
-                        == "INCOME",
-                        Transaction.amount,
-                    ),
-                    else_=Decimal("0.00"),
-                )
-            ),
-            Decimal("0.00"),
-        ).label("income"),
-        func.coalesce(
-            func.sum(
-                case(
-                    (
-                        Transaction.transaction_type
-                        == "EXPENSE",
-                        Transaction.amount,
-                    ),
-                    else_=Decimal("0.00"),
-                )
-            ),
-            Decimal("0.00"),
-        ).label("expense"),
-    ).filter(
-        Transaction.user_id == user_id,
-    )
-
-    if start_date is not None:
-        query = query.filter(
-            Transaction.transaction_date >= start_date
-        )
-
-    if end_date is not None:
-        query = query.filter(
-            Transaction.transaction_date <= end_date
-        )
-
-    rows = (
-        query
-        .group_by(month_expression)
-        .order_by(month_expression.asc())
-        .all()
+    monthly_cash_flow = get_monthly_cash_flow(
+        db=db,
+        user_id=user_id,
+        start_date=start_date,
+        end_date=end_date,
     )
 
     items = []
-
     total_income = Decimal("0.00")
     total_expense = Decimal("0.00")
 
-    for row in rows:
-        income = (
-            row.income
-            or Decimal("0.00")
-        )
-
-        expense = (
-            row.expense
-            or Decimal("0.00")
-        )
-
+    for month in monthly_cash_flow["items"]:
+        income = month["income"]
+        expense = month["expense"]
         savings = income - expense
 
         if income > Decimal("0.00"):
@@ -834,7 +838,7 @@ def get_savings_trend(
 
         items.append(
             {
-                "month": row.month.strftime("%Y-%m"),
+                "month": month["month"],
                 "income": income,
                 "expense": expense,
                 "savings": savings,
@@ -996,9 +1000,15 @@ def get_analytics_insights(
 
     monthly_items = monthly_cash_flow["items"]
 
-    if monthly_items:
+    expense_months = [
+        item
+        for item in monthly_items
+        if item["expense"] > Decimal("0.00")
+    ]
+
+    if expense_months:
         highest_expense_month = max(
-            monthly_items,
+            expense_months,
             key=lambda item: item["expense"],
         )
 
@@ -1016,25 +1026,45 @@ def get_analytics_insights(
             }
         )
 
-        # -----------------------------------------------------
-        # Highest savings month
-        # -----------------------------------------------------
+    # ---------------------------------------------------------
+    # Best savings / cash-flow month
+    # ---------------------------------------------------------
 
+    active_cash_flow_months = [
+        item
+        for item in monthly_items
+        if item["net"] != Decimal("0.00")
+    ]
+
+    if active_cash_flow_months:
         highest_savings_month = max(
-            monthly_items,
+            active_cash_flow_months,
             key=lambda item: item["net"],
         )
+
+        highest_savings_value = highest_savings_month["net"]
+
+        if highest_savings_value > Decimal("0.00"):
+            title = "Highest savings month"
+            message = (
+                f"{highest_savings_month['month']} "
+                f"had your highest savings "
+                f"of ₹{highest_savings_value}."
+            )
+        else:
+            title = "Best cash-flow month"
+            message = (
+                f"{highest_savings_month['month']} "
+                f"had your best cash flow at "
+                f"₹{highest_savings_value}."
+            )
 
         insights.append(
             {
                 "type": "HIGHEST_SAVINGS_MONTH",
-                "title": "Highest savings month",
-                "message": (
-                    f"{highest_savings_month['month']} "
-                    f"had your highest monthly savings "
-                    f"of ₹{highest_savings_month['net']}."
-                ),
-                "value": highest_savings_month["net"],
+                "title": title,
+                "message": message,
+                "value": highest_savings_value,
                 "percentage": None,
             }
         )
@@ -1051,7 +1081,7 @@ def get_analytics_insights(
                     "title": "Positive cash flow",
                     "message": (
                         f"You saved ₹{savings} "
-                        f"more than you spent during this period."
+                        f"during this period after expenses."
                     ),
                     "value": savings,
                     "percentage": savings_rate,

@@ -2,10 +2,12 @@ import { serverApiClient } from "./serverClient";
 
 import type {
   AnalyticsComparisonResponse,
+  AnalyticsInsightsResponse,
   CategoryTrendsResponse,
   ExpenseByCategoryResponse,
   IncomeExpenseSummary,
   MonthlyCashFlowResponse,
+  SavingsTrendResponse,
   TopTransactionsResponse,
 } from "@/types/analytics";
 
@@ -153,5 +155,21 @@ export async function getTopTransactions(
     `/api/v1/analytics/top-transactions${buildTopTransactionsQuery(
       query
     )}`
+  );
+}
+
+export async function getSavingsTrend(
+  query: AnalyticsQuery = {}
+): Promise<SavingsTrendResponse> {
+  return serverApiClient<SavingsTrendResponse>(
+    `/api/v1/analytics/savings-trend${buildQuery(query)}`
+  );
+}
+
+export async function getAnalyticsInsights(
+  query: AnalyticsQuery = {}
+): Promise<AnalyticsInsightsResponse> {
+  return serverApiClient<AnalyticsInsightsResponse>(
+    `/api/v1/analytics/insights${buildQuery(query)}`
   );
 }

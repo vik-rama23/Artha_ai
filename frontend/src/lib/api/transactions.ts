@@ -9,21 +9,31 @@ import type {
 
 export type TransactionFilters = {
   accountId?: string;
+  categoryId?: string;
   transactionType?: "INCOME" | "EXPENSE";
   startDate?: string;
   endDate?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
 };
 
 export async function getTransactions(
   filters?: TransactionFilters
 ): Promise<TransactionListResponse> {
-  const params =
-    new URLSearchParams();
+  const params = new URLSearchParams();
 
   if (filters?.accountId) {
     params.set(
       "account_id",
       filters.accountId
+    );
+  }
+
+  if (filters?.categoryId) {
+    params.set(
+      "category_id",
+      filters.categoryId
     );
   }
 
@@ -45,6 +55,31 @@ export async function getTransactions(
     params.set(
       "end_date",
       filters.endDate
+    );
+  }
+
+  if (filters?.search?.trim()) {
+    params.set(
+      "search",
+      filters.search.trim()
+    );
+  }
+
+  if (
+    filters?.limit !== undefined
+  ) {
+    params.set(
+      "limit",
+      String(filters.limit)
+    );
+  }
+
+  if (
+    filters?.offset !== undefined
+  ) {
+    params.set(
+      "offset",
+      String(filters.offset)
     );
   }
 

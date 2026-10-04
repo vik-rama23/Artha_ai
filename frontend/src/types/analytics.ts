@@ -99,6 +99,42 @@ export type TopTransactionsResponse = {
   items: TopTransactionItem[];
 };
 
+export type SavingsTrendItem = {
+  month: string;
+  income: NumericValue;
+  expense: NumericValue;
+  savings: NumericValue;
+  savings_rate: NumericValue;
+};
+
+export type SavingsTrendResponse = {
+  start_date: string | null;
+  end_date: string | null;
+  total_income: NumericValue;
+  total_expense: NumericValue;
+  total_savings: NumericValue;
+  average_savings_rate: NumericValue;
+  items: SavingsTrendItem[];
+};
+
+export type AnalyticsInsight = {
+  type: string;
+  title: string;
+  message: string;
+  value: NumericValue;
+  percentage: NumericValue | null;
+};
+
+export type AnalyticsInsightsResponse = {
+  start_date: string | null;
+  end_date: string | null;
+  income: NumericValue;
+  expense: NumericValue;
+  savings: NumericValue;
+  savings_rate: NumericValue;
+  insights: AnalyticsInsight[];
+};
+
 export type AnalyticsData = {
   summary: IncomeExpenseSummary;
   expensesByCategory: ExpenseByCategoryResponse;
@@ -106,4 +142,6 @@ export type AnalyticsData = {
   comparison: AnalyticsComparisonResponse | null;
   categoryTrends: CategoryTrendsResponse | null;
   topTransactions: TopTransactionsResponse;
+  savingsTrend: SavingsTrendResponse | null;
+  insights: AnalyticsInsightsResponse | null;
 };

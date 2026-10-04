@@ -265,6 +265,10 @@ def list_transactions(
     ),
     start_date: date | None = None,
     end_date: date | None = None,
+    search: str | None = Query(
+        default=None,
+        max_length=100,
+    ),
     limit: int = Query(
         default=50,
         ge=1,
@@ -306,6 +310,7 @@ def list_transactions(
             transaction_type=transaction_type,
             start_date=start_date,
             end_date=end_date,
+            search=search,
             limit=limit,
             offset=offset,
         )
