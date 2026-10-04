@@ -276,8 +276,19 @@
    MOBILE HEADER
    ============================================================ */
 
+.desktopHeader {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 40;
+}
+
 .mobileHeader {
   display: none;
+}
+
+.desktopHeader > div {
+  display: block;
 }
 
 .mobileMenuButton {
