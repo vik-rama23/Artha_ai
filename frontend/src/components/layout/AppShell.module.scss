@@ -356,6 +356,10 @@
    ============================================================ */
 
 @media (max-width: 800px) {
+  .desktopHeader {
+    display: none;
+  }
+
   .sidebar {
     width: 280px;
 
