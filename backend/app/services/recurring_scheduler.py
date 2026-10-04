@@ -7,6 +7,9 @@ from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
 from app.models.users import User
+from app.services.notifications import (
+    process_notifications_for_user,
+)
 from app.services.recurring_transactions import (
     process_due_recurring_transactions,
 )
@@ -17,8 +20,8 @@ logger = logging.getLogger("artha.scheduler")
 # PostgreSQL advisory lock ID.
 #
 # This prevents multiple Artha scheduler instances from processing
-# recurring transactions at the same time, including multiple
-# Uvicorn workers/processes.
+# recurring transactions and notification events at the same time,
+# including multiple Uvicorn workers/processes.
 RECURRING_SCHEDULER_LOCK_ID = 839274
 
 
@@ -63,17 +66,11 @@ def release_scheduler_lock(db: Session) -> None:
 
 def process_due_recurring_transactions_for_all_users() -> dict:
     """
-    Process all due recurring transactions across active users.
+    Process recurring transactions and in-app notifications for all users.
 
-    This function is intentionally synchronous because the underlying
-    SQLAlchemy session and recurring transaction service are synchronous.
-
-    The async scheduler loop invokes this function using
-    asyncio.to_thread() so database processing does not block the
-    scheduler's event loop.
-
-    Returns:
-        Dictionary containing processing statistics.
+    Notifications are evaluated before due recurring transactions are
+    generated so overdue rules can produce an overdue notification before
+    a scheduler catch-up advances their next occurrence.
     """
 
     db = SessionLocal()
@@ -82,11 +79,9 @@ def process_due_recurring_transactions_for_all_users() -> dict:
     total_generated = 0
     total_processed_rules = 0
     total_skipped_rules = 0
+    total_notifications_created = 0
 
     try:
-        # ---------------------------------------------------------
-        # Acquire PostgreSQL scheduler lock
-        # ---------------------------------------------------------
         lock_acquired = acquire_scheduler_lock(db)
 
         if not lock_acquired:
@@ -100,6 +95,7 @@ def process_due_recurring_transactions_for_all_users() -> dict:
                 "processed_rules": 0,
                 "generated_transactions": 0,
                 "skipped_rules": 0,
+                "notifications_created": 0,
                 "items": [],
                 "skipped_due_to_lock": True,
             }
@@ -108,9 +104,6 @@ def process_due_recurring_transactions_for_all_users() -> dict:
             "Recurring scheduler: concurrency lock acquired."
         )
 
-        # ---------------------------------------------------------
-        # Find users
-        # ---------------------------------------------------------
         user_ids = db.query(User.id).all()
 
         if not user_ids:
@@ -123,6 +116,7 @@ def process_due_recurring_transactions_for_all_users() -> dict:
                 "processed_rules": 0,
                 "generated_transactions": 0,
                 "skipped_rules": 0,
+                "notifications_created": 0,
                 "items": [],
             }
 
@@ -131,11 +125,22 @@ def process_due_recurring_transactions_for_all_users() -> dict:
             len(user_ids),
         )
 
-        # ---------------------------------------------------------
-        # Process recurring transactions for each user
-        # ---------------------------------------------------------
         for (user_id,) in user_ids:
             try:
+                notification_result = process_notifications_for_user(
+                    db=db,
+                    user_id=user_id,
+                )
+
+                notifications_created = notification_result.get(
+                    "notifications_created",
+                    0,
+                )
+
+                total_notifications_created += (
+                    notifications_created
+                )
+
                 result = process_due_recurring_transactions(
                     db,
                     user_id,
@@ -162,10 +167,12 @@ def process_due_recurring_transactions_for_all_users() -> dict:
 
                 logger.info(
                     "Recurring scheduler: user=%s "
+                    "notifications_created=%s "
                     "processed_rules=%s "
                     "generated_transactions=%s "
                     "skipped_rules=%s",
                     user_id,
+                    notifications_created,
                     processed_rules,
                     generated,
                     skipped_rules,
@@ -179,14 +186,13 @@ def process_due_recurring_transactions_for_all_users() -> dict:
                     user_id,
                 )
 
-        # ---------------------------------------------------------
-        # Final summary
-        # ---------------------------------------------------------
         logger.info(
             "Recurring scheduler completed: "
+            "notifications_created=%s "
             "processed_rules=%s "
             "generated_transactions=%s "
             "skipped_rules=%s",
+            total_notifications_created,
             total_processed_rules,
             total_generated,
             total_skipped_rules,
@@ -197,6 +203,7 @@ def process_due_recurring_transactions_for_all_users() -> dict:
             "processed_rules": total_processed_rules,
             "generated_transactions": total_generated,
             "skipped_rules": total_skipped_rules,
+            "notifications_created": total_notifications_created,
             "items": [],
         }
 
@@ -213,13 +220,11 @@ def process_due_recurring_transactions_for_all_users() -> dict:
             "processed_rules": total_processed_rules,
             "generated_transactions": total_generated,
             "skipped_rules": total_skipped_rules,
+            "notifications_created": total_notifications_created,
             "items": [],
         }
 
     finally:
-        # ---------------------------------------------------------
-        # Release PostgreSQL scheduler lock
-        # ---------------------------------------------------------
         if lock_acquired:
             try:
                 release_scheduler_lock(db)
@@ -241,13 +246,10 @@ async def recurring_scheduler_loop(
     interval_seconds: int,
 ) -> None:
     """
-    Continuously process due recurring transactions.
+    Continuously process due recurring transactions and notifications.
 
     The scheduler runs once immediately and then repeats according
     to the configured interval.
-
-    The synchronous database processing function is executed in a
-    worker thread so it does not block the asyncio event loop.
     """
 
     logger.info(
