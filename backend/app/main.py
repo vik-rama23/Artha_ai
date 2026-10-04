@@ -11,6 +11,7 @@ from app.api.auth import router as auth_router
 from app.api.budgets import router as budgets_router
 from app.api.categories import router as categories_router
 from app.api.dashboard import router as dashboard_router
+from app.api.notifications import router as notifications_router
 from app.api.recurring_transactions import (
     router as recurring_transactions_router,
 )
@@ -87,6 +88,7 @@ async def lifespan(app: FastAPI):
                 "Recurring transaction scheduler stopped."
             )
 
+
 app = FastAPI(
     title="Artha API",
     description="Personal Finance & Expense Management API",
@@ -105,18 +107,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/health")
 def health_check():
     return {
         "status": "ok",
         "service": "artha-api",
     }
+
+
 app.include_router(auth_router)
 app.include_router(accounts_router)
 app.include_router(analytics_router)
 app.include_router(budgets_router)
 app.include_router(dashboard_router)
 app.include_router(categories_router)
+app.include_router(notifications_router)
 app.include_router(
     recurring_transactions_router
 )
