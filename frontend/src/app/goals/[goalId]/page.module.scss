@@ -224,6 +224,12 @@
   gap: 4px;
 }
 
+.progressSubtext {
+  color: #8b928d;
+  font-size: 8px;
+  font-weight: 500;
+}
+
 .progressLabel,
 .targetAmount span {
   color: #929992;
@@ -268,9 +274,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 8px;
+  gap: 12px;
+  margin-top: 9px;
   color: #8b928d;
   font-size: 8px;
+}
+
+.progressPercent {
+  color: #53665a;
+  font-weight: 700;
 }
 
 .completedText {
@@ -331,6 +343,11 @@
   background: #faf8f2;
 }
 
+.deadlineCard.onTrack { border-color: #dbe7df; background: #f7fbf8; }
+.deadlineCard.dueSoon { border-color: #e8dfc7; background: #fcfaf4; }
+.deadlineCard.overdue { border-color: #ead7cf; background: #fdf8f5; }
+.deadlineCard.completed { border-color: #d8e8dd; background: #f5faf6; }
+
 .deadlineIcon {
   display: flex;
   flex-shrink: 0;
@@ -343,21 +360,40 @@
   color: #65736a;
 }
 
-.deadlineCard > div:last-child {
+.deadlineContent {
   display: flex;
+  min-width: 0;
+  flex: 1;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
-.deadlineCard strong {
-  color: #536159;
-  font-size: 9px;
+.deadlineTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.deadlineCard span {
-  color: #959b96;
-  font-size: 8px;
+.deadlineCard strong { color: #536159; font-size: 9px; }
+.deadlineCard span { color: #959b96; font-size: 8px; }
+
+.deadlineStatus {
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #ece9df;
+  color: #68746c !important;
+  font-size: 7px !important;
+  font-weight: 700;
 }
+
+.onTrack .deadlineIcon,
+.completed .deadlineIcon { background: #e2eee6; color: #357657; }
+.dueSoon .deadlineIcon { background: #f0e8d4; color: #9a722d; }
+.overdue .deadlineIcon { background: #f3e1d9; color: #a85f3d; }
+.onTrack .deadlineStatus,
+.completed .deadlineStatus { background: #e2eee6; color: #357657 !important; }
+.dueSoon .deadlineStatus { background: #f0e8d4; color: #9a722d !important; }
+.overdue .deadlineStatus { background: #f3e1d9; color: #a85f3d !important; }
 
 /* ============================================================
    CONTRIBUTIONS
@@ -813,6 +849,12 @@
 
   .currentAmount {
     font-size: 22px;
+  }
+
+  .deadlineTitleRow {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
   }
 
   .summaryGrid {
