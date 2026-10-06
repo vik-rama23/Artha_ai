@@ -871,17 +871,10 @@ def generate_recurring_transaction(
     )
 
     validate_category(
-
         db=db,
-
         user_id=user_id,
-
         category_id=recurring_transaction.category_id,
-
-        recurring_transaction_id=recurring_transaction.id,
-
         transaction_type=recurring_transaction.transaction_type,
-
     )
 
     transaction = Transaction(
