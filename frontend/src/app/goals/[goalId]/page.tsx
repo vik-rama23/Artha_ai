@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   CircleAlert,
   Target,
+  TrendingUp,
 } from "lucide-react";
 import { notFound } from "next/navigation";
 
@@ -596,28 +597,51 @@ export default async function GoalDetailsPage({
                   contribution,
                 ) => (
                   <div
-                    key={
-                      contribution.id
-                    }
-                    className={
-                      styles.contributionRow
-                    }
+                    key={contribution.id}
+                    className={styles.contributionRow}
                   >
-                    <div
-                      className={
-                        styles.contributionDate
-                      }
-                    >
+                    <div className={styles.contributionDate}>
                       <span>
-                        {new Intl.DateTimeFormat(
-                          "en-IN",
-                          {
-                            day: "2-digit",
-                          },
-                        ).format(
+                        {new Intl.DateTimeFormat("en-IN", {
+                          day: "2-digit",
+                        }).format(
                           new Date(
                             `${contribution.contribution_date}T00:00:00`,
                           ),
+                        )}
+                      </span>
+
+                      <small>
+                        {new Intl.DateTimeFormat("en-IN", {
+                          month: "short",
+                          year: "numeric",
+                        }).format(
+                          new Date(
+                            `${contribution.contribution_date}T00:00:00`,
+                          ),
+                        )}
+                      </small>
+                    </div>
+
+                    <div className={styles.contributionInfo}>
+                      <span className={styles.contributionLabel}>
+                        Contribution
+                      </span>
+
+                      <strong>
+                        {formatCurrency(contribution.amount)}
+                      </strong>
+
+                      <span className={styles.contributionNote}>
+                        {contribution.notes || "Added to this goal"}
+                      </span>
+                    </div>
+
+                    <div className={styles.contributionAmount}>
+                      <TrendingUp size={15} strokeWidth={1.8} />
+                      <span>Added</span>
+                    </div>
+                  </div>                ),
                         )}
                       </span>
 
