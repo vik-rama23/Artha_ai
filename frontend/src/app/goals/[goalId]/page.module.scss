@@ -130,23 +130,43 @@
   gap: 8px;
 }
 
-.addButton {
+.addButton,
+.editButton {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   min-height: 37px;
   padding: 0 13px;
-  border: 1px solid #285a45;
   border-radius: 8px;
-  background: #285a45;
-  color: #ffffff;
   cursor: pointer;
   font-size: 9px;
   font-weight: 700;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.addButton {
+  border: 1px solid #285a45;
+  background: #285a45;
+  color: #ffffff;
 }
 
 .addButton:hover {
   background: #204b39;
+}
+
+.editButton {
+  border: 1px solid #d7dfd9;
+  background: #f7faf8;
+  color: #285a45;
+}
+
+.editButton:hover {
+  border-color: #b9cbbf;
+  background: #eef5f0;
 }
 
 .deleteButton {
@@ -165,6 +185,13 @@
 .deleteButton:hover {
   border-color: #d9bbae;
   background: #fbf1eb;
+}
+
+.deleteButton:focus-visible,
+.editButton:focus-visible,
+.addButton:focus-visible {
+  outline: 3px solid rgba(40, 90, 69, 0.12);
+  outline-offset: 2px;
 }
 
 .deleteButton:disabled {
