@@ -593,9 +593,7 @@ export default async function GoalDetailsPage({
               }
             >
               {goal.contributions.map(
-                (
-                  contribution,
-                ) => (
+                (contribution) => (
                   <div
                     key={contribution.id}
                     className={styles.contributionRow}
@@ -640,45 +638,6 @@ export default async function GoalDetailsPage({
                     <div className={styles.contributionAmount}>
                       <TrendingUp size={15} strokeWidth={1.8} />
                       <span>Added</span>
-                    </div>
-                  </div>                ),
-                        )}
-                      </span>
-
-                      <small>
-                        {new Intl.DateTimeFormat(
-                          "en-IN",
-                          {
-                            month:
-                              "short",
-                            year: "numeric",
-                          },
-                        ).format(
-                          new Date(
-                            `${contribution.contribution_date}T00:00:00`,
-                          ),
-                        )}
-                      </small>
-                    </div>
-
-                    <div
-                      className={
-                        styles.contributionInfo
-                      }
-                    >
-                      <strong>
-                        {formatCurrency(
-                          contribution.amount,
-                        )}
-                      </strong>
-
-                      {contribution.notes && (
-                        <span>
-                          {
-                            contribution.notes
-                          }
-                        </span>
-                      )}
                     </div>
                   </div>
                 ),
