@@ -1028,6 +1028,46 @@
 }
 
 @media (max-width: 520px) {
+
+  .goalsHeader {
+    align-items: center;
+  }
+
+  .goalsLink {
+    font-size: 11px;
+  }
+
+  .goalRow {
+    grid-template-columns: 34px minmax(0, 1fr) 16px;
+    gap: 10px;
+    padding: 13px 14px;
+  }
+
+  .goalRowIcon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .goalRowMeta {
+    font-size: 9px;
+  }
+
+  .goalsEmpty {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 16px 14px;
+  }
+
+  .createGoalLink {
+    width: 100%;
+    justify-content: flex-start;
+    margin-left: 53px;
+  }
+
+  .goalsCompleted {
+    padding: 16px 14px;
+  }
+
   .page {
     padding: 20px 14px 32px;
   }
