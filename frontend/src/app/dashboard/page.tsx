@@ -8,14 +8,18 @@ import {
   CreditCard,
   IndianRupee,
   PiggyBank,
+  Target,
+  TrendingUp,
   Wallet,
 } from "lucide-react";
 
 import { getDashboard } from "@/lib/api/dashboard";
+import { getGoals } from "@/lib/api/goalsServer";
 import type {
   DashboardData,
   DashboardTransaction,
 } from "@/types/dashboard";
+import type { Goal } from "@/types/goal";
 
 import styles from "./dashboard.module.scss";
 
@@ -158,13 +162,23 @@ function getMaxCashFlowValue(
 
 export default async function DashboardPage() {
   let dashboard: DashboardData | null = null;
+  let goals: Goal[] = [];
   let error = false;
+  let goalsError = false;
 
   try {
     dashboard = await getDashboard();
   } catch (err) {
     console.error("Failed to load dashboard:", err);
     error = true;
+  }
+
+  try {
+    const goalsResponse = await getGoals();
+    goals = goalsResponse.items;
+  } catch (err) {
+    console.error("Failed to load dashboard goals:", err);
+    goalsError = true;
   }
 
   if (error || !dashboard) {
@@ -213,6 +227,51 @@ export default async function DashboardPage() {
           dashboard.monthly_cash_flow.length - 1
         ]
       : null;
+
+  const activeGoals = goals
+    .filter((goal) => !goal.is_completed)
+    .sort((a, b) => {
+      const aTarget = Number(a.target_amount) || 0;
+      const bTarget = Number(b.target_amount) || 0;
+      const aProgress =
+        aTarget > 0
+          ? (Number(a.current_amount) || 0) / aTarget
+          : 0;
+      const bProgress =
+        bTarget > 0
+          ? (Number(b.current_amount) || 0) / bTarget
+          : 0;
+
+      return bProgress - aProgress;
+    })
+    .slice(0, 3);
+
+  const completedGoals = goals.filter(
+    (goal) => goal.is_completed
+  ).length;
+
+  const totalGoalTarget = goals.reduce(
+    (total, goal) =>
+      total + (Number(goal.target_amount) || 0),
+    0
+  );
+
+  const totalGoalSaved = goals.reduce(
+    (total, goal) =>
+      total + (Number(goal.current_amount) || 0),
+    0
+  );
+
+  const totalGoalProgress =
+    totalGoalTarget > 0
+      ? Math.min(
+          Math.max(
+            (totalGoalSaved / totalGoalTarget) * 100,
+            0
+          ),
+          100
+        )
+      : 0;
 
   return (
     <main className={styles.page}>
@@ -339,6 +398,165 @@ export default async function DashboardPage() {
           </p>
         </article>
       </section>
+
+
+      {/* -------------------------------------------------- */}
+      {/* Goals */}
+      {/* -------------------------------------------------- */}
+
+      {!goalsError && (
+        <section className={styles.goalsCard}>
+          <div className={styles.goalsHeader}>
+            <div>
+              <p className={styles.goalsEyebrow}>
+                FINANCIAL PLANNING
+              </p>
+
+              <h2>Goals</h2>
+
+              <p>
+                {goals.length === 0
+                  ? "Turn your plans into achievable financial milestones."
+                  : goals.length + " " +
+                    (goals.length === 1 ? "goal" : "goals") +
+                    " · " +
+                    completedGoals +
+                    " completed"}
+              </p>
+            </div>
+
+            <Link
+              href="/goals"
+              className={styles.goalsLink}
+            >
+              View all goals
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          {goals.length === 0 ? (
+            <div className={styles.goalsEmpty}>
+              <div className={styles.goalsEmptyIcon}>
+                <Target size={20} strokeWidth={1.8} />
+              </div>
+
+              <div>
+                <strong>No financial goals yet</strong>
+                <span>
+                  Create a goal to start tracking your progress.
+                </span>
+              </div>
+
+              <Link
+                href="/goals/new"
+                className={styles.createGoalLink}
+              >
+                Create goal
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className={styles.goalsOverview}>
+                <div className={styles.goalOverviewValue}>
+                  <span>Saved across goals</span>
+                  <strong>{formatCurrency(totalGoalSaved)}</strong>
+                </div>
+
+                <div className={styles.goalOverviewProgress}>
+                  <div className={styles.goalOverviewLabels}>
+                    <span>
+                      {totalGoalProgress.toFixed(0)}% of total target
+                    </span>
+                    <span>{formatCurrency(totalGoalTarget)}</span>
+                  </div>
+
+                  <div className={styles.goalOverviewTrack}>
+                    <div
+                      className={styles.goalOverviewBar}
+                      style={{
+                        width: totalGoalProgress + "%",
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {activeGoals.length > 0 ? (
+                <div className={styles.goalList}>
+                  {activeGoals.map((goal) => {
+                    const target =
+                      Number(goal.target_amount) || 0;
+                    const current =
+                      Number(goal.current_amount) || 0;
+                    const progress =
+                      target > 0
+                        ? Math.min(
+                            Math.max((current / target) * 100, 0),
+                            100
+                          )
+                        : 0;
+                    const remaining = Math.max(
+                      target - current,
+                      0
+                    );
+
+                    return (
+                      <Link
+                        key={goal.id}
+                        href={"/goals/" + goal.id}
+                        className={styles.goalRow}
+                      >
+                        <div className={styles.goalRowIcon}>
+                          <Target size={17} strokeWidth={1.8} />
+                        </div>
+
+                        <div className={styles.goalRowInfo}>
+                          <div className={styles.goalRowTop}>
+                            <strong>{goal.name}</strong>
+                            <span>{progress.toFixed(0)}%</span>
+                          </div>
+
+                          <div className={styles.goalRowTrack}>
+                            <div
+                              className={styles.goalRowBar}
+                              style={{
+                                width: progress + "%",
+                              }}
+                            />
+                          </div>
+
+                          <div className={styles.goalRowMeta}>
+                            <span>
+                              {formatCurrency(current)} saved
+                            </span>
+                            <span>
+                              {formatCurrency(remaining)} remaining
+                            </span>
+                          </div>
+                        </div>
+
+                        <TrendingUp
+                          className={styles.goalRowArrow}
+                          size={16}
+                          strokeWidth={1.8}
+                        />
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className={styles.goalsCompleted}>
+                  <Target size={18} strokeWidth={1.8} />
+                  <span>
+                    All your goals are complete. Great work!
+                  </span>
+                </div>
+              )}
+            </>
+          )}
+        </section>
+      )}
 
       {/* -------------------------------------------------- */}
       {/* Main Analytics */}
