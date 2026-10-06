@@ -442,9 +442,14 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  min-height: 68px;
-  padding: 11px 21px;
+  min-height: 76px;
+  padding: 12px 21px;
   border-bottom: 1px solid #eee9e0;
+  transition: background 0.15s ease;
+}
+
+.contributionRow:hover {
+  background: #fcfbf7;
 }
 
 .contributionRow:last-child {
@@ -454,7 +459,7 @@
 .contributionDate {
   display: flex;
   flex-shrink: 0;
-  width: 43px;
+  width: 48px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -477,21 +482,42 @@
 .contributionInfo {
   display: flex;
   min-width: 0;
+  flex: 1;
   flex-direction: column;
   gap: 3px;
 }
 
-.contributionInfo strong {
-  color: #3f574a;
-  font-size: 10px;
+.contributionLabel {
+  color: #9a9f9a;
+  font-size: 7px;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-.contributionInfo span {
+.contributionInfo strong {
+  color: #315343;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.contributionNote {
   overflow: hidden;
-  color: #969c97;
+  color: #8d958f;
   font-size: 8px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.contributionAmount {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  color: #39704d;
+  font-size: 7px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .emptyContributions {
@@ -867,7 +893,16 @@
   }
 
   .contributionRow {
+    gap: 10px;
     padding: 10px 14px;
+  }
+
+  .contributionAmount {
+    display: none;
+  }
+
+  .contributionInfo strong {
+    font-size: 11px;
   }
 
   .modalOverlay {
