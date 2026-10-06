@@ -447,7 +447,7 @@ export default function GoalDetailsClient({
                 <button
                     type="button"
                     className={
-                        styles.addButton
+                        styles.editButton
                     }
                     onClick={
                         handleOpenEdit
