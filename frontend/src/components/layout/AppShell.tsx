@@ -13,6 +13,7 @@ import {
   Repeat,
   Settings,
   Tags,
+  Target,
   Wallet,
   X,
 } from "lucide-react";
@@ -64,6 +65,11 @@ const navigation = [
     label: "Budgets",
     icon: PiggyBank,
     href: "/budgets",
+  },
+  {
+    label: "Goals",
+    icon: Target,
+    href: "/goals",
   },
   {
     label: "Analytics",
