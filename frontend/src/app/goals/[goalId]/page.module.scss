@@ -833,7 +833,8 @@
     width: 100%;
   }
 
-  .addButton {
+  .addButton,
+  .editButton {
     flex: 1;
   }
 
@@ -905,13 +906,62 @@
     font-size: 11px;
   }
 
+  .actionButtons {
+    gap: 6px;
+  }
+
+  .addButton,
+  .editButton {
+    min-height: 39px;
+    padding: 0 10px;
+  }
+
+  .deleteButton {
+    width: 39px;
+    height: 39px;
+  }
+
+  .progressHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .targetAmount {
+    width: 100%;
+    text-align: left;
+  }
+
   .modalOverlay {
     align-items: flex-end;
     padding: 0;
   }
 
   .modal {
-    max-height: 90vh;
+    max-height: 92vh;
     border-radius: 15px 15px 0 0;
+  }
+
+  .modalHeader {
+    padding: 17px 16px 13px;
+  }
+
+  .contributionForm {
+    padding: 15px 16px 18px;
+  }
+
+  .modalActions {
+    position: sticky;
+    bottom: 0;
+    margin-right: -16px;
+    margin-bottom: -18px;
+    margin-left: -16px;
+    padding: 10px 16px;
+    border-top: 1px solid #ebe5da;
+    background: #fffdf8;
+  }
+
+  .modalCancel,
+  .modalSubmit {
+    flex: 1;
   }
 }
