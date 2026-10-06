@@ -169,6 +169,30 @@ export default async function GoalDetailsPage({
     currentAmount >=
       targetAmount;
 
+  const deadlineStatus =
+    isCompleted
+      ? "completed"
+      : daysRemaining === null
+        ? "noDate"
+        : daysRemaining < 0
+          ? "overdue"
+          : daysRemaining <= 30
+            ? "dueSoon"
+            : "onTrack";
+
+  const deadlineStatusLabel =
+    isCompleted
+      ? "Goal completed"
+      : daysRemaining === null
+        ? "No deadline set"
+        : daysRemaining < 0
+          ? "Overdue"
+          : daysRemaining === 0
+            ? "Due today"
+            : daysRemaining <= 30
+              ? "Due soon"
+              : "On track";
+
   return (
     <main className={styles.page}>
       <div
@@ -316,6 +340,14 @@ export default async function GoalDetailsPage({
                   goal.current_amount,
                 )}
               </strong>
+
+              <span
+                className={
+                  styles.progressSubtext
+                }
+              >
+                {Math.round(progress)}% of your target
+              </span>
             </div>
 
             <div
@@ -356,30 +388,22 @@ export default async function GoalDetailsPage({
             }
           >
             <span>
-              {Math.round(
-                progress,
-              )}
-              % complete
+              {isCompleted
+                ? "Target reached"
+                : formatCurrency(
+                    remainingAmount.toFixed(2),
+                  ) + " remaining"}
             </span>
 
-            {isCompleted ? (
-              <span
-                className={
-                  styles.completedText
-                }
-              >
-                Goal achieved
-              </span>
-            ) : (
-              <span>
-                {formatCurrency(
-                  remainingAmount.toFixed(
-                    2,
-                  ),
-                )}{" "}
-                remaining
-              </span>
-            )}
+            <span
+              className={
+                isCompleted
+                  ? styles.completedText
+                  : styles.progressPercent
+              }
+            >
+              {Math.round(progress)}% complete
+            </span>
           </div>
         </section>
 
@@ -466,9 +490,7 @@ export default async function GoalDetailsPage({
         {/* ================================================== */}
 
         <section
-          className={
-            styles.deadlineCard
-          }
+          className={`${styles.deadlineCard} ${styles[deadlineStatus]}`}
         >
           <div
             className={
@@ -489,27 +511,27 @@ export default async function GoalDetailsPage({
             )}
           </div>
 
-          <div>
-            <strong>
-              {goal.target_date
-                ? formatTargetDate(
-                    goal.target_date,
-                  )
-                : "No target date set"}
-            </strong>
+          <div className={styles.deadlineContent}>
+            <div className={styles.deadlineTitleRow}>
+              <strong>
+                {goal.target_date
+                  ? formatTargetDate(goal.target_date)
+                  : "No target date set"}
+              </strong>
+
+              <span className={styles.deadlineStatus}>
+                {deadlineStatusLabel}
+              </span>
+            </div>
 
             <span>
               {isCompleted
                 ? "You have reached this financial goal."
-                : daysRemaining ===
-                    null
+                : daysRemaining === null
                   ? "Set a target date to track your deadline."
                   : daysRemaining < 0
-                    ? `${Math.abs(
-                        daysRemaining,
-                      )} days past the target date`
-                    : daysRemaining ===
-                        0
+                    ? `${Math.abs(daysRemaining)} days past the target date`
+                    : daysRemaining === 0
                       ? "Target date is today"
                       : `${daysRemaining} days remaining`}
             </span>
