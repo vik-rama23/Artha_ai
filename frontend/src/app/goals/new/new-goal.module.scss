@@ -1,0 +1,519 @@
+.page {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 28px 45px;
+}
+
+.container {
+  width: 100%;
+}
+
+.backRow {
+  margin-bottom: 18px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #6f7972;
+  font-size: 10px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: #285a45;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #8a928c;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  margin: 6px 0 0;
+  color: #234b3b;
+  font-size: 29px;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+}
+
+.subtitle {
+  max-width: 600px;
+  margin: 7px 0 0;
+  color: #7d877f;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   FORM CARD
+   ============================================================ */
+
+.formCard {
+  border: 1px solid #e5dfd3;
+  border-radius: 15px;
+  background: #fffdf8;
+  box-shadow: 0 5px 18px rgba(43, 53, 46, 0.045);
+}
+
+.form {
+  padding: 24px;
+}
+
+/* ============================================================
+   SECTION
+   ============================================================ */
+
+.section {
+  padding-bottom: 25px;
+  border-bottom: 1px solid #ebe5da;
+}
+
+.section + .section {
+  padding-top: 25px;
+}
+
+.sectionHeader {
+  margin-bottom: 20px;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  color: #315343;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sectionHeader p {
+  max-width: 620px;
+  margin: 5px 0 0;
+  color: #8a928c;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   FIELDS
+   ============================================================ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-top: 17px;
+}
+
+.sectionHeader + .field {
+  margin-top: 0;
+}
+
+.field label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: #526057;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.optional {
+  color: #a0a69f;
+  font-size: 8px;
+  font-weight: 500;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid #ddd7cb;
+  border-radius: 9px;
+  outline: none;
+  background: #ffffff;
+  color: #385648;
+  font-size: 11px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.field input {
+  height: 40px;
+  padding: 0 12px;
+}
+
+.field textarea {
+  min-height: 95px;
+  padding: 11px 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: #b0b4af;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: #7e9d8d;
+  box-shadow: 0 0 0 3px rgba(40, 90, 69, 0.07);
+}
+
+.field input:disabled {
+  cursor: not-allowed;
+  background: #f5f2eb;
+}
+
+.helper {
+  margin-top: 5px;
+  color: #9a9f9a;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   TWO COLUMN
+   ============================================================ */
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: repeat(
+    2,
+    minmax(0, 1fr)
+  );
+  gap: 16px;
+}
+
+/* ============================================================
+   AMOUNT
+   ============================================================ */
+
+.amountInput {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  overflow: hidden;
+  border: 1px solid #ddd7cb;
+  border-radius: 9px;
+  background: #ffffff;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.amountInput:focus-within {
+  border-color: #7e9d8d;
+  box-shadow: 0 0 0 3px rgba(40, 90, 69, 0.07);
+}
+
+.amountInput > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 100%;
+  border-right: 1px solid #eee9df;
+  color: #6d786f;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.amountInput input {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.amountInput input:focus {
+  border: 0;
+  box-shadow: none;
+}
+
+/* ============================================================
+   DATE
+   ============================================================ */
+
+.dateInput {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  padding-left: 12px;
+  border: 1px solid #ddd7cb;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #6d786f;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.dateInput:focus-within {
+  border-color: #7e9d8d;
+  box-shadow: 0 0 0 3px rgba(40, 90, 69, 0.07);
+}
+
+.dateInput input {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.dateInput input:focus {
+  border: 0;
+  box-shadow: none;
+}
+
+/* ============================================================
+   ICON OPTIONS
+   ============================================================ */
+
+.iconOptions {
+  display: grid;
+  grid-template-columns: repeat(
+    5,
+    minmax(0, 1fr)
+  );
+  gap: 10px;
+}
+
+.iconOption {
+  position: relative;
+  display: flex;
+  min-height: 84px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid #e3ddd2;
+  border-radius: 10px;
+  outline: none;
+  background: #ffffff;
+  color: #7c857e;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.iconOption:hover {
+  border-color: #c6d2ca;
+  background: #fbfcfa;
+  transform: translateY(-1px);
+}
+
+.iconOptionActive {
+  border-color: #7e9d8d;
+  background: #f3f8f4;
+  color: #285a45;
+}
+
+.iconOptionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #f1ede4;
+  color: #6f7972;
+}
+
+.iconOptionActive .iconOptionIcon {
+  background: #e0ece5;
+  color: #285a45;
+}
+
+.iconOptionLabel {
+  color: #657068;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.iconOptionActive .iconOptionLabel {
+  color: #285a45;
+}
+
+.selectedIcon {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #285a45;
+  color: #ffffff;
+}
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+
+.error {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: 1px solid #e8cfc1;
+  border-radius: 9px;
+  background: #fbf1eb;
+}
+
+.error strong {
+  color: #a85f3d;
+  font-size: 10px;
+}
+
+.error span {
+  color: #8e6754;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 22px;
+}
+
+.cancelButton,
+.submitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 9px;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cancelButton {
+  padding: 0 15px;
+  border: 1px solid #ddd7cb;
+  background: #ffffff;
+  color: #6f7972;
+}
+
+.cancelButton:hover {
+  border-color: #cfc7ba;
+  color: #385648;
+}
+
+.submitButton {
+  gap: 6px;
+  padding: 0 17px;
+  border: 1px solid #285a45;
+  background: #285a45;
+  color: #ffffff;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #204b39;
+}
+
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.spinner {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 800px) {
+  .page {
+    padding: 20px 14px 35px;
+  }
+
+  .header h1 {
+    font-size: 26px;
+  }
+
+  .form {
+    padding: 18px;
+  }
+
+  .twoColumn {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .iconOptions {
+    grid-template-columns: repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  }
+}
+
+@media (max-width: 480px) {
+  .formCard {
+    border-radius: 12px;
+  }
+
+  .form {
+    padding: 15px;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+  }
+
+  .iconOptions {
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  }
+}
