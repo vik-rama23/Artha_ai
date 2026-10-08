@@ -37,6 +37,7 @@ function formatCurrency(
 function getAccountIcon(accountType: string) {
   switch (accountType.toUpperCase()) {
     case "BANK":
+    case "SAVINGS":
       return Landmark;
 
     case "CREDIT_CARD":
@@ -56,6 +57,9 @@ function getAccountTypeLabel(
   switch (accountType.toUpperCase()) {
     case "BANK":
       return "Bank Account";
+
+    case "SAVINGS":
+      return "Savings Account";
 
     case "CREDIT_CARD":
       return "Credit Card";
