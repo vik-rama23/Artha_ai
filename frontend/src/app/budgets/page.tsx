@@ -251,7 +251,7 @@ export default async function BudgetsPage({
             </span>
           </div>
         </section>
-      )
+      )}
 
       <section className={styles.card}>
         <div className={styles.monthHeader}>
