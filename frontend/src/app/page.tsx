@@ -19,6 +19,7 @@ import { getCurrentUser } from "@/lib/api/auth";
 import { getCashFlowForecast } from "@/lib/api/cashFlowForecast";
 import { getDashboard } from "@/lib/api/dashboard";
 import { getGoals } from "@/lib/api/goalsServer";
+import { getServerBudgets } from "@/lib/api/serverBudgets";
 
 import type {
   DashboardData,
@@ -26,6 +27,7 @@ import type {
 } from "@/types/dashboard";
 import type { CashFlowForecast } from "@/types/cashFlowForecast";
 import type { Goal } from "@/types/goal";
+import type { Budget } from "@/lib/api/budgets";
 
 import styles from "./page.module.scss";
 
@@ -425,16 +427,99 @@ function getFinancialHealth(
   savingsRate: number,
   net: number,
   goalProgress: number,
-  goalCount: number
+  goalCount: number,
+  forecastStatus: CashFlowForecast["status"] | null,
+  budgets: Budget[]
 ) {
-  const savingsScore = savingsRate >= 30 ? 40 : savingsRate >= 20 ? 34 : savingsRate >= 10 ? 26 : savingsRate > 0 ? 16 : 5;
-  const cashFlowScore = net > 0 ? 30 : net === 0 ? 20 : 5;
-  const goalScore = goalCount === 0 ? 20 : goalProgress >= 75 ? 30 : goalProgress >= 50 ? 25 : goalProgress >= 25 ? 18 : 10;
-  const score = Math.min(savingsScore + cashFlowScore + goalScore, 100);
-  const label = score >= 80 ? "Excellent" : score >= 65 ? "Good" : score >= 50 ? "Fair" : "Needs attention";
-  const message = score >= 80 ? "Your savings, cash flow and goals are working well together." : score >= 65 ? "You have a solid foundation. A few focused improvements can strengthen it further." : score >= 50 ? "Your finances are moving, but there are a few areas worth improving." : "Your current cash flow needs attention before focusing on bigger financial goals.";
-  const primaryInsight = savingsRate < 10 ? "Increase your monthly savings rate." : net <= 0 ? "Bring monthly expenses below income." : goalCount > 0 && goalProgress < 25 ? "Increase contributions toward your goals." : "Keep your current financial habits consistent.";
-  return { score, label, message, primaryInsight };
+  const savingsScore =
+    savingsRate >= 30
+      ? 40
+      : savingsRate >= 20
+        ? 34
+        : savingsRate >= 10
+          ? 26
+          : savingsRate > 0
+            ? 16
+            : 5;
+
+  const cashFlowScore =
+    net > 0 ? 30 : net === 0 ? 20 : 5;
+
+  const goalScore =
+    goalCount === 0
+      ? 20
+      : goalProgress >= 75
+        ? 30
+        : goalProgress >= 50
+          ? 25
+          : goalProgress >= 25
+            ? 18
+            : 10;
+
+  const budgetRiskCount = budgets.filter(
+    (budget) =>
+      budget.status === "EXCEEDED" ||
+      Number(budget.projected_overspend) > 0
+  ).length;
+
+  const budgetScore =
+    budgetRiskCount === 0
+      ? 10
+      : budgetRiskCount === 1
+        ? 5
+        : 0;
+
+  let score = Math.min(
+    savingsScore +
+      cashFlowScore +
+      goalScore +
+      budgetScore,
+    100
+  );
+
+  if (forecastStatus === "RISK") {
+    score = Math.max(score - 15, 0);
+  } else if (forecastStatus === "WATCH") {
+    score = Math.max(score - 7, 0);
+  }
+
+  const label =
+    score >= 80
+      ? "Excellent"
+      : score >= 65
+        ? "Good"
+        : score >= 50
+          ? "Fair"
+          : "Needs attention";
+
+  const message =
+    score >= 80
+      ? "Your savings, cash flow, budgets and goals are working well together."
+      : score >= 65
+        ? "You have a solid financial foundation. A few focused improvements can strengthen it further."
+        : score >= 50
+          ? "Your finances are moving, but a few areas need attention."
+          : "Your current cash flow or spending needs attention before taking on more commitments.";
+
+  const primaryInsight =
+    forecastStatus === "RISK"
+      ? "Your projected cash flow is at risk."
+      : budgetRiskCount > 0
+        ? "Review budgets that are projected to exceed their limits."
+        : savingsRate < 10
+          ? "Increase your monthly savings rate."
+          : net <= 0
+            ? "Bring monthly expenses below income."
+            : goalCount > 0 && goalProgress < 25
+              ? "Increase contributions toward your goals."
+              : "Keep your current financial habits consistent.";
+
+  return {
+    score,
+    label,
+    message,
+    primaryInsight,
+  };
 }
 
 function getMonthlyChange(current: number, previous: number) {
@@ -500,6 +585,7 @@ export default async function DashboardPage() {
   let currentUser = null;
   let goals: Goal[] = [];
   let forecast: CashFlowForecast | null = null;
+  let budgets: Budget[] = [];
   let errorMessage = "";
 
   try {
@@ -532,6 +618,18 @@ export default async function DashboardPage() {
 
     errorMessage =
       "Unable to connect to the Artha backend.";
+  }
+
+  try {
+    const budgetResponse = await getServerBudgets(
+      new Date().toISOString().slice(0, 8) + "01"
+    );
+    budgets = budgetResponse.items;
+  } catch (error) {
+    console.error(
+      "Failed to load budgets for financial health:",
+      error
+    );
   }
 
   try {
@@ -696,7 +794,9 @@ export default async function DashboardPage() {
     savingsRate,
     net,
     totalGoalProgress,
-    goals.length
+    goals.length,
+    forecast?.status ?? null,
+    budgets
   );
 
   const attentionGoal = activeGoals
