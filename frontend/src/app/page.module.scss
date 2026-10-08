@@ -619,9 +619,274 @@
   color: #173d2f;
 }
 
+
+/* ============================================================
+   FINANCIAL GOALS
+   ============================================================ */
+
+.goalsCard {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid #e5dfd4;
+  border-radius: 17px;
+  background: #fffdf9;
+  box-shadow: 0 5px 18px rgba(40, 49, 43, 0.045);
+}
+
+.goalsCard .cardHeader {
+  margin-bottom: 17px;
+}
+
+.goalsSummary {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  align-items: center;
+  gap: 26px;
+  margin-bottom: 4px;
+  padding: 15px 0 17px;
+  border-top: 1px solid #eee9df;
+  border-bottom: 1px solid #eee9df;
+}
+
+.goalsSummaryValue {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goalsSummaryValue span {
+  color: #8b8f89;
+  font-size: 10px;
+}
+
+.goalsSummaryValue strong {
+  color: #1f5a43;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.goalsSummaryProgress {
+  min-width: 0;
+}
+
+.goalsSummaryLabels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+  color: #8b8f89;
+  font-size: 10px;
+}
+
+.goalsSummaryLabels span:last-child {
+  color: #52695d;
+  font-weight: 700;
+}
+
+.goalsProgressTrack,
+.goalTrack {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ece8df;
+}
+
+.goalsProgressTrack {
+  height: 7px;
+}
+
+.goalsProgressBar,
+.goalBar {
+  height: 100%;
+  border-radius: inherit;
+  background: #39704d;
+  transition: width 250ms ease;
+}
+
+.goalsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.goalRow {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 4px;
+  border-bottom: 1px solid #eee9df;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    background 150ms ease,
+    padding 150ms ease;
+}
+
+.goalRow:last-child {
+  border-bottom: 0;
+}
+
+.goalRow:hover {
+  padding-right: 7px;
+  padding-left: 7px;
+  border-radius: 10px;
+  background: #f7f4ed;
+}
+
+.goalRow:focus-visible,
+.goalCreateButton:focus-visible {
+  outline: 2px solid #b28a2e;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.goalIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e8f1eb;
+  color: #1f5a43;
+}
+
+.goalInfo {
+  min-width: 0;
+}
+
+.goalTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.goalTitleRow strong {
+  overflow: hidden;
+  color: #385347;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goalTitleRow span {
+  flex: 0 0 auto;
+  color: #39704d;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.goalTrack {
+  height: 5px;
+}
+
+.goalMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  color: #999c96;
+  font-size: 9px;
+}
+
+.goalMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.goalArrow {
+  color: #a3a59f;
+  transition:
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.goalRow:hover .goalArrow {
+  color: #39704d;
+  transform: translateX(2px);
+}
+
+.goalsEmpty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 2px 2px;
+}
+
+.goalsEmptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 10px;
+  background: #e8f1eb;
+  color: #1f5a43;
+}
+
+.goalsEmptyContent {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.goalsEmptyContent strong {
+  color: #40594e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.goalsEmptyContent span {
+  color: #999c96;
+  font-size: 9px;
+}
+
+.goalCreateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border: 1px solid #d7dfd9;
+  border-radius: 9px;
+  background: #f7faf8;
+  color: #315a49;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.goalCreateButton:hover {
+  border-color: #b9cbbf;
+  background: #eef5f0;
+}
+
+.goalsCompleted {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 2px 2px;
+  color: #39704d;
+  font-size: 10px;
+  font-weight: 650;
+}
+
 /* ============================================================
    BOTTOM GRID
    ============================================================ */
+
 
 .bottomGrid {
   display: grid;
