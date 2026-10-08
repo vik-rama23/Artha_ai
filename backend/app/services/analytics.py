@@ -1134,3 +1134,93 @@ def get_analytics_insights(
         "savings_rate": savings_rate,
         "insights": insights,
     }
+
+
+def get_budget_vs_actual(
+    db: Session,
+    user_id: UUID,
+    month_start: date | None = None,
+) -> dict:
+    from app.services.budgets import (
+        get_budget_response,
+        get_month_end,
+        normalize_month_start,
+    )
+    from app.models.budgets import Budget
+
+    selected_month = normalize_month_start(
+        month_start or date.today()
+    )
+    month_end = get_month_end(selected_month)
+
+    budgets = (
+        db.query(Budget)
+        .filter(
+            Budget.user_id == user_id,
+            Budget.month_start == selected_month,
+        )
+        .order_by(Budget.created_at.asc())
+        .all()
+    )
+
+    items = []
+
+    for budget in budgets:
+        data = get_budget_response(
+            db=db,
+            budget=budget,
+        )
+
+        items.append(
+            {
+                "budget_id": budget.id,
+                "category_id": budget.category_id,
+                "category_name": (
+                    data["category_name"]
+                    or budget.name
+                ),
+                "budget_amount": data["amount"],
+                "actual_amount": data["spent"],
+                "variance": data["amount"] - data["spent"],
+                "percentage_used": data["percentage_used"],
+                "projected_amount": data["projected_spend"],
+                "projected_variance": (
+                    data["amount"]
+                    - (
+                        data["projected_spend"]
+                        or Decimal("0.00")
+                    )
+                ),
+                "status": data["status"],
+            }
+        )
+
+    total_budget = sum(
+        (item["budget_amount"] for item in items),
+        Decimal("0.00"),
+    )
+    total_actual = sum(
+        (item["actual_amount"] for item in items),
+        Decimal("0.00"),
+    )
+    total_projected = sum(
+        (
+            item["projected_amount"]
+            or Decimal("0.00")
+            for item in items
+        ),
+        Decimal("0.00"),
+    )
+
+    return {
+        "month_start": selected_month,
+        "month_end": month_end,
+        "total_budget": total_budget,
+        "total_actual": total_actual,
+        "total_variance": total_budget - total_actual,
+        "total_projected": total_projected,
+        "total_projected_variance": (
+            total_budget - total_projected
+        ),
+        "items": items,
+    }
