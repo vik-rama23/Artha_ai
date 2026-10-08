@@ -184,6 +184,39 @@ export default async function BudgetsPage({
         </Link>
       </header>
 
+      <section className={styles.monthFilter}>
+        <div>
+          <p className={styles.sectionEyebrow}>MONTHLY VIEW</p>
+
+          <h2>{formatMonth(selectedMonth)}</h2>
+        </div>
+
+        <div className={styles.monthNavigation}>
+          <Link
+            href={`/budgets?month=${previousMonth}`}
+            className={styles.monthButton}
+            aria-label="Previous month"
+          >
+            ←
+          </Link>
+
+          <Link
+            href={`/budgets?month=${getCurrentMonth()}`}
+            className={styles.todayButton}
+          >
+            This month
+          </Link>
+
+          <Link
+            href={`/budgets?month=${nextMonth}`}
+            className={styles.monthButton}
+            aria-label="Next month"
+          >
+            →
+          </Link>
+        </div>
+      </section>
+
       <section className={styles.summaryGrid}>
         <article className={styles.summaryCard}>
           <div className={styles.summaryLabel}>
@@ -254,39 +287,6 @@ export default async function BudgetsPage({
       )}
 
       <section className={styles.card}>
-        <div className={styles.monthHeader}>
-          <div>
-            <p className={styles.sectionEyebrow}>MONTHLY VIEW</p>
-
-            <h2>{formatMonth(selectedMonth)}</h2>
-          </div>
-
-          <div className={styles.monthNavigation}>
-            <Link
-              href={`/budgets?month=${previousMonth}`}
-              className={styles.monthButton}
-              aria-label="Previous month"
-            >
-              ←
-            </Link>
-
-            <Link
-              href={`/budgets?month=${getCurrentMonth()}`}
-              className={styles.todayButton}
-            >
-              This month
-            </Link>
-
-            <Link
-              href={`/budgets?month=${nextMonth}`}
-              className={styles.monthButton}
-              aria-label="Next month"
-            >
-              →
-            </Link>
-          </div>
-        </div>
-
         {error ? (
           <div className={styles.emptyState}>
             <strong>Unable to load budgets</strong>
