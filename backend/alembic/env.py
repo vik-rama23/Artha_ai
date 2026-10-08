@@ -14,7 +14,8 @@ from app.models.transactions import Transaction
 from app.models.budgets import Budget
 from app.models.recurring_transactions import RecurringTransaction
 from app.models.notifications import Notification
-from app.models.goals import Goal, GoalContribution\nfrom app.models.net_worth import NetWorthItem
+from app.models.goals import Goal, GoalContribution
+from app.models.net_worth import NetWorthItem
 
 
 # Alembic Config object
