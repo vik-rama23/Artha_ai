@@ -7,6 +7,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   AlertTriangle,
+  HeartPulse,
   CalendarDays,
   CreditCard,
   IndianRupee,
@@ -421,6 +422,22 @@ function getGoalAttention(goal: Goal) {
   };
 }
 
+function getFinancialHealth(
+  savingsRate: number,
+  net: number,
+  goalProgress: number,
+  goalCount: number
+) {
+  const savingsScore = savingsRate >= 30 ? 40 : savingsRate >= 20 ? 34 : savingsRate >= 10 ? 26 : savingsRate > 0 ? 16 : 5;
+  const cashFlowScore = net > 0 ? 30 : net === 0 ? 20 : 5;
+  const goalScore = goalCount === 0 ? 20 : goalProgress >= 75 ? 30 : goalProgress >= 50 ? 25 : goalProgress >= 25 ? 18 : 10;
+  const score = Math.min(savingsScore + cashFlowScore + goalScore, 100);
+  const label = score >= 80 ? "Excellent" : score >= 65 ? "Good" : score >= 50 ? "Fair" : "Needs attention";
+  const message = score >= 80 ? "Your savings, cash flow and goals are working well together." : score >= 65 ? "You have a solid foundation. A few focused improvements can strengthen it further." : score >= 50 ? "Your finances are moving, but there are a few areas worth improving." : "Your current cash flow needs attention before focusing on bigger financial goals.";
+  const primaryInsight = savingsRate < 10 ? "Increase your monthly savings rate." : net <= 0 ? "Bring monthly expenses below income." : goalCount > 0 && goalProgress < 25 ? "Increase contributions toward your goals." : "Keep your current financial habits consistent.";
+  return { score, label, message, primaryInsight };
+}
+
 function getCashFlowMessage(
   net: number,
   savingsRate: number
@@ -626,6 +643,13 @@ export default async function DashboardPage() {
           100
         )
       : 0;
+
+  const financialHealth = getFinancialHealth(
+    savingsRate,
+    net,
+    totalGoalProgress,
+    goals.length
+  );
 
   const attentionGoal = activeGoals
     .slice()
@@ -939,6 +963,54 @@ export default async function DashboardPage() {
             this month
           </p>
         </article>
+      </section>
+
+      {/* ================================================== */}
+      {/* FINANCIAL HEALTH */}
+      {/* ================================================== */}
+
+      <section className={styles.financialHealthCard} aria-label="Financial health">
+        <div className={styles.financialHealthHeader}>
+          <div className={styles.financialHealthTitle}>
+            <div className={styles.financialHealthIcon}>
+              <HeartPulse size={18} strokeWidth={1.9} />
+            </div>
+            <div>
+              <p className={styles.eyebrow}>Financial health</p>
+              <h2>Your financial health is {financialHealth.label.toLowerCase()}</h2>
+            </div>
+          </div>
+          <div className={styles.financialHealthScore}>
+            <strong>{financialHealth.score}</strong>
+            <span>/100</span>
+          </div>
+        </div>
+
+        <div className={styles.financialHealthBody}>
+          <div className={styles.financialHealthProgress}>
+            <div className={styles.financialHealthProgressBar} style={{ width: financialHealth.score + "%" }} />
+          </div>
+          <p>{financialHealth.message}</p>
+        </div>
+
+        <div className={styles.financialHealthMetrics}>
+          <div>
+            <span>Savings rate</span>
+            <strong>{Math.max(savingsRate, 0).toFixed(0)}%</strong>
+          </div>
+          <div>
+            <span>Monthly cash flow</span>
+            <strong>{formatCompactCurrency(net)}</strong>
+          </div>
+          <div>
+            <span>Goal progress</span>
+            <strong>{totalGoalTarget > 0 ? totalGoalProgress.toFixed(0) + "%" : "Not set"}</strong>
+          </div>
+          <div className={styles.financialHealthInsight}>
+            <span>Next focus</span>
+            <strong>{financialHealth.primaryInsight}</strong>
+          </div>
+        </div>
       </section>
 
       {/* ================================================== */}
