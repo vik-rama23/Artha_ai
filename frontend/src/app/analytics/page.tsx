@@ -11,6 +11,8 @@ import {
   getTopTransactions,
 } from "@/lib/api/analytics";
 
+import { getCashFlowForecast } from "@/lib/api/cashFlowForecast";
+
 import styles from "./page.module.scss";
 
 type PeriodKey =
