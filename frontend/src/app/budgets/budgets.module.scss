@@ -472,3 +472,99 @@
     gap: 5px;
   }
 }
+
+.intelligenceBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 13px 15px;
+  border: 1px solid #ead7c7;
+  border-radius: 12px;
+  background: #fff8f2;
+}
+
+.intelligenceIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: #f7e5d8;
+  color: #a85f3d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.intelligenceBanner strong {
+  display: block;
+  color: #7e4937;
+  font-size: 11px;
+}
+
+.intelligenceBanner span {
+  display: block;
+  margin-top: 3px;
+  color: #8b766c;
+  font-size: 10px;
+}
+
+.intelligenceRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.intelligenceRow > div {
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: #f7f4ed;
+}
+
+.intelligenceRow span {
+  display: block;
+  color: #8a918a;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.intelligenceRow strong {
+  display: block;
+  margin-top: 4px;
+  color: #315343;
+  font-size: 12px;
+}
+
+.budgetInsight {
+  margin-top: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: #f1f7f2;
+  color: #527061;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.budgetInsightWarning {
+  background: #fbf4df;
+  color: #8a661b;
+}
+
+.budgetInsightDanger {
+  background: #fff0eb;
+  color: #a54a38;
+}
+
+@media (max-width: 760px) {
+  .intelligenceRow {
+    grid-template-columns: 1fr;
+  }
+
+  .intelligenceBanner {
+    align-items: flex-start;
+  }
+}
