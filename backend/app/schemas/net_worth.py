@@ -11,6 +11,7 @@ class NetWorthItemCreate(BaseModel):
     category: str = Field(min_length=1, max_length=50)
     value: Decimal = Field(gt=0, max_digits=15, decimal_places=2)
     as_of_date: date
+    history_start_date: date | None = None
     notes: str | None = None
 
 
