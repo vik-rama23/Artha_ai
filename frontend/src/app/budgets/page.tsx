@@ -178,17 +178,10 @@ export default async function BudgetsPage({
           </p>
         </div>
 
-        <div className={styles.headerActions}>
-          <div className={styles.periodControl}>
-            <span>Month</span>
-            <strong>{formatMonth(selectedMonth)}</strong>
-          </div>
-
-          <Link href="/budgets/new" className={styles.addButton}>
-            <Plus size={18} />
-            Add Budget
-          </Link>
-        </div>
+        <Link href="/budgets/new" className={styles.addButton}>
+          <Plus size={18} />
+          Add Budget
+        </Link>
       </header>
 
       <nav className={styles.monthNavigationBar} aria-label="Budget month">
