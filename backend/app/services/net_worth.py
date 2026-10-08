@@ -82,23 +82,45 @@ def _build_snapshot(
         account_type = account.account_type.upper()
         balance = _account_balance_at(db, account, as_of_date)
 
-        if account_type in ASSET_ACCOUNT_TYPES and balance > 0:
-            assets += balance
-            asset_items.append({
-                "name": account.name,
-                "category": account_type,
-                "source": "ACCOUNT",
-                "value": balance,
-            })
+        if account_type in ASSET_ACCOUNT_TYPES:
+            if balance > 0:
+                assets += balance
+                asset_items.append({
+                    "name": account.name,
+                    "category": account_type,
+                    "source": "ACCOUNT",
+                    "value": balance,
+                })
+            elif balance < 0:
+                # Negative bank/cash/investment balances represent
+                # an overdraft or margin liability.
+                overdraft = abs(balance)
+                liabilities += overdraft
+                liability_items.append({
+                    "name": account.name,
+                    "category": "OVERDRAFT",
+                    "source": "ACCOUNT",
+                    "value": overdraft,
+                })
         elif account_type in LIABILITY_ACCOUNT_TYPES:
-            liability = max(balance, Decimal("0.00"))
-            if liability > 0:
-                liabilities += liability
+            if balance > 0:
+                liabilities += balance
                 liability_items.append({
                     "name": account.name,
                     "category": account_type,
                     "source": "ACCOUNT",
-                    "value": liability,
+                    "value": balance,
+                })
+            elif balance < 0:
+                # A negative credit-card balance means the issuer
+                # owes the user money, so it is an asset.
+                credit_balance = abs(balance)
+                assets += credit_balance
+                asset_items.append({
+                    "name": account.name,
+                    "category": "CREDIT_BALANCE",
+                    "source": "ACCOUNT",
+                    "value": credit_balance,
                 })
 
     for item in _manual_items_at(db, user_id, as_of_date):
