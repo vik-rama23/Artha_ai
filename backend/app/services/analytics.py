@@ -942,6 +942,60 @@ def get_analytics_insights(
         )
 
     # ---------------------------------------------------------
+    # Budget recommendation
+    # ---------------------------------------------------------
+
+    if (
+        start_date is None
+        or (
+            start_date <= date.today()
+            and (
+                end_date is None
+                or end_date >= date.today()
+            )
+        )
+    ):
+        budget_analysis = get_budget_vs_actual(
+            db=db,
+            user_id=user_id,
+            month_start=date.today(),
+        )
+
+        projected_variance = budget_analysis[
+            "total_projected_variance"
+        ]
+
+        if budget_analysis["items"]:
+            if projected_variance < Decimal("0.00"):
+                overspend = abs(projected_variance)
+                insights.append(
+                    {
+                        "type": "BUDGET_RISK",
+                        "title": "Budget risk",
+                        "message": (
+                            f"Current spending trends could put you "
+                            f"about ₹{overspend:,.0f} over budget this month."
+                        ),
+                        "value": overspend,
+                        "percentage": None,
+                    }
+                )
+            elif budget_analysis["total_variance"] > Decimal("0.00"):
+                insights.append(
+                    {
+                        "type": "BUDGET_HEADROOM",
+                        "title": "Budget headroom",
+                        "message": (
+                            f"You currently have ₹"
+                            f"{budget_analysis['total_variance']:,.0f} "
+                            "of planned spending remaining."
+                        ),
+                        "value": budget_analysis["total_variance"],
+                        "percentage": None,
+                    }
+                )
+
+    # ---------------------------------------------------------
     # Highest spending category
     # ---------------------------------------------------------
 
@@ -1116,6 +1170,8 @@ def get_analytics_insights(
         "HIGHEST_SAVINGS_MONTH": 5,
         "POSITIVE_SAVINGS": 6,
         "NEGATIVE_SAVINGS": 6,
+        "BUDGET_RISK": 1,
+        "BUDGET_HEADROOM": 3,
     }
 
     insights.sort(
