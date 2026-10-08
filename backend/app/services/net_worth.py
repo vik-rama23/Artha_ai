@@ -80,8 +80,6 @@ def _build_snapshot(
                     "value": balance,
                 })
             elif balance < 0:
-                # Negative bank/cash/investment balances represent
-                # an overdraft or margin liability.
                 overdraft = abs(balance)
                 liabilities += overdraft
                 liability_items.append({
@@ -100,8 +98,6 @@ def _build_snapshot(
                     "value": balance,
                 })
             elif balance < 0:
-                # A negative credit-card balance means the issuer
-                # owes the user money, so it is an asset.
                 credit_balance = abs(balance)
                 assets += credit_balance
                 asset_items.append({
@@ -145,6 +141,7 @@ def get_net_worth(
     as_of_date: date | None = None,
 ) -> dict:
     today = as_of_date or date.today()
+
     assets, liabilities, asset_items, liability_items = _build_snapshot(
         db, user_id, today
     )
@@ -156,22 +153,60 @@ def get_net_worth(
     )
 
     history: list[dict] = []
+    previous_history_net_worth: Decimal | None = None
+    previous_history_assets: Decimal | None = None
+    previous_history_liabilities: Decimal | None = None
 
     for offset in range(11, -1, -1):
         month_start = _subtract_months(
             date(today.year, today.month, 1),
             offset,
         )
-        month_end = _month_end(month_start.year, month_start.month)
-        month_assets, month_liabilities, _, _ = _build_snapshot(
-            db, user_id, month_end
+
+        # Completed months use their month-end snapshot.
+        # The current month uses today's date so the trend never
+        # projects forward to the end of an unfinished month.
+        is_current_month = offset == 0
+        snapshot_date = (
+            today
+            if is_current_month
+            else _month_end(month_start.year, month_start.month)
         )
+
+        month_assets, month_liabilities, _, _ = _build_snapshot(
+            db,
+            user_id,
+            snapshot_date,
+        )
+        month_net_worth = month_assets - month_liabilities
+
         history.append({
             "month": month_start,
+            "snapshot_date": snapshot_date,
             "assets": month_assets,
             "liabilities": month_liabilities,
-            "net_worth": month_assets - month_liabilities,
+            "net_worth": month_net_worth,
+            "asset_change": (
+                None
+                if previous_history_assets is None
+                else month_assets - previous_history_assets
+            ),
+            "liability_change": (
+                None
+                if previous_history_liabilities is None
+                else month_liabilities - previous_history_liabilities
+            ),
+            "net_worth_change": (
+                None
+                if previous_history_net_worth is None
+                else month_net_worth - previous_history_net_worth
+            ),
+            "is_current": is_current_month,
         })
+
+        previous_history_assets = month_assets
+        previous_history_liabilities = month_liabilities
+        previous_history_net_worth = month_net_worth
 
     return {
         "as_of_date": today,
