@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 from uuid import UUID
 
@@ -16,7 +17,7 @@ from app.schemas.accounts import (
 def get_account_balance(
     db: Session,
     account_id: UUID,
-    as_of_date=None,
+    as_of_date: date | None = None,
 ) -> Decimal:
     account = (
         db.query(Account)
@@ -69,7 +70,7 @@ def get_account_balance(
 def calculate_account_balance(
     db: Session,
     account: Account,
-    as_of_date=None,
+    as_of_date: date | None = None,
 ) -> Decimal:
     return get_account_balance(
         db=db,
@@ -162,6 +163,25 @@ def update_account(
     updates = payload.model_dump(
         exclude_unset=True
     )
+
+    if "account_type" in updates:
+        new_account_type = updates["account_type"]
+
+        if new_account_type != account.account_type:
+            transaction_exists = db.scalar(
+                select(Transaction.id)
+                .where(Transaction.account_id == account.id)
+                .limit(1)
+            )
+
+            if transaction_exists is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=(
+                        "Account type cannot be changed after "
+                        "transactions have been recorded."
+                    ),
+                )
 
     for field, value in updates.items():
         if field == "currency" and value:
