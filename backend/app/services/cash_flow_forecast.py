@@ -1,6 +1,6 @@
 from calendar import monthrange
 from datetime import date
-from decimal import Decimal, ROUND_UP
+from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -14,8 +14,6 @@ from app.services.analytics import get_income_expense_summary
 
 
 ZERO = Decimal("0.00")
-ONE_HUNDRED = Decimal("100")
-
 
 def _month_end(value: date) -> date:
     return date(
@@ -224,28 +222,12 @@ def _get_status_and_insight(
         )
 
     if current_balance > ZERO:
-        spending_ratio = (
-            projected_expense / current_balance
-            if current_balance > ZERO
-            else ONE_HUNDRED
-        )
-
         if projected_month_end_balance < current_balance * Decimal("0.10"):
             return (
                 "WATCH",
                 (
                     "Your projected month-end balance is getting low. "
                     "Consider reducing discretionary spending."
-                ),
-            )
-
-        if spending_ratio >= Decimal("0.80"):
-            return (
-                "WATCH",
-                (
-                    "A large share of your available cash is expected "
-                    "to be spent this month. Keep an eye on discretionary "
-                    "expenses."
                 ),
             )
 
