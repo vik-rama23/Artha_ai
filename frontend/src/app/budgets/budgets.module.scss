@@ -106,13 +106,18 @@
   overflow: hidden;
 }
 
-.monthHeader {
+.monthFilter {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 22px 24px;
-  border-bottom: 1px solid #eee8dc;
+  min-height: 84px;
+  padding: 16px 20px;
+  border: 1px solid #e8e1d4;
+  border-radius: 16px;
+  background: #fffdf8;
+  box-shadow: 0 4px 18px rgba(55, 48, 37, 0.04);
+  margin-bottom: 20px;
 
   h2 {
     margin: 5px 0 0;
@@ -440,7 +445,7 @@
     min-height: auto;
   }
 
-  .monthHeader {
+  .monthFilter {
     align-items: flex-start;
     flex-direction: column;
     padding: 18px;
