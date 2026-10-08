@@ -41,6 +41,24 @@ function formatMonth(value: string): string {
   }).format(new Date(`${value}T00:00:00`));
 }
 
+function formatSnapshotDate(value: string): string {
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(`${value}T00:00:00`));
+}
+
+function formatSignedCurrency(value: string | number | null): string {
+  if (value === null) return "—";
+
+  const numericValue = Number(value);
+
+  if (numericValue === 0) return "₹0";
+
+  return `${numericValue > 0 ? "+" : "-"}${formatCurrency(Math.abs(numericValue))}`;
+}
+
 function formatCategory(value: string): string {
   return value
     .replaceAll("_", " ")
@@ -103,6 +121,11 @@ export default function NetWorthPage() {
     if (Number(data.net_worth_change) < 0) return "down";
     return "flat";
   }, [data]);
+
+  const currentHistoryPoint = useMemo(
+    () => data?.history.find((point) => point.is_current) ?? null,
+    [data]
+  );
 
   function resetForm() {
     const today = todayDate();
@@ -312,8 +335,26 @@ export default function NetWorthPage() {
               <div className={styles.cardHeader}>
                 <div>
                   <h2>Net worth trend</h2>
-                  <p>Last 12 months</p>
+                  <p>12 monthly snapshots</p>
                 </div>
+              </div>
+
+              <div className={styles.trendExplanation}>
+                <div className={styles.trendFormula}>
+                  <strong>Net worth = assets − liabilities</strong>
+                  <span>
+                    Each row shows the net worth on that snapshot date. Completed
+                    months use month-end; the current month uses today.
+                  </span>
+                </div>
+
+                {currentHistoryPoint && (
+                  <div className={styles.trendCurrent}>
+                    <span>Today</span>
+                    <strong>{formatCurrency(currentHistoryPoint.net_worth)}</strong>
+                    <small>{formatSnapshotDate(currentHistoryPoint.snapshot_date)}</small>
+                  </div>
+                )}
               </div>
 
               <div className={styles.history}>
@@ -326,20 +367,72 @@ export default function NetWorthPage() {
                   );
                   const width =
                     (Math.abs(Number(point.net_worth)) / max) * 100;
+                  const change = Number(point.net_worth_change ?? 0);
 
                   return (
-                    <div key={point.month} className={styles.historyRow}>
-                      <span>{formatMonth(point.month)}</span>
-                      <div className={styles.historyTrack}>
-                        <div
-                          className={styles.historyBar}
-                          style={{ width: `${Math.max(width, 2)}%` }}
-                        />
+                    <div
+                      key={point.snapshot_date}
+                      className={
+                        `${styles.historyRow} ${point.is_current ? styles.historyCurrent : ""}`
+                      }
+                      title={
+                        `${formatSnapshotDate(point.snapshot_date)}: ` +
+                        `Assets ${formatCurrency(point.assets)}, ` +
+                        `Liabilities ${formatCurrency(point.liabilities)}, ` +
+                        `Net worth ${formatCurrency(point.net_worth)}`
+                      }
+                    >
+                      <div className={styles.historyDate}>
+                        <span>{formatMonth(point.month)}</span>
+                        {point.is_current && <em>Today</em>}
                       </div>
+
+                      <div className={styles.historyDetails}>
+                        <div className={styles.historyTrack}>
+                          <div
+                            className={
+                              `${styles.historyBar} ${Number(point.net_worth) < 0 ? styles.historyBarNegative : ""}`
+                            }
+                            style={{ width: `${Math.max(width, 2)}%` }}
+                          />
+                        </div>
+
+                        <div className={styles.historyMeta}>
+                          <span>
+                            Assets {formatCurrency(point.assets)}
+                          </span>
+                          <span>
+                            Liabilities {formatCurrency(point.liabilities)}
+                          </span>
+                          <span
+                            className={
+                              change > 0
+                                ? styles.historyPositive
+                                : change < 0
+                                  ? styles.historyNegative
+                                  : ""
+                            }
+                          >
+                            Change {formatSignedCurrency(point.net_worth_change)}
+                          </span>
+                        </div>
+                      </div>
+
                       <strong>{formatCurrency(point.net_worth)}</strong>
                     </div>
                   );
                 })}
+              </div>
+
+              <div className={styles.trendLegend}>
+                <span>
+                  <i className={styles.legendBar} />
+                  Bar length = absolute net worth
+                </span>
+                <span>
+                  <i className={styles.legendChange} />
+                  Change = current snapshot vs previous snapshot
+                </span>
               </div>
             </article>
 
