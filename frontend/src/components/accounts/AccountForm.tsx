@@ -251,16 +251,14 @@ export default function AccountForm({
           <input
             id="currency"
             type="text"
-            maxLength={3}
-            value={form.currency}
-            onChange={(event) =>
-              updateField(
-                "currency",
-                event.target.value.toUpperCase()
-              )
-            }
+            value="INR"
+            readOnly
             disabled={submitting}
           />
+
+          <small>
+            Artha currently calculates Net Worth in INR only.
+          </small>
         </div>
 
         <div
