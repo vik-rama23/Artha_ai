@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  BarChart3,
+  BarChart3,\n  Scale,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -75,6 +75,11 @@ const navigation = [
     label: "Analytics",
     icon: BarChart3,
     href: "/analytics",
+  },
+  {
+    label: "Net Worth",
+    icon: Scale,
+    href: "/net-worth",
   },
 ];
 
