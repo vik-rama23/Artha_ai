@@ -510,6 +510,7 @@ export default async function AnalyticsPage({
     topTransactions,
     savingsTrend,
     analyticsInsights,
+    forecast,
   ] = await Promise.all([
     getIncomeExpenseSummary(
       analyticsQuery
@@ -552,6 +553,7 @@ export default async function AnalyticsPage({
     }),
     getSavingsTrend(analyticsQuery),
     getAnalyticsInsights(analyticsQuery),
+    getCashFlowForecast(),
   ]);
 
   const income =
@@ -1716,6 +1718,121 @@ export default async function AnalyticsPage({
               </div>
             )}
           </article>
+        </section>
+
+        <section className={styles.forecastSection}>
+          <div className={styles.forecastHeader}>
+            <div>
+              <p className={styles.forecastEyebrow}>FORECAST</p>
+              <h2>Cash Flow Forecast</h2>
+              <span>Projected position for the rest of this month.</span>
+            </div>
+
+            <span
+              className={`${styles.forecastStatus} ${styles[`forecastStatus${forecast.status}`]}`}
+            >
+              {forecast.status === "HEALTHY"
+                ? "Healthy"
+                : forecast.status === "WATCH"
+                  ? "Watch"
+                  : "At Risk"}
+            </span>
+          </div>
+
+          <div className={styles.forecastMain}>
+            <div className={styles.forecastBalance}>
+              <span>Projected month-end balance</span>
+              <strong>
+                {formatCurrency(
+                  forecast.projected_month_end_balance
+                )}
+              </strong>
+              <small>
+                {forecast.days_remaining === 0
+                  ? "Month ends today"
+                  : `${forecast.days_remaining} days remaining`}
+              </small>
+            </div>
+
+            <div className={styles.forecastMetrics}>
+              <div>
+                <span>Current balance</span>
+                <strong>{formatCurrency(forecast.current_balance)}</strong>
+              </div>
+
+              <div>
+                <span>Expected income</span>
+                <strong>{formatCurrency(forecast.expected_recurring_income)}</strong>
+              </div>
+
+              <div>
+                <span>Expected expenses</span>
+                <strong>{formatCurrency(forecast.projected_expense)}</strong>
+              </div>
+
+              <div>
+                <span>Variable spend / day</span>
+                <strong>{formatCurrency(forecast.average_daily_variable_expense)}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.forecastInsight}>
+            <strong>Artha insight</strong>
+            <span>{forecast.insight}</span>
+          </div>
+
+          <div className={styles.forecastCommitments}>
+            <div className={styles.forecastCommitmentsHeader}>
+              <div>
+                <h3>Upcoming recurring commitments</h3>
+                <p>Scheduled income and expenses expected before month end.</p>
+              </div>
+              <span>{forecast.upcoming_items.length} items</span>
+            </div>
+
+            {forecast.upcoming_items.length === 0 ? (
+              <div className={styles.forecastEmpty}>
+                No recurring commitments are scheduled for the rest of this month.
+              </div>
+            ) : (
+              <div className={styles.forecastItemList}>
+                {forecast.upcoming_items.map((item) => (
+                  <div
+                    className={styles.forecastItem}
+                    key={`${item.recurring_transaction_id}-${item.occurrence_date}`}
+                  >
+                    <div>
+                      <strong>{item.name}</strong>
+                      <span>
+                        {new Intl.DateTimeFormat("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          timeZone: "UTC",
+                        }).format(
+                          new Date(`${item.occurrence_date}T00:00:00Z`)
+                        )}
+                        {" · "}
+                        {item.frequency}
+                      </span>
+                    </div>
+
+                    <strong
+                      className={
+                        item.transaction_type === "INCOME"
+                          ? styles.forecastIncome
+                          : styles.forecastExpense
+                      }
+                    >
+                      {item.transaction_type === "INCOME" ? "+" : "-"}
+                      {formatCurrency(item.amount)}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </section>
 
         <section
