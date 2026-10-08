@@ -142,17 +142,25 @@ export default async function BudgetsPage({
         )
       : 0;
 
-  const totalProjectedOverspend = budgets.reduce(
-    (total, budget) =>
-      total + Math.max(Number(budget.projected_overspend), 0),
-    0,
-  );
+  const intelligenceBudget =
+    budgets.find((budget) => budget.category_id === null) ??
+    null;
 
-  const totalSafeDailySpend = budgets.reduce(
-    (total, budget) =>
-      total + Math.max(Number(budget.safe_daily_spend), 0),
-    0,
-  );
+  const totalProjectedOverspend = intelligenceBudget
+    ? Math.max(Number(intelligenceBudget.projected_overspend), 0)
+    : budgets.reduce(
+        (total, budget) =>
+          total + Math.max(Number(budget.projected_overspend), 0),
+        0,
+      );
+
+  const totalSafeDailySpend = intelligenceBudget
+    ? Math.max(Number(intelligenceBudget.safe_daily_spend), 0)
+    : budgets.reduce(
+        (total, budget) =>
+          total + Math.max(Number(budget.safe_daily_spend), 0),
+        0,
+      );
 
   const previousMonth = getMonthNavigation(selectedMonth, -1);
   const nextMonth = getMonthNavigation(selectedMonth, 1);
