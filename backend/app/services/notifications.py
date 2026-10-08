@@ -513,10 +513,6 @@ def process_notifications_for_user(
             )
 
             if forecast["status"] == "RISK":
-                projected_balance = forecast[
-                    "projected_month_end_balance"
-                ]
-
                 notification = create_notification(
                     db=db,
                     user_id=user_id,
@@ -537,7 +533,7 @@ def process_notifications_for_user(
         except Exception:
             # Forecast alerts should never prevent existing
             # budget and recurring notifications from being created.
-            db.rollback()
+            pass
 
         db.commit()
 
