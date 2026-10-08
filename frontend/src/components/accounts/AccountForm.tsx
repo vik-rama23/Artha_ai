@@ -19,12 +19,23 @@ type AccountFormProps = {
   initialValues?: Partial<CreateAccountPayload>;
 };
 
+function getTodayDate(): string {
+  const today = new Date();
+
+  return [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
 const DEFAULT_VALUES: CreateAccountPayload = {
   name: "",
   account_type: "BANK",
   institution_name: "",
   account_number_last4: "",
   opening_balance: 0,
+  opening_balance_date: getTodayDate(),
   currency: "INR",
   notes: "",
 };
@@ -74,6 +85,11 @@ export default function AccountForm({
       return;
     }
 
+    if (!form.opening_balance_date) {
+      setError("Please select an opening balance date.");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError(null);
@@ -87,6 +103,7 @@ export default function AccountForm({
           account_number_last4:
             form.account_number_last4?.trim() || null,
           opening_balance: Number(form.opening_balance),
+          opening_balance_date: form.opening_balance_date,
           currency: form.currency.toUpperCase(),
           notes: form.notes?.trim() || null,
         };
@@ -101,6 +118,7 @@ export default function AccountForm({
           account_number_last4:
             form.account_number_last4?.trim() || null,
           opening_balance: Number(form.opening_balance),
+          opening_balance_date: form.opening_balance_date,
           currency: form.currency.toUpperCase(),
           notes: form.notes?.trim() || null,
         };
@@ -241,8 +259,32 @@ export default function AccountForm({
           />
 
           <small>
-            Use a negative opening balance for an overdraft or
-            credit balance that already existed when you started tracking.
+            This is the balance that existed on the opening balance date.
+          </small>
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="opening_balance_date">
+            Opening Balance Date
+          </label>
+
+          <input
+            id="opening_balance_date"
+            type="date"
+            value={form.opening_balance_date}
+            max={getTodayDate()}
+            onChange={(event) =>
+              updateField(
+                "opening_balance_date",
+                event.target.value
+              )
+            }
+            disabled={submitting}
+          />
+
+          <small>
+            Artha uses this date when reconstructing historical account
+            balances and Net Worth snapshots.
           </small>
         </div>
 
