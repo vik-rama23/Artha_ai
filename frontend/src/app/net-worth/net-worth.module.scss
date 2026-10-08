@@ -347,6 +347,14 @@
   font-size: 13px;
 }
 
+.itemActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.iconButton,
 .deleteButton {
   display: inline-flex;
   align-items: center;
@@ -358,9 +366,32 @@
   color: #9ca3af;
 }
 
+.iconButton {
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: transparent;
+  color: #9ca3af;
+}
+
+.iconButton:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
 .deleteButton:hover {
   background: #fef2f2;
   color: #b91c1c;
+}
+
+.fieldHint {
+  margin-top: -2px;
+  color: #9ca3af;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.45;
 }
 
 .loading {
