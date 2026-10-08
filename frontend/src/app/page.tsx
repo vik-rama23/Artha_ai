@@ -438,6 +438,51 @@ function getFinancialHealth(
   return { score, label, message, primaryInsight };
 }
 
+function getMonthlyChange(current: number, previous: number) {
+  if (previous === 0) {
+    return current === 0 ? 0 : null;
+  }
+
+  return ((current - previous) / Math.abs(previous)) * 100;
+}
+
+function formatChange(change: number | null) {
+  if (change === null) {
+    return "New";
+  }
+
+  const rounded = Math.abs(change).toFixed(0);
+  return change > 0 ? "+" + rounded + "%" : rounded + "%";
+}
+
+function getMonthlyReviewInsight(
+  income: number,
+  expense: number,
+  previousExpense: number,
+  savingsRate: number,
+  topCategory: DashboardData["expenses_by_category"][number] | null
+) {
+  const expenseChange = getMonthlyChange(expense, previousExpense);
+
+  if (expenseChange !== null && expenseChange > 10) {
+    return "Expenses increased this month. Review your largest spending categories before adding new commitments.";
+  }
+
+  if (savingsRate >= 25) {
+    return "You kept a strong share of your income this month. Consider directing part of the surplus toward your highest-priority goal.";
+  }
+
+  if (expense > income) {
+    return "This month ended with expenses above income. Focus on reducing discretionary spending before increasing contributions.";
+  }
+
+  if (topCategory) {
+    return topCategory.category_name + " is your largest spending category this month at " + formatCurrency(topCategory.amount) + ".";
+  }
+
+  return "Keep recording transactions consistently to make your monthly review more useful.";
+}
+
 function getCashFlowMessage(
   net: number,
   savingsRate: number
@@ -692,6 +737,32 @@ export default async function DashboardPage() {
     attentionGoal
       ? getGoalAttention(attentionGoal)
       : null;
+
+  const previousMonth =
+    monthlyCashFlow.length > 1
+      ? monthlyCashFlow[monthlyCashFlow.length - 2]
+      : null;
+
+  const currentReviewIncome = latestMonth
+    ? Number(latestMonth.income) || 0
+    : income;
+  const currentReviewExpense = latestMonth
+    ? Number(latestMonth.expense) || 0
+    : expense;
+  const previousReviewExpense = previousMonth
+    ? Number(previousMonth.expense) || 0
+    : 0;
+  const currentReviewNet =
+    currentReviewIncome - currentReviewExpense;
+  const currentReviewSavingsRate =
+    getSavingsRate(
+      currentReviewIncome,
+      currentReviewExpense
+    );
+  const expenseChange = getMonthlyChange(
+    currentReviewExpense,
+    previousReviewExpense
+  );
 
   const recommendedGoal = activeGoals
     .map((goal) => ({
@@ -1009,6 +1080,71 @@ export default async function DashboardPage() {
           <div className={styles.financialHealthInsight}>
             <span>Next focus</span>
             <strong>{financialHealth.primaryInsight}</strong>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================== */}
+      {/* MONTHLY FINANCIAL REVIEW */}
+      {/* ================================================== */}
+
+      <section className={styles.monthlyReviewCard} aria-label="Monthly financial review">
+        <div className={styles.monthlyReviewHeader}>
+          <div>
+            <p className={styles.eyebrow}>Monthly review</p>
+            <h2>
+              {latestMonth
+                ? formatMonthYear(latestMonth.month)
+                : "This month"}
+            </h2>
+            <p className={styles.monthlyReviewSubtitle}>
+              A quick look at how your money moved this month.
+            </p>
+          </div>
+
+          <div className={styles.monthlyReviewNet}>
+            <span>Net saved</span>
+            <strong className={currentReviewNet >= 0 ? styles.reviewPositive : styles.reviewNegative}>
+              {formatCurrency(currentReviewNet)}
+            </strong>
+          </div>
+        </div>
+
+        <div className={styles.monthlyReviewMetrics}>
+          <div>
+            <span>Income</span>
+            <strong>{formatCompactCurrency(currentReviewIncome)}</strong>
+          </div>
+          <div>
+            <span>Expenses</span>
+            <strong>{formatCompactCurrency(currentReviewExpense)}</strong>
+            <small>
+              {expenseChange === null
+                ? "No previous data"
+                : formatChange(expenseChange) + " vs previous month"}
+            </small>
+          </div>
+          <div>
+            <span>Savings rate</span>
+            <strong>{Math.max(currentReviewSavingsRate, 0).toFixed(0)}%</strong>
+          </div>
+        </div>
+
+        <div className={styles.monthlyReviewInsight}>
+          <div className={styles.monthlyReviewInsightIcon}>
+            <TrendingUp size={15} strokeWidth={1.9} />
+          </div>
+          <div>
+            <span>Artha insight</span>
+            <p>
+              {getMonthlyReviewInsight(
+                currentReviewIncome,
+                currentReviewExpense,
+                previousReviewExpense,
+                currentReviewSavingsRate,
+                topCategories[0] ?? null
+              )}
+            </p>
           </div>
         </div>
       </section>
