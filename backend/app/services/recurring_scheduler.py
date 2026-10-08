@@ -8,6 +8,7 @@ from sqlalchemy import text
 from app.db.session import SessionLocal
 from app.models.budgets import Budget
 from app.models.recurring_transactions import RecurringTransaction
+from app.models.transactions import Transaction
 from app.services.budgets import normalize_month_start
 from app.services.notifications import (
     process_notifications_for_user,
@@ -91,6 +92,18 @@ def get_notification_user_ids(
         )
     }
 
+    transaction_user_ids = {
+        UUID(str(user_id))
+        for (user_id,) in (
+            db.query(Transaction.user_id)
+            .filter(
+                Transaction.transaction_date <= processing_date,
+            )
+            .distinct()
+            .all()
+        )
+    }
+
     recurring_user_ids = {
         UUID(str(user_id))
         for (user_id,) in (
@@ -105,7 +118,11 @@ def get_notification_user_ids(
         )
     }
 
-    return budget_user_ids | recurring_user_ids
+    return (
+        budget_user_ids
+        | recurring_user_ids
+        | transaction_user_ids
+    )
 
 
 def get_due_recurring_user_ids(
