@@ -323,6 +323,21 @@
 .totalExpense {
   color: #285a45;
   font-size: 13px;
+  white-space: nowrap;
+}
+
+.savingsTrendSummary {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 16px;
+  text-align: right;
+
+  > span {
+    color: #8c948d;
+    font-size: 9px;
+    white-space: nowrap;
+  }
 }
 
 .donutArea {
