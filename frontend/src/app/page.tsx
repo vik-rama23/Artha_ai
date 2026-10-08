@@ -438,6 +438,45 @@ function getFinancialHealth(
   return { score, label, message, primaryInsight };
 }
 
+function getMonthlyChange(current: number, previous: number) {
+  if (previous === 0) {
+    return current === 0 ? 0 : null;
+  }
+
+  return ((current - previous) / Math.abs(previous)) * 100;
+}
+
+function getMonthlyReviewInsight(
+  income: number,
+  expense: number,
+  previousExpense: number,
+  savingsRate: number,
+  topCategory: DashboardData["expenses_by_category"][number] | null
+) {
+  const expenseChange = getMonthlyChange(
+    expense,
+    previousExpense
+  );
+
+  if (expenseChange !== null && expenseChange > 10) {
+    return "Expenses increased this month. Review your largest spending category.";
+  }
+
+  if (savingsRate >= 25) {
+    return "Strong savings month. Consider directing part of the surplus toward your highest-priority goal.";
+  }
+
+  if (expense > income) {
+    return "Expenses are above income this month. Focus on discretionary spending before increasing contributions.";
+  }
+
+  if (topCategory) {
+    return topCategory.category_name + " is your largest spending category this month.";
+  }
+
+  return "Keep recording transactions consistently to make your monthly review more useful.";
+}
+
 function getCashFlowMessage(
   net: number,
   savingsRate: number
@@ -692,6 +731,39 @@ export default async function DashboardPage() {
     attentionGoal
       ? getGoalAttention(attentionGoal)
       : null;
+
+  const previousMonth =
+    monthlyCashFlow.length > 1
+      ? monthlyCashFlow[monthlyCashFlow.length - 2]
+      : null;
+
+  const currentReviewIncome = latestMonth
+    ? Number(latestMonth.income) || 0
+    : income;
+  const currentReviewExpense = latestMonth
+    ? Number(latestMonth.expense) || 0
+    : expense;
+  const previousReviewExpense = previousMonth
+    ? Number(previousMonth.expense) || 0
+    : 0;
+  const currentReviewNet =
+    currentReviewIncome - currentReviewExpense;
+  const currentReviewSavingsRate =
+    getSavingsRate(
+      currentReviewIncome,
+      currentReviewExpense
+    );
+  const expenseChange = getMonthlyChange(
+    currentReviewExpense,
+    previousReviewExpense
+  );
+  const reviewInsight = getMonthlyReviewInsight(
+    currentReviewIncome,
+    currentReviewExpense,
+    previousReviewExpense,
+    currentReviewSavingsRate,
+    topCategories[0] ?? null
+  );
 
   const recommendedGoal = activeGoals
     .map((goal) => ({
@@ -1265,6 +1337,52 @@ export default async function DashboardPage() {
         </Link>
       </section>
 
+
+      {/* ================================================== */}
+      {/* THIS MONTH */}
+      {/* ================================================== */}
+
+      <section className={styles.monthlyReviewStrip}>
+        <div className={styles.monthlyReviewStripTitle}>
+          <span>This month</span>
+          <strong>
+            {latestMonth
+              ? formatMonthYear(latestMonth.month)
+              : "Current month"}
+          </strong>
+        </div>
+
+        <div className={styles.monthlyReviewStripMetrics}>
+          <div>
+            <span>Income</span>
+            <strong>{formatCompactCurrency(currentReviewIncome)}</strong>
+          </div>
+          <div>
+            <span>Expenses</span>
+            <strong>{formatCompactCurrency(currentReviewExpense)}</strong>
+            <small>
+              {expenseChange === null
+                ? "No previous data"
+                : (expenseChange > 0 ? "+" : "") +
+                  expenseChange.toFixed(0) +
+                  "% vs last month"}
+            </small>
+          </div>
+          <div>
+            <span>Saved</span>
+            <strong>{formatCompactCurrency(currentReviewNet)}</strong>
+          </div>
+          <div>
+            <span>Savings rate</span>
+            <strong>{Math.max(currentReviewSavingsRate, 0).toFixed(0)}%</strong>
+          </div>
+        </div>
+
+        <div className={styles.monthlyReviewStripInsight}>
+          <TrendingUp size={14} strokeWidth={1.9} />
+          <span>{reviewInsight}</span>
+        </div>
+      </section>
 
       {/* ================================================== */}
       {/* FINANCIAL GOALS */}
