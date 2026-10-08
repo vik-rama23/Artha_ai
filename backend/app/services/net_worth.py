@@ -198,7 +198,18 @@ def create_net_worth_item(
     user_id: UUID,
     payload: NetWorthItemCreate,
 ) -> NetWorthItem:
-    item = NetWorthItem(user_id=user_id, **payload.model_dump())
+    history_start_date = payload.history_start_date or payload.as_of_date
+
+    if history_start_date > payload.as_of_date:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="History start date cannot be after the as-of date.",
+        )
+
+    data = payload.model_dump()
+    data["history_start_date"] = history_start_date
+
+    item = NetWorthItem(user_id=user_id, **data)
     db.add(item)
     db.commit()
     db.refresh(item)
@@ -223,7 +234,21 @@ def update_net_worth_item(
             detail="Net worth item not found.",
         )
 
-    for field, value in payload.model_dump(exclude_unset=True).items():
+    values = payload.model_dump(exclude_unset=True)
+
+    effective_as_of_date = values.get("as_of_date", item.as_of_date)
+    effective_history_start_date = values.get(
+        "history_start_date",
+        item.history_start_date,
+    )
+
+    if effective_history_start_date > effective_as_of_date:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="History start date cannot be after the as-of date.",
+        )
+
+    for field, value in values.items():
         setattr(item, field, value)
 
     db.commit()
