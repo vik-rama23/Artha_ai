@@ -861,3 +861,301 @@
     font-size: 9px;
   }
 }
+
+/* ============================================================
+   Analytics V4
+   Cash Flow Forecast
+   ============================================================ */
+
+.forecastSection {
+  margin-bottom: 14px;
+  padding: 20px;
+  border: 1px solid #dfe8e1;
+  border-radius: 15px;
+  background: #fbfdfb;
+  box-shadow: 0 5px 18px rgba(43, 53, 46, 0.045);
+}
+
+.forecastHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.forecastEyebrow {
+  margin: 0 0 4px;
+  color: #a67b2f;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.forecastHeader h2 {
+  margin: 0;
+  color: #234b3b;
+  font-size: 16px;
+}
+
+.forecastHeader span {
+  display: block;
+  margin-top: 5px;
+  color: #8a928c;
+  font-size: 10px;
+}
+
+.forecastStatus {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.forecastStatusHEALTHY {
+  color: #2f6947;
+  background: #edf7ef;
+}
+
+.forecastStatusWATCH {
+  color: #9a722d;
+  background: #fbf4df;
+}
+
+.forecastStatusRISK {
+  color: #a84d3b;
+  background: #fdf0ed;
+}
+
+.forecastMain {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(0, 2.1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.forecastBalance {
+  padding: 15px;
+  border: 1px solid #e3ebe4;
+  border-radius: 11px;
+  background: #ffffff;
+}
+
+.forecastBalance span {
+  display: block;
+  color: #8a928c;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.forecastBalance strong {
+  display: block;
+  margin-top: 8px;
+  color: #1f5a43;
+  font-size: 25px;
+  letter-spacing: -0.6px;
+}
+
+.forecastBalance small {
+  display: block;
+  margin-top: 5px;
+  color: #9a9f9a;
+  font-size: 8px;
+}
+
+.forecastMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid #e3ebe4;
+  border-radius: 11px;
+  background: #ffffff;
+}
+
+.forecastMetrics > div {
+  padding: 14px 12px;
+  border-left: 1px solid #edf0ec;
+}
+
+.forecastMetrics > div:first-child {
+  border-left: 0;
+}
+
+.forecastMetrics span {
+  display: block;
+  color: #8a928c;
+  font-size: 8px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.forecastMetrics strong {
+  display: block;
+  margin-top: 6px;
+  color: #315343;
+  font-size: 12px;
+}
+
+.forecastInsight {
+  display: flex;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #f4f8f4;
+  color: #69766e;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.forecastInsight strong {
+  flex: 0 0 auto;
+  color: #39704d;
+}
+
+.forecastCommitments {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e8ede8;
+}
+
+.forecastCommitmentsHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.forecastCommitmentsHeader h3 {
+  margin: 0;
+  color: #385648;
+  font-size: 11px;
+}
+
+.forecastCommitmentsHeader p {
+  margin: 4px 0 0;
+  color: #929991;
+  font-size: 8px;
+}
+
+.forecastCommitmentsHeader > span {
+  flex: 0 0 auto;
+  color: #8a928c;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.forecastItemList {
+  display: flex;
+  flex-direction: column;
+}
+
+.forecastItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee9df;
+}
+
+.forecastItem:last-child {
+  border-bottom: 0;
+}
+
+.forecastItem > div {
+  min-width: 0;
+}
+
+.forecastItem > div strong {
+  display: block;
+  overflow: hidden;
+  color: #315343;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.forecastItem > div span {
+  display: block;
+  margin-top: 3px;
+  color: #969d97;
+  font-size: 8px;
+}
+
+.forecastIncome,
+.forecastExpense {
+  flex: 0 0 auto;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.forecastIncome {
+  color: #357657;
+}
+
+.forecastExpense {
+  color: #a85f3d;
+}
+
+.forecastEmpty {
+  padding: 12px;
+  border-radius: 8px;
+  background: #f7f3ea;
+  color: #8a928c;
+  font-size: 9px;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .forecastMain {
+    grid-template-columns: 1fr;
+  }
+
+  .forecastMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .forecastMetrics > div:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid #edf0ec;
+  }
+
+  .forecastMetrics > div:nth-child(4) {
+    border-top: 1px solid #edf0ec;
+  }
+}
+
+@media (max-width: 480px) {
+  .forecastSection {
+    padding: 15px;
+  }
+
+  .forecastHeader {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .forecastStatus {
+    align-self: flex-start;
+  }
+
+  .forecastMetrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .forecastMetrics > div {
+    border-left: 0;
+  }
+
+  .forecastMetrics > div:nth-child(n + 3) {
+    border-top: 1px solid #edf0ec;
+  }
+
+  .forecastItem {
+    align-items: flex-start;
+  }
+}
