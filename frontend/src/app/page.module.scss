@@ -606,6 +606,28 @@
 }
 
 @media (max-width: 600px) {
+  .monthlyReviewStrip {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .monthlyReviewStripTitle {
+    grid-column: 1 / -1;
+  }
+
+  .monthlyReviewStripMetrics {
+    grid-column: 1 / -1;
+  }
+
+  .monthlyReviewStripInsight {
+    grid-column: 1 / -1;
+    padding: 8px 0 0;
+    border-top: 1px solid #eee9df;
+    border-left: 0;
+  }
+
+
   .dashboardHealth {
     margin: 0;
   }
@@ -1293,6 +1315,93 @@
 .goalAttention:hover .goalAttentionArrow {
   color: #39704d;
   transform: translateX(2px);
+}
+
+.monthlyReviewStrip {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr) minmax(220px, 1.2fr);
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 13px 15px;
+  border: 1px solid #e5dfd4;
+  border-radius: 13px;
+  background: #fffdf9;
+}
+
+.monthlyReviewStripTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.monthlyReviewStripTitle span {
+  color: #9a9d97;
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.monthlyReviewStripTitle strong {
+  color: #385347;
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.monthlyReviewStripMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.monthlyReviewStripMetrics > div {
+  min-width: 0;
+  padding-left: 10px;
+  border-left: 1px solid #eee9df;
+}
+
+.monthlyReviewStripMetrics span {
+  display: block;
+  color: #9a9d97;
+  font-size: 7px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.monthlyReviewStripMetrics strong {
+  display: block;
+  margin-top: 3px;
+  color: #315a49;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.monthlyReviewStripMetrics small {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: #8a918b;
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.monthlyReviewStripInsight {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  padding-left: 12px;
+  border-left: 1px solid #eee9df;
+  color: #69766e;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.monthlyReviewStripInsight svg {
+  flex: 0 0 auto;
+  color: #39704d;
 }
 
 .goalNextAction {
