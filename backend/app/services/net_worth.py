@@ -4,16 +4,13 @@ from decimal import Decimal
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import and_, or_, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.accounts import Account
 from app.models.net_worth import NetWorthItem
 from app.models.transactions import Transaction
-from app.schemas.net_worth import (
-    NetWorthItemCreate,
-    NetWorthItemUpdate,
-)
+from app.schemas.net_worth import NetWorthItemCreate, NetWorthItemUpdate
 
 
 ASSET_ACCOUNT_TYPES = {"BANK", "CASH", "INVESTMENT"}
@@ -29,15 +26,17 @@ def _account_balance_at(
         select(Transaction)
         .where(Transaction.account_id == account.id)
         .where(Transaction.transaction_date <= as_of_date)
+        .order_by(Transaction.transaction_date.asc())
     ).all()
 
     balance = account.opening_balance
+    is_liability = account.account_type.upper() in LIABILITY_ACCOUNT_TYPES
 
     for transaction in transactions:
         if transaction.transaction_type == "INCOME":
-            balance += transaction.amount
+            balance += -transaction.amount if is_liability else transaction.amount
         elif transaction.transaction_type == "EXPENSE":
-            balance -= transaction.amount
+            balance += transaction.amount if is_liability else -transaction.amount
 
     return balance
 
@@ -54,10 +53,12 @@ def _manual_items_at(
         .order_by(NetWorthItem.as_of_date.asc(), NetWorthItem.created_at.asc())
     ).all()
 
-    latest: dict[tuple[str, str], NetWorthItem] = {}
+    latest: dict[tuple[str, str, str], NetWorthItem] = {}
 
     for item in items:
-        latest[(item.item_type, str(item.id))] = item
+        latest[
+            (item.item_type, item.category, item.name.strip().lower())
+        ] = item
 
     return list(latest.values())
 
@@ -68,8 +69,7 @@ def _build_snapshot(
     as_of_date: date,
 ) -> tuple[Decimal, Decimal, list[dict], list[dict]]:
     accounts = db.scalars(
-        select(Account)
-        .where(Account.user_id == user_id)
+        select(Account).where(Account.user_id == user_id)
     ).all()
 
     assets = Decimal("0.00")
@@ -78,55 +78,41 @@ def _build_snapshot(
     liability_items: list[dict] = []
 
     for account in accounts:
-        balance = _account_balance_at(
-            db=db,
-            account=account,
-            as_of_date=as_of_date,
-        )
+        account_type = account.account_type.upper()
+        balance = _account_balance_at(db, account, as_of_date)
 
-        if account.account_type.upper() in ASSET_ACCOUNT_TYPES:
-            if balance > 0:
-                assets += balance
-                asset_items.append({
-                    "name": account.name,
-                    "category": account.account_type.upper(),
-                    "source": "ACCOUNT",
-                    "value": balance,
-                })
-        elif account.account_type.upper() in LIABILITY_ACCOUNT_TYPES:
+        if account_type in ASSET_ACCOUNT_TYPES and balance > 0:
+            assets += balance
+            asset_items.append({
+                "name": account.name,
+                "category": account_type,
+                "source": "ACCOUNT",
+                "value": balance,
+            })
+        elif account_type in LIABILITY_ACCOUNT_TYPES:
             liability = max(balance, Decimal("0.00"))
             if liability > 0:
                 liabilities += liability
                 liability_items.append({
                     "name": account.name,
-                    "category": account.account_type.upper(),
+                    "category": account_type,
                     "source": "ACCOUNT",
                     "value": liability,
                 })
 
-    manual_items = _manual_items_at(
-        db=db,
-        user_id=user_id,
-        as_of_date=as_of_date,
-    )
+    for item in _manual_items_at(db, user_id, as_of_date):
+        target = asset_items if item.item_type == "ASSET" else liability_items
+        target.append({
+            "name": item.name,
+            "category": item.category,
+            "source": "MANUAL",
+            "value": item.value,
+        })
 
-    for item in manual_items:
         if item.item_type == "ASSET":
             assets += item.value
-            asset_items.append({
-                "name": item.name,
-                "category": item.category,
-                "source": "MANUAL",
-                "value": item.value,
-            })
         else:
             liabilities += item.value
-            liability_items.append({
-                "name": item.name,
-                "category": item.category,
-                "source": "MANUAL",
-                "value": item.value,
-            })
 
     return assets, liabilities, asset_items, liability_items
 
@@ -148,23 +134,14 @@ def get_net_worth(
     as_of_date: date | None = None,
 ) -> dict:
     today = as_of_date or date.today()
-
     assets, liabilities, asset_items, liability_items = _build_snapshot(
-        db=db,
-        user_id=user_id,
-        as_of_date=today,
+        db, user_id, today
     )
 
-    previous_date = _subtract_months(today, 1)
-    previous_month_end = _month_end(
-        previous_date.year,
-        previous_date.month,
-    )
-
+    previous_start = _subtract_months(today, 1)
+    previous_end = _month_end(previous_start.year, previous_start.month)
     previous_assets, previous_liabilities, _, _ = _build_snapshot(
-        db=db,
-        user_id=user_id,
-        as_of_date=previous_month_end,
+        db, user_id, previous_end
     )
 
     history: list[dict] = []
@@ -174,17 +151,10 @@ def get_net_worth(
             date(today.year, today.month, 1),
             offset,
         )
-        month_end = _month_end(
-            month_start.year,
-            month_start.month,
-        )
-
+        month_end = _month_end(month_start.year, month_start.month)
         month_assets, month_liabilities, _, _ = _build_snapshot(
-            db=db,
-            user_id=user_id,
-            as_of_date=month_end,
+            db, user_id, month_end
         )
-
         history.append({
             "month": month_start,
             "assets": month_assets,
@@ -200,7 +170,7 @@ def get_net_worth(
         "asset_change": assets - previous_assets,
         "liability_change": liabilities - previous_liabilities,
         "net_worth_change": (
-            (assets - liabilities)
+            assets - liabilities
             - (previous_assets - previous_liabilities)
         ),
         "asset_items": asset_items,
@@ -209,10 +179,7 @@ def get_net_worth(
     }
 
 
-def get_net_worth_items(
-    db: Session,
-    user_id: UUID,
-) -> list[NetWorthItem]:
+def get_net_worth_items(db: Session, user_id: UUID) -> list[NetWorthItem]:
     return list(
         db.scalars(
             select(NetWorthItem)
@@ -231,16 +198,7 @@ def create_net_worth_item(
     user_id: UUID,
     payload: NetWorthItemCreate,
 ) -> NetWorthItem:
-    item = NetWorthItem(
-        user_id=user_id,
-        name=payload.name,
-        item_type=payload.item_type,
-        category=payload.category,
-        value=payload.value,
-        as_of_date=payload.as_of_date,
-        notes=payload.notes,
-    )
-
+    item = NetWorthItem(user_id=user_id, **payload.model_dump())
     db.add(item)
     db.commit()
     db.refresh(item)
