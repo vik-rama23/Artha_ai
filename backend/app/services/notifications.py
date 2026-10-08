@@ -10,15 +10,19 @@ from app.models.budgets import Budget
 from app.models.notifications import Notification
 from app.models.recurring_transactions import RecurringTransaction
 from app.services.budgets import (
+    calculate_projected_spend,
     get_budget_status,
     get_month_end,
     get_spending_for_budget,
     normalize_month_start,
 )
+from app.services.cash_flow_forecast import get_cash_flow_forecast
 
 
 BUDGET_WARNING = "BUDGET_WARNING"
 BUDGET_EXCEEDED = "BUDGET_EXCEEDED"
+BUDGET_FORECAST_RISK = "BUDGET_FORECAST_RISK"
+CASH_FLOW_RISK = "CASH_FLOW_RISK"
 RECURRING_PAYMENT_DUE = "RECURRING_PAYMENT_DUE"
 RECURRING_PAYMENT_OVERDUE = "RECURRING_PAYMENT_OVERDUE"
 
@@ -250,6 +254,46 @@ def _create_budget_notification(
 
     budget_label = budget.name.strip()
 
+    projected_spend = calculate_projected_spend(
+        spent=spent,
+        month_start=month_start,
+        month_end=month_end,
+        today=processing_date,
+    )
+    projected_overspend = (
+        max(
+            projected_spend - amount,
+            Decimal("0.00"),
+        )
+        if projected_spend is not None
+        else Decimal("0.00")
+    )
+
+    if (
+        projected_overspend > Decimal("0.00")
+        and status_value != "EXCEEDED"
+    ):
+        notification = create_notification(
+            db=db,
+            user_id=user_id,
+            notification_type=BUDGET_FORECAST_RISK,
+            title=f"Budget forecast risk: {budget_label}",
+            message=(
+                f"At your current spending rate, {budget_label} "
+                f"may exceed its {_format_amount(amount)} budget "
+                f"by about {_format_amount(projected_overspend)}."
+            ),
+            priority=PRIORITY_HIGH,
+            dedupe_key=(
+                f"{BUDGET_FORECAST_RISK}:"
+                f"{budget.id}:{month_start.isoformat()}"
+            ),
+            reference_type="BUDGET",
+            reference_id=budget.id,
+            scheduled_for=_utc_datetime_for_date(processing_date),
+        )
+        return notification is not None
+
     if status_value == "EXCEEDED":
         notification_type = BUDGET_EXCEEDED
         title = f"Budget exceeded: {budget_label}"
@@ -460,6 +504,40 @@ def process_notifications_for_user(
                 ),
             ):
                 created += 1
+
+        try:
+            forecast = get_cash_flow_forecast(
+                db=db,
+                user_id=user_id,
+                forecast_date=today,
+            )
+
+            if forecast["status"] == "RISK":
+                projected_balance = forecast[
+                    "projected_month_end_balance"
+                ]
+
+                notification = create_notification(
+                    db=db,
+                    user_id=user_id,
+                    notification_type=CASH_FLOW_RISK,
+                    title="Cash flow risk: projected deficit",
+                    message=forecast["insight"],
+                    priority=PRIORITY_HIGH,
+                    dedupe_key=(
+                        f"{CASH_FLOW_RISK}:"
+                        f"{user_id}:{today.year}-{today.month:02d}"
+                    ),
+                    reference_type="CASH_FLOW_FORECAST",
+                    scheduled_for=_utc_datetime_for_date(today),
+                )
+
+                if notification is not None:
+                    created += 1
+        except Exception:
+            # Forecast alerts should never prevent existing
+            # budget and recurring notifications from being created.
+            db.rollback()
 
         db.commit()
 
