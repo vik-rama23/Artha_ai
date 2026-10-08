@@ -8,6 +8,7 @@ export type Account = {
   institution_name: string | null;
   account_number_last4: string | null;
   opening_balance: string;
+  opening_balance_date: string;
   current_balance: string;
   currency: string;
   notes: string | null;
@@ -19,6 +20,7 @@ export type CreateAccountPayload = {
   institution_name?: string | null;
   account_number_last4?: string | null;
   opening_balance: number;
+  opening_balance_date: string;
   currency: string;
   notes?: string | null;
 };
@@ -29,6 +31,7 @@ export type UpdateAccountPayload = {
   institution_name?: string | null;
   account_number_last4?: string | null;
   opening_balance?: number;
+  opening_balance_date?: string;
   currency?: string;
   notes?: string | null;
 };
