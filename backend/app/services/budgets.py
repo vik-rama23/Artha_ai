@@ -300,6 +300,48 @@ def get_budget_response(
         warning_percentage=budget.warning_percentage,
     )
 
+    today = date.today()
+
+    if month_start.year == today.year and month_start.month == today.month:
+        days_remaining = max(
+            (month_end - today).days,
+            0,
+        )
+        elapsed_days = today.day
+    elif today > month_end:
+        days_remaining = 0
+        elapsed_days = get_days_in_month(month_start)
+    else:
+        days_remaining = get_days_in_month(month_start)
+        elapsed_days = 0
+
+    daily_spend_rate = (
+        money(
+            spent / Decimal(elapsed_days)
+        )
+        if elapsed_days > 0
+        else Decimal("0.00")
+    )
+
+    safe_daily_spend = (
+        money(
+            max(remaining, Decimal("0.00"))
+            / Decimal(days_remaining)
+        )
+        if days_remaining > 0
+        else Decimal("0.00")
+    )
+
+    insight = get_budget_insight(
+        spent=spent,
+        amount=amount,
+        remaining=remaining,
+        projected_overspend=projected_overspend,
+        percentage_used=percentage_used,
+        days_remaining=days_remaining,
+        safe_daily_spend=safe_daily_spend,
+    )
+
     category_name = None
 
     if budget.category_id is not None:
