@@ -639,6 +639,11 @@ export default async function DashboardPage() {
       return getGoalProgress(a) - getGoalProgress(b);
     })[0] ?? null;
 
+  const attention =
+    attentionGoal
+      ? getGoalAttention(attentionGoal)
+      : null;
+
   const topCategories =
     [...categories]
       .sort(
@@ -1370,46 +1375,38 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            {attentionGoal && (
-              (() => {
-                const attention = getGoalAttention(
-                  attentionGoal
-                );
+            {attentionGoal && attention && (
+              <Link
+                href={"/goals/" + attentionGoal.id}
+                className={
+                  styles.goalAttention +
+                  " " +
+                  styles["goalAttention" + attention.tone]
+                }
+              >
+                <div className={styles.goalAttentionIcon}>
+                  <AlertTriangle
+                    size={16}
+                    strokeWidth={1.9}
+                  />
+                </div>
 
-                return (
-                  <Link
-                    href={"/goals/" + attentionGoal.id}
-                    className={
-                      styles.goalAttention +
-                      " " +
-                      styles["goalAttention" + attention.tone]
-                    }
-                  >
-                    <div className={styles.goalAttentionIcon}>
-                      <AlertTriangle
-                        size={16}
-                        strokeWidth={1.9}
-                      />
-                    </div>
+                <div className={styles.goalAttentionContent}>
+                  <div className={styles.goalAttentionTop}>
+                    <span>{attention.label}</span>
+                    <strong>{attentionGoal.name}</strong>
+                  </div>
 
-                    <div className={styles.goalAttentionContent}>
-                      <div className={styles.goalAttentionTop}>
-                        <span>{attention.label}</span>
-                        <strong>{attentionGoal.name}</strong>
-                      </div>
+                  <p>{attention.message}</p>
 
-                      <p>{attention.message}</p>
+                  <small>{attention.detail}</small>
+                </div>
 
-                      <small>{attention.detail}</small>
-                    </div>
-
-                    <ArrowRight
-                      size={15}
-                      className={styles.goalAttentionArrow}
-                    />
-                  </Link>
-                );
-              })()
+                <ArrowRight
+                  size={15}
+                  className={styles.goalAttentionArrow}
+                />
+              </Link>
             )}
 
             {activeGoals.length > 0 ? (
