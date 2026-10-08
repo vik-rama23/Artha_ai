@@ -123,6 +123,8 @@ export default function EditAccountPage() {
             opening_balance: Number(
               account.opening_balance
             ),
+            opening_balance_date:
+              account.opening_balance_date,
             currency: account.currency,
             notes: account.notes,
           }}
