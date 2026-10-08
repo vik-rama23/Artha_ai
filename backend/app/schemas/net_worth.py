@@ -48,9 +48,14 @@ class NetWorthBreakdownItem(BaseModel):
 
 class NetWorthHistoryPoint(BaseModel):
     month: date
+    snapshot_date: date
     assets: Decimal
     liabilities: Decimal
     net_worth: Decimal
+    asset_change: Decimal | None = None
+    liability_change: Decimal | None = None
+    net_worth_change: Decimal | None = None
+    is_current: bool = False
 
 
 class NetWorthResponse(BaseModel):
