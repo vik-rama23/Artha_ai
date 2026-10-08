@@ -16,6 +16,7 @@ from app.schemas.accounts import (
 def get_account_balance(
     db: Session,
     account_id: UUID,
+    as_of_date=None,
 ) -> Decimal:
     account = (
         db.query(Account)
@@ -28,11 +29,10 @@ def get_account_balance(
 
     is_credit_card = account.account_type.upper() == "CREDIT_CARD"
 
-    balance_change = (
-        db.query(
-            func.coalesce(
-                func.sum(
-                    case(
+    transaction_query = db.query(
+        func.coalesce(
+            func.sum(
+                case(
                         (
                             Transaction.transaction_type
                             == "INCOME",
@@ -48,30 +48,33 @@ def get_account_balance(
                             else -Transaction.amount,
                         ),
                         else_=Decimal("0.00"),
-                    )
-                ),
-                Decimal("0.00"),
-            )
+                )
+            ),
+            Decimal("0.00"),
         )
-        .filter(
-            Transaction.account_id == account_id
-        )
-        .scalar()
+    ).filter(
+        Transaction.account_id == account_id
     )
 
-    return (
-        account.opening_balance
-        + balance_change
-    )
+    if as_of_date is not None:
+        transaction_query = transaction_query.filter(
+            Transaction.transaction_date <= as_of_date
+        )
+
+    balance_change = transaction_query.scalar()
+
+    return account.opening_balance + balance_change
 
 
 def calculate_account_balance(
     db: Session,
     account: Account,
+    as_of_date=None,
 ) -> Decimal:
     return get_account_balance(
         db=db,
         account_id=account.id,
+        as_of_date=as_of_date,
     )
 
 
