@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 from uuid import UUID
 
@@ -22,6 +23,9 @@ class AccountCreate(BaseModel):
         default=Decimal("0.00"),
         max_digits=15,
         decimal_places=2,
+    )
+    opening_balance_date: date = Field(
+        default_factory=date.today,
     )
     currency: str = Field(
         default="INR",
@@ -54,6 +58,7 @@ class AccountUpdate(BaseModel):
         max_digits=15,
         decimal_places=2,
     )
+    opening_balance_date: date | None = None
     currency: str | None = Field(
         default=None,
         pattern="^INR$",
@@ -71,6 +76,7 @@ class AccountResponse(BaseModel):
     institution_name: str | None = None
     account_number_last4: str | None = None
     opening_balance: Decimal
+    opening_balance_date: date
     current_balance: Decimal
     currency: str
     notes: str | None = None
