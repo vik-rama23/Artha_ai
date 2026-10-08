@@ -42,6 +42,39 @@
   line-height: 1.5;
 }
 
+.dashboardHealth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  margin-right: 10px;
+  padding: 7px 10px;
+  border: 1px solid #dce6df;
+  border-radius: 10px;
+  background: #f6faf7;
+}
+
+.dashboardHealth span {
+  color: #7d8981;
+  font-size: 8px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.dashboardHealth strong {
+  color: #1f5a43;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.dashboardHealth small {
+  padding-left: 6px;
+  border-left: 1px solid #dce6df;
+  color: #39704d;
+  font-size: 8px;
+  font-weight: 700;
+}
+
 .addButton {
   display: inline-flex;
   align-items: center;
@@ -573,6 +606,19 @@
 }
 
 @media (max-width: 600px) {
+  .dashboardHealth {
+    margin: 0;
+  }
+
+  .header {
+    gap: 12px;
+  }
+
+  .header > div:first-child {
+    width: 100%;
+  }
+
+
   .monthlyReviewCard {
     margin-bottom: 14px;
     padding: 15px;
@@ -1247,6 +1293,70 @@
 .goalAttention:hover .goalAttentionArrow {
   color: #39704d;
   transform: translateX(2px);
+}
+
+.goalNextAction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 11px 0 3px;
+  padding: 9px 11px;
+  border: 1px solid #e8dfc7;
+  border-radius: 10px;
+  background: #fcfaf4;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
+}
+
+.goalNextAction:hover {
+  border-color: #d8c99f;
+  background: #faf6e9;
+}
+
+.goalNextAction:focus-visible {
+  outline: 2px solid #b28a2e;
+  outline-offset: 2px;
+}
+
+.goalNextAction > div:first-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.goalNextAction > div:first-child span {
+  color: #9a722d;
+  font-size: 7px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.goalNextAction > div:first-child strong {
+  overflow: hidden;
+  color: #385347;
+  font-size: 10px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goalNextActionMeta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  color: #9a722d;
+}
+
+.goalNextActionMeta small {
+  font-size: 8px;
+  font-weight: 700;
 }
 
 .goalsList {
