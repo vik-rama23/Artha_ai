@@ -138,7 +138,10 @@ def get_dashboard(
             account_id=account.id,
         )
 
-        total_balance += balance
+        if account.account_type.upper() == "CREDIT_CARD":
+            total_balance -= balance
+        else:
+            total_balance += balance
 
     # --------------------------------------------------
     # Current Month Summary
