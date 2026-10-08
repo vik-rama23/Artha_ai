@@ -156,12 +156,15 @@ export default function AccountsPage() {
   }, []);
 
   const totalBalance = useMemo(() => {
-    return accounts.reduce(
-      (total, account) =>
-        total +
-        Number(account.current_balance),
-      0
-    );
+    return accounts.reduce((total, account) => {
+      const balance = Number(account.current_balance);
+
+      if (account.account_type.toUpperCase() === "CREDIT_CARD") {
+        return total - balance;
+      }
+
+      return total + balance;
+    }, 0);
   }, [accounts]);
 
   function openDeleteModal(
@@ -314,7 +317,7 @@ export default function AccountsPage() {
 
             <div>
               <span>
-                Total Balance
+                Net Account Balance
               </span>
 
               <strong>
