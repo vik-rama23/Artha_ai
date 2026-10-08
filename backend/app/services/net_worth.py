@@ -50,6 +50,7 @@ def _manual_items_at(
         select(NetWorthItem)
         .where(NetWorthItem.user_id == user_id)
         .where(NetWorthItem.as_of_date <= as_of_date)
+        .where(NetWorthItem.history_start_date <= as_of_date)
         .order_by(NetWorthItem.as_of_date.asc(), NetWorthItem.created_at.asc())
     ).all()
 
