@@ -757,6 +757,15 @@ export default async function DashboardPage() {
     currentReviewExpense,
     previousReviewExpense
   );
+  const topCategories =
+    [...categories]
+      .sort(
+        (a, b) =>
+          Number(b.amount) -
+          Number(a.amount)
+      )
+      .slice(0, 5);
+
   const reviewInsight = getMonthlyReviewInsight(
     currentReviewIncome,
     currentReviewExpense,
@@ -782,15 +791,6 @@ export default async function DashboardPage() {
       (a, b) =>
         b.monthly - a.monthly
     )[0] ?? null;
-
-  const topCategories =
-    [...categories]
-      .sort(
-        (a, b) =>
-          Number(b.amount) -
-          Number(a.amount)
-      )
-      .slice(0, 5);
 
   return (
     <main className={styles.dashboard}>
