@@ -19,37 +19,6 @@
   }
 }
 
-.headerActions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.periodControl {
-  min-width: 155px;
-  padding: 11px 14px;
-  border: 1px solid #e3ddcf;
-  border-radius: 12px;
-  background: #fffdf8;
-  text-align: right;
-
-  span {
-    display: block;
-    color: #8c948d;
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  strong {
-    display: block;
-    margin-top: 4px;
-    color: #285a45;
-    font-size: 13px;
-  }
-}
-
 .monthNavigationBar {
   display: flex;
   align-items: center;
@@ -430,15 +399,6 @@
 
   .header h1 {
     font-size: 27px;
-  }
-
-  .headerActions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .periodControl {
-    text-align: left;
   }
 
   .addButton {
