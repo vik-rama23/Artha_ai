@@ -173,3 +173,40 @@ export async function getAnalyticsInsights(
     `/api/v1/analytics/insights${buildQuery(query)}`
   );
 }
+
+
+export type BudgetVsActualItem = {
+  budget_id: string;
+  category_id: string | null;
+  category_name: string;
+  budget_amount: string;
+  actual_amount: string;
+  variance: string;
+  percentage_used: string;
+  projected_amount: string | null;
+  projected_variance: string;
+  status: "ON_TRACK" | "WARNING" | "EXCEEDED";
+};
+
+export type BudgetVsActualResponse = {
+  month_start: string;
+  month_end: string;
+  total_budget: string;
+  total_actual: string;
+  total_variance: string;
+  total_projected: string;
+  total_projected_variance: string;
+  items: BudgetVsActualItem[];
+};
+
+export async function getBudgetVsActual(
+  monthStart?: string
+): Promise<BudgetVsActualResponse> {
+  const query = monthStart
+    ? `?month_start=${encodeURIComponent(monthStart)}`
+    : "";
+
+  return serverApiClient<BudgetVsActualResponse>(
+    `/api/v1/analytics/budget-vs-actual${query}`
+  );
+}
