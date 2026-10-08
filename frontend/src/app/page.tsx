@@ -19,6 +19,7 @@ import { getCurrentUser } from "@/lib/api/auth";
 import { getCashFlowForecast } from "@/lib/api/cashFlowForecast";
 import { getDashboard } from "@/lib/api/dashboard";
 import { getGoals } from "@/lib/api/goalsServer";
+import { getNetWorth } from "@/lib/api/netWorth";
 import { getServerBudgets } from "@/lib/api/serverBudgets";
 
 import type {
@@ -28,6 +29,7 @@ import type {
 import type { CashFlowForecast } from "@/types/cashFlowForecast";
 import type { Goal } from "@/types/goal";
 import type { Budget } from "@/lib/api/budgets";
+import type { NetWorthResponse } from "@/lib/api/netWorth";
 
 import styles from "./page.module.scss";
 
@@ -586,6 +588,7 @@ export default async function DashboardPage() {
   let goals: Goal[] = [];
   let forecast: CashFlowForecast | null = null;
   let budgets: Budget[] = [];
+  let netWorth: NetWorthResponse | null = null;
   let errorMessage = "";
 
   try {
@@ -638,6 +641,15 @@ export default async function DashboardPage() {
   } catch (error) {
     console.error(
       "Failed to load dashboard goals:",
+      error
+    );
+  }
+
+  try {
+    netWorth = await getNetWorth();
+  } catch (error) {
+    console.error(
+      "Failed to load dashboard net worth:",
       error
     );
   }
@@ -1054,6 +1066,28 @@ export default async function DashboardPage() {
           </p>
         </article>
       </section>
+
+      {netWorth && (
+        <section className={styles.netWorthStrip}>
+          <div className={styles.netWorthStripMain}>
+            <div>
+              <span>Net worth</span>
+              <strong>{formatCurrency(netWorth.net_worth)}</strong>
+            </div>
+            <div className={styles.netWorthStripMeta}>
+              <span>Assets {formatCompactCurrency(netWorth.total_assets)}</span>
+              <span>Liabilities {formatCompactCurrency(netWorth.total_liabilities)}</span>
+              <span className={Number(netWorth.net_worth_change) >= 0 ? styles.netWorthPositive : styles.netWorthNegative}>
+                {Number(netWorth.net_worth_change) >= 0 ? "+" : "-"}{formatCompactCurrency(Math.abs(Number(netWorth.net_worth_change)))} vs last month
+              </span>
+            </div>
+          </div>
+          <Link href="/net-worth" className={styles.textButton}>
+            View net worth
+            <ArrowRight size={13} />
+          </Link>
+        </section>
+      )}
 
       {/* ================================================== */}
       {/* CASH FLOW + EXPENSE BREAKDOWN */}
