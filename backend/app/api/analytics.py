@@ -22,7 +22,8 @@ from app.schemas.analytics import (
     MonthlyCashFlowResponse,
     TopTransactionsResponse,
     SavingsTrendResponse,
-    AnalyticsInsightsResponse
+    AnalyticsInsightsResponse,
+    BudgetVsActualResponse,
 )
 from app.services.analytics import (
     get_analytics_comparison,
@@ -32,7 +33,8 @@ from app.services.analytics import (
     get_monthly_cash_flow,
     get_top_transactions,
     get_savings_trend,
-    get_analytics_insights
+    get_analytics_insights,
+    get_budget_vs_actual,
 )
 
 
@@ -326,4 +328,21 @@ def analytics_insights(
 
     return AnalyticsInsightsResponse(
         **result
+    )
+
+
+@router.get(
+    "/budget-vs-actual",
+    response_model=BudgetVsActualResponse,
+    status_code=status.HTTP_200_OK,
+)
+def budget_vs_actual(
+    month_start: date | None = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return get_budget_vs_actual(
+        db=db,
+        user_id=current_user.id,
+        month_start=month_start,
     )
