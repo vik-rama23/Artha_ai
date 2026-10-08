@@ -3,6 +3,7 @@ import Link from "next/link";
 import {
   getAnalyticsComparison,
   getAnalyticsInsights,
+  getBudgetVsActual,
   getCategoryTrends,
   getExpensesByCategory,
   getIncomeExpenseSummary,
@@ -513,6 +514,7 @@ export default async function AnalyticsPage({
     savingsTrend,
     analyticsInsights,
     forecast,
+    budgetVsActual,
   ] = await Promise.all([
     getIncomeExpenseSummary(
       analyticsQuery
@@ -556,6 +558,7 @@ export default async function AnalyticsPage({
     getSavingsTrend(analyticsQuery),
     getAnalyticsInsights(analyticsQuery),
     getCashFlowForecast(),
+    getBudgetVsActual(),
   ]);
 
   const income =
@@ -766,6 +769,71 @@ export default async function AnalyticsPage({
           </Link>
         </nav>
 
+        <section className={styles.budgetActualSection}>
+          <div className={styles.budgetActualHeader}>
+            <div>
+              <p className={styles.eyebrow}>BUDGET PERFORMANCE</p>
+              <h2>Budget vs Actual</h2>
+              <p>See where your planned spending stands against actual and projected spending.</p>
+            </div>
+            <Link href="/budgets" className={styles.budgetActualLink}>
+              Manage budgets
+            </Link>
+          </div>
+
+          {budgetVsActual.items.length === 0 ? (
+            <div className={styles.budgetActualEmpty}>
+              No budgets are configured for this month yet.
+            </div>
+          ) : (
+            <>
+              <div className={styles.budgetActualMetrics}>
+                <div><span>Budget</span><strong>{formatCurrency(budgetVsActual.total_budget)}</strong></div>
+                <div><span>Actual</span><strong>{formatCurrency(budgetVsActual.total_actual)}</strong></div>
+                <div><span>Projected</span><strong>{formatCurrency(budgetVsActual.total_projected)}</strong></div>
+                <div>
+                  <span>Projected variance</span>
+                  <strong className={getNumericValue(budgetVsActual.total_projected_variance) < 0 ? styles.budgetVarianceNegative : styles.budgetVariancePositive}>
+                    {formatCurrency(budgetVsActual.total_projected_variance)}
+                  </strong>
+                </div>
+              </div>
+
+              <div className={styles.budgetActualList}>
+                {budgetVsActual.items.map((item) => {
+                  const used = Math.min(Math.max(getNumericValue(item.percentage_used), 0), 100);
+
+                  return (
+                    <div className={styles.budgetActualRow} key={item.budget_id}>
+                      <div className={styles.budgetActualName}>
+                        <strong>{item.category_name}</strong>
+                        <span>{formatCurrency(item.actual_amount)} / {formatCurrency(item.budget_amount)}</span>
+                      </div>
+
+                      <div className={styles.budgetActualTrack}>
+                        <div
+                          className={`${styles.budgetActualBar} ${
+                            item.status === "EXCEEDED"
+                              ? styles.budgetActualBarDanger
+                              : item.status === "WARNING"
+                                ? styles.budgetActualBarWarning
+                                : styles.budgetActualBarGood
+                          }`}
+                          style={{ width: used + "%" }}
+                        />
+                      </div>
+
+                      <div className={styles.budgetActualMeta}>
+                        <span>{used.toFixed(0)}% used</span>
+                        <strong>{item.projected_amount ? formatCurrency(item.projected_amount) : "—"}</strong>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </section>
         <section
           className={
             styles.summaryGrid
