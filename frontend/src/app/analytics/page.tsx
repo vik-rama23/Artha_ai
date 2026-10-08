@@ -1485,7 +1485,7 @@ export default async function AnalyticsPage({
               </p>
             </div>
 
-            <div>
+            <div className={styles.savingsTrendSummary}>
               <strong className={styles.totalExpense}>
                 {formatCurrency(savingsTrend.total_savings)}
               </strong>
