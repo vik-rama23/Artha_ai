@@ -39,6 +39,8 @@ def recalculate_account_balance(
     if account is None:
         raise ValueError("Account not found.")
 
+    is_credit_card = account.account_type.upper() == "CREDIT_CARD"
+
     balance_change = (
         db.query(
             func.coalesce(
@@ -47,12 +49,16 @@ def recalculate_account_balance(
                         (
                             Transaction.transaction_type
                             == "INCOME",
-                            Transaction.amount,
+                            -Transaction.amount
+                            if is_credit_card
+                            else Transaction.amount,
                         ),
                         (
                             Transaction.transaction_type
                             == "EXPENSE",
-                            -Transaction.amount,
+                            Transaction.amount
+                            if is_credit_card
+                            else -Transaction.amount,
                         ),
                         else_=Decimal("0.00"),
                     )
