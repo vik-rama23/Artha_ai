@@ -705,6 +705,144 @@
   transition: width 250ms ease;
 }
 
+.goalAttention {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 5px;
+  padding: 11px 12px;
+  border: 1px solid #e8dfc7;
+  border-radius: 11px;
+  background: #fcfaf4;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.goalAttention:hover {
+  border-color: #d8c99f;
+  background: #faf6e9;
+  transform: translateY(-1px);
+}
+
+.goalAttention:focus-visible {
+  outline: 2px solid #b28a2e;
+  outline-offset: 2px;
+}
+
+.goalAttentionOverdue {
+  border-color: #ead7cf;
+  background: #fdf8f5;
+}
+
+.goalAttentionOverdue:hover {
+  border-color: #dfc0b2;
+  background: #fcf3ee;
+}
+
+.goalAttentionDueSoon {
+  border-color: #e8dfc7;
+  background: #fcfaf4;
+}
+
+.goalAttentionFocus {
+  border-color: #dce6df;
+  background: #f6faf7;
+}
+
+.goalAttentionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #f0e8d4;
+  color: #9a722d;
+}
+
+.goalAttentionOverdue .goalAttentionIcon {
+  background: #f3e1d9;
+  color: #a85f3d;
+}
+
+.goalAttentionFocus .goalAttentionIcon {
+  background: #e5eee7;
+  color: #39704d;
+}
+
+.goalAttentionContent {
+  min-width: 0;
+}
+
+.goalAttentionTop {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.goalAttentionTop span {
+  flex: 0 0 auto;
+  color: #9a722d;
+  font-size: 8px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.goalAttentionOverdue .goalAttentionTop span {
+  color: #a85f3d;
+}
+
+.goalAttentionFocus .goalAttentionTop span {
+  color: #39704d;
+}
+
+.goalAttentionTop strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #385347;
+  font-size: 10px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goalAttentionContent p {
+  margin: 3px 0 0;
+  overflow: hidden;
+  color: #81877f;
+  font-size: 9px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goalAttentionContent small {
+  display: block;
+  margin-top: 4px;
+  color: #6f7c73;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.goalAttentionArrow {
+  color: #9d9f98;
+  transition:
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.goalAttention:hover .goalAttentionArrow {
+  color: #39704d;
+  transform: translateX(2px);
+}
+
 .goalsList {
   display: flex;
   flex-direction: column;
