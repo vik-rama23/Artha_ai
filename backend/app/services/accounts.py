@@ -28,45 +28,41 @@ def get_account_balance(
     if account is None:
         raise ValueError("Account not found.")
 
+    snapshot_date = as_of_date or date.today()
+
+    # An account does not contribute to historical balances before
+    # the date on which its opening balance became effective.
+    if snapshot_date < account.opening_balance_date:
+        return Decimal("0.00")
+
     is_credit_card = account.account_type.upper() == "CREDIT_CARD"
 
     transaction_query = db.query(
         func.coalesce(
             func.sum(
                 case(
-                        (
-                            Transaction.transaction_type
-                            == "INCOME",
-                            -Transaction.amount
-                            if is_credit_card
-                            else Transaction.amount,
-                        ),
-                        (
-                            Transaction.transaction_type
-                            == "EXPENSE",
-                            Transaction.amount
-                            if is_credit_card
-                            else -Transaction.amount,
-                        ),
-                        else_=Decimal("0.00"),
+                    (
+                        Transaction.transaction_type == "INCOME",
+                        -Transaction.amount
+                        if is_credit_card
+                        else Transaction.amount,
+                    ),
+                    (
+                        Transaction.transaction_type == "EXPENSE",
+                        Transaction.amount
+                        if is_credit_card
+                        else -Transaction.amount,
+                    ),
+                    else_=Decimal("0.00"),
                 )
             ),
             Decimal("0.00"),
         )
     ).filter(
-        Transaction.account_id == account_id
+        Transaction.account_id == account_id,
+        Transaction.transaction_date >= account.opening_balance_date,
+        Transaction.transaction_date <= snapshot_date,
     )
-
-    if as_of_date is not None:
-        transaction_query = transaction_query.filter(
-            Transaction.transaction_date <= as_of_date
-        )
-
-    if as_of_date is None:
-        as_of_date = date.today()
-        transaction_query = transaction_query.filter(
-            Transaction.transaction_date <= as_of_date
-        )
 
     balance_change = transaction_query.scalar()
 
@@ -142,7 +138,12 @@ def create_account(
             payload.account_number_last4
         ),
         opening_balance=payload.opening_balance,
-        current_balance=payload.opening_balance,
+        opening_balance_date=payload.opening_balance_date,
+        current_balance=(
+            payload.opening_balance
+            if payload.opening_balance_date <= date.today()
+            else Decimal("0.00")
+        ),
         currency=payload.currency.upper(),
         notes=payload.notes,
     )
@@ -188,6 +189,26 @@ def update_account(
                         "transactions have been recorded."
                     ),
                 )
+
+    if "opening_balance_date" in updates:
+        new_opening_date = updates["opening_balance_date"]
+
+        earliest_transaction_date = db.scalar(
+            select(func.min(Transaction.transaction_date))
+            .where(Transaction.account_id == account.id)
+        )
+
+        if (
+            earliest_transaction_date is not None
+            and new_opening_date > earliest_transaction_date
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=(
+                    "Opening balance date cannot be after an existing "
+                    "transaction date."
+                ),
+            )
 
     for field, value in updates.items():
         if field == "currency" and value:
