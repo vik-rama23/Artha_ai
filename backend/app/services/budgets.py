@@ -207,6 +207,45 @@ def get_budget(
     return budget
 
 
+def get_budget_insight(
+    spent: Decimal,
+    amount: Decimal,
+    remaining: Decimal,
+    projected_overspend: Decimal,
+    percentage_used: Decimal,
+    days_remaining: int,
+    safe_daily_spend: Decimal,
+) -> str:
+    if projected_overspend > Decimal("0.00"):
+        return (
+            f"At your current spending rate, this budget may exceed its limit "
+            f"by ₹{projected_overspend:,.0f}."
+        )
+
+    if remaining <= Decimal("0.00"):
+        return "This budget is fully used. Avoid additional discretionary spending."
+
+    if days_remaining <= 0:
+        return "The budget period has ended. Review this month's actual spending."
+
+    if percentage_used >= Decimal("80.00"):
+        return (
+            f"You have {days_remaining} days left. "
+            f"Try to keep spending within ₹{safe_daily_spend:,.0f} per day."
+        )
+
+    if percentage_used >= Decimal("50.00") and days_remaining <= 10:
+        return (
+            f"You have {days_remaining} days left with "
+            f"₹{remaining:,.0f} remaining."
+        )
+
+    return (
+        f"You can spend about ₹{safe_daily_spend:,.0f} per day "
+        "and stay within this budget."
+    )
+
+
 def get_budget_response(
     db: Session,
     budget: Budget,
@@ -292,6 +331,10 @@ def get_budget_response(
         ),
         "projected_spend": projected_spend,
         "projected_overspend": projected_overspend,
+        "days_remaining": days_remaining,
+        "daily_spend_rate": daily_spend_rate,
+        "safe_daily_spend": safe_daily_spend,
+        "insight": insight,
         "status": status_value,
         "created_at": budget.created_at.isoformat(),
         "updated_at": budget.updated_at.isoformat(),
