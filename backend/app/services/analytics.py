@@ -1163,6 +1163,21 @@ def get_budget_vs_actual(
         .all()
     )
 
+    # An overall budget represents the complete spending limit.
+    # When it exists, do not add category budgets to the total because
+    # that would double-count the same spending plan.
+    overall_budget = next(
+        (
+            budget
+            for budget in budgets
+            if budget.category_id is None
+        ),
+        None,
+    )
+
+    if overall_budget is not None:
+        budgets = [overall_budget]
+
     items = []
 
     for budget in budgets:
