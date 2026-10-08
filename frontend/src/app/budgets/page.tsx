@@ -178,14 +178,11 @@ export default async function BudgetsPage({
           </p>
         </div>
 
-        <Link href="/budgets/new" className={styles.addButton}>
-          <Plus size={18} />
-          Add Budget
-        </Link>
       </header>
 
       <nav className={styles.monthNavigationBar} aria-label="Budget month">
-        <Link
+        <div className={styles.monthNavigationLinks}>
+          <Link
           href={`/budgets?month=${previousMonth}`}
           className={styles.monthNavigationLink}
           aria-label="Previous month"
@@ -200,12 +197,18 @@ export default async function BudgetsPage({
           This Month
         </Link>
 
-        <Link
-          href={`/budgets?month=${nextMonth}`}
-          className={styles.monthNavigationLink}
-          aria-label="Next month"
-        >
-          Next →
+          <Link
+            href={`/budgets?month=${nextMonth}`}
+            className={styles.monthNavigationLink}
+            aria-label="Next month"
+          >
+            Next →
+          </Link>
+        </div>
+
+        <Link href="/budgets/new" className={styles.addButton}>
+          <Plus size={17} />
+          Add Budget
         </Link>
       </nav>
 
