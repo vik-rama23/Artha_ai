@@ -287,6 +287,152 @@
 }
 
 /* ============================================================
+   FINANCIAL HEALTH
+   ============================================================ */
+
+.financialHealthCard {
+  margin-bottom: 20px;
+  padding: 19px 20px;
+  border: 1px solid #e1e7e2;
+  border-radius: 17px;
+  background: #fbfdfb;
+  box-shadow: 0 5px 18px rgba(40, 49, 43, 0.045);
+}
+
+.financialHealthHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.financialHealthTitle {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 11px;
+}
+
+.financialHealthIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 11px;
+  background: #e5eee7;
+  color: #39704d;
+}
+
+.financialHealthTitle .eyebrow {
+  margin: 0 0 3px;
+  color: #718077;
+  font-size: 8px;
+}
+
+.financialHealthTitle h2 {
+  margin: 0;
+  overflow: hidden;
+  color: #385347;
+  font-size: 13px;
+  font-weight: 720;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.financialHealthScore {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.financialHealthScore strong {
+  color: #1f5a43;
+  font-size: 25px;
+  font-weight: 780;
+  line-height: 1;
+}
+
+.financialHealthScore span {
+  color: #9ba39d;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.financialHealthBody {
+  margin-top: 15px;
+}
+
+.financialHealthProgress {
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e8ede9;
+}
+
+.financialHealthProgressBar {
+  height: 100%;
+  border-radius: inherit;
+  background: #39704d;
+  transition: width 300ms ease;
+}
+
+.financialHealthBody p {
+  margin: 8px 0 0;
+  color: #7f8982;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.financialHealthMetrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(210px, 1.4fr);
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.financialHealthMetrics > div {
+  min-width: 0;
+  padding: 10px 11px;
+  border: 1px solid #e5ebe6;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.financialHealthMetrics span {
+  display: block;
+  color: #9aa29c;
+  font-size: 8px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.financialHealthMetrics strong {
+  display: block;
+  margin-top: 5px;
+  overflow: hidden;
+  color: #315a49;
+  font-size: 11px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.financialHealthInsight strong {
+  color: #53685c;
+  font-size: 9px;
+}
+
+@media (max-width: 820px) {
+  .financialHealthMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ============================================================
    CASH FLOW
    ============================================================ */
 
