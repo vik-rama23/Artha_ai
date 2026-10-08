@@ -64,11 +64,6 @@ export default function AccountForm({
       return;
     }
 
-    if (form.opening_balance < 0) {
-      setError("Opening balance cannot be negative.");
-      return;
-    }
-
     if (
       form.account_number_last4 &&
       form.account_number_last4.length !== 4
@@ -230,7 +225,6 @@ export default function AccountForm({
           <input
             id="opening_balance"
             type="number"
-            min="0"
             step="0.01"
             value={form.opening_balance}
             onChange={(event) =>
@@ -242,6 +236,11 @@ export default function AccountForm({
             placeholder="0.00"
             disabled={submitting}
           />
+
+          <span className={styles.fieldHint}>
+            Use a negative opening balance for an overdraft or
+            credit balance that already existed when you started tracking.
+          </span>
         </div>
 
         <div className={styles.field}>
