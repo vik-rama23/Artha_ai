@@ -6,6 +6,7 @@ import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
+  AlertTriangle,
   CalendarDays,
   CreditCard,
   IndianRupee,
@@ -318,6 +319,83 @@ function getGoalDeadline(goal: Goal) {
   }).format(target);
 }
 
+function getGoalDaysRemaining(goal: Goal) {
+  if (!goal.target_date) {
+    return null;
+  }
+
+  const target = new Date(
+    goal.target_date + "T00:00:00"
+  );
+  const today = new Date();
+
+  if (Number.isNaN(target.getTime())) {
+    return null;
+  }
+
+  today.setHours(0, 0, 0, 0);
+  target.setHours(0, 0, 0, 0);
+
+  return Math.ceil(
+    (target.getTime() - today.getTime()) /
+      (1000 * 60 * 60 * 24)
+  );
+}
+
+function getGoalAttention(goal: Goal) {
+  const daysRemaining = getGoalDaysRemaining(goal);
+  const current = Number(goal.current_amount) || 0;
+  const target = Number(goal.target_amount) || 0;
+  const remaining = Math.max(target - current, 0);
+  const progress = getGoalProgress(goal);
+
+  if (daysRemaining !== null && daysRemaining < 0) {
+    return {
+      tone: "overdue",
+      label: "Needs attention",
+      message:
+        "This goal is overdue. Consider updating the target date or increasing your contribution.",
+      detail: formatCurrency(remaining) + " remaining",
+    };
+  }
+
+  if (daysRemaining !== null && daysRemaining <= 30) {
+    const timeLabel =
+      daysRemaining === 0
+        ? "Due today"
+        : daysRemaining === 1
+          ? "1 day left"
+          : daysRemaining + " days left";
+
+    return {
+      tone: "dueSoon",
+      label: "Due soon",
+      message:
+        timeLabel +
+        ". Prioritize this goal if it is important to you.",
+      detail: formatCurrency(remaining) + " remaining",
+    };
+  }
+
+  if (daysRemaining === null && progress < 50) {
+    return {
+      tone: "focus",
+      label: "Focus goal",
+      message:
+        "This goal is still below 50%. A regular contribution can help build momentum.",
+      detail: formatCurrency(remaining) + " remaining",
+    };
+  }
+
+  return {
+    tone: "focus",
+    label: "Next focus",
+    message:
+      "Keep building this goal with consistent contributions.",
+    detail: formatCurrency(remaining) + " remaining",
+  };
+}
+
 function getCashFlowMessage(
   net: number,
   savingsRate: number
@@ -523,6 +601,43 @@ export default async function DashboardPage() {
           100
         )
       : 0;
+
+  const attentionGoal = activeGoals
+    .slice()
+    .sort((a, b) => {
+      const aDays = getGoalDaysRemaining(a);
+      const bDays = getGoalDaysRemaining(b);
+
+      if (
+        aDays !== null &&
+        aDays < 0 &&
+        !(bDays !== null && bDays < 0)
+      ) {
+        return -1;
+      }
+
+      if (
+        bDays !== null &&
+        bDays < 0 &&
+        !(aDays !== null && aDays < 0)
+      ) {
+        return 1;
+      }
+
+      if (aDays !== null && bDays !== null) {
+        return aDays - bDays;
+      }
+
+      if (aDays !== null) {
+        return -1;
+      }
+
+      if (bDays !== null) {
+        return 1;
+      }
+
+      return getGoalProgress(a) - getGoalProgress(b);
+    })[0] ?? null;
 
   const topCategories =
     [...categories]
@@ -1254,6 +1369,48 @@ export default async function DashboardPage() {
                 </div>
               </div>
             </div>
+
+            {attentionGoal && (
+              (() => {
+                const attention = getGoalAttention(
+                  attentionGoal
+                );
+
+                return (
+                  <Link
+                    href={"/goals/" + attentionGoal.id}
+                    className={
+                      styles.goalAttention +
+                      " " +
+                      styles["goalAttention" + attention.tone]
+                    }
+                  >
+                    <div className={styles.goalAttentionIcon}>
+                      <AlertTriangle
+                        size={16}
+                        strokeWidth={1.9}
+                      />
+                    </div>
+
+                    <div className={styles.goalAttentionContent}>
+                      <div className={styles.goalAttentionTop}>
+                        <span>{attention.label}</span>
+                        <strong>{attentionGoal.name}</strong>
+                      </div>
+
+                      <p>{attention.message}</p>
+
+                      <small>{attention.detail}</small>
+                    </div>
+
+                    <ArrowRight
+                      size={15}
+                      className={styles.goalAttentionArrow}
+                    />
+                  </Link>
+                );
+              })()
+            )}
 
             {activeGoals.length > 0 ? (
               <div className={styles.goalsList}>
