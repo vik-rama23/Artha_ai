@@ -705,6 +705,98 @@
   transition: width 250ms ease;
 }
 
+.goalRecommendation {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 5px;
+  padding: 11px 12px;
+  border: 1px solid #dce6df;
+  border-radius: 11px;
+  background: #f6faf7;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.goalRecommendation:hover {
+  border-color: #bfd2c5;
+  background: #eff7f1;
+  transform: translateY(-1px);
+}
+
+.goalRecommendation:focus-visible {
+  outline: 2px solid #39704d;
+  outline-offset: 2px;
+}
+
+.goalRecommendationIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #e5eee7;
+  color: #39704d;
+}
+
+.goalRecommendationContent {
+  min-width: 0;
+}
+
+.goalRecommendationTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.goalRecommendationTop span {
+  overflow: hidden;
+  color: #66746b;
+  font-size: 8px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.goalRecommendationTop strong {
+  flex: 0 0 auto;
+  color: #1f5a43;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.goalRecommendationContent p {
+  margin: 3px 0 0;
+  overflow: hidden;
+  color: #81877f;
+  font-size: 9px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goalRecommendationArrow {
+  color: #9d9f98;
+  transition:
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.goalRecommendation:hover .goalRecommendationArrow {
+  color: #39704d;
+  transform: translateX(2px);
+}
+
 .goalAttention {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr) 16px;
