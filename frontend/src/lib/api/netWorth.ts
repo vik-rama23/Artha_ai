@@ -21,9 +21,14 @@ export type NetWorthBreakdownItem = {
 
 export type NetWorthHistoryPoint = {
   month: string;
+  snapshot_date: string;
   assets: string;
   liabilities: string;
   net_worth: string;
+  asset_change: string | null;
+  liability_change: string | null;
+  net_worth_change: string | null;
+  is_current: boolean;
 };
 
 export type NetWorthResponse = {
