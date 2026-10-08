@@ -237,10 +237,10 @@ export default function AccountForm({
             disabled={submitting}
           />
 
-          <span className={styles.fieldHint}>
+          <small>
             Use a negative opening balance for an overdraft or
             credit balance that already existed when you started tracking.
-          </span>
+          </small>
         </div>
 
         <div className={styles.field}>
