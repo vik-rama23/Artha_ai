@@ -8,6 +8,7 @@ export type NetWorthItem = {
   category: string;
   value: string;
   as_of_date: string;
+  history_start_date: string;
   notes: string | null;
 };
 
@@ -44,6 +45,7 @@ export type CreateNetWorthItemPayload = {
   category: string;
   value: number;
   as_of_date: string;
+  history_start_date?: string;
   notes?: string | null;
 };
 
