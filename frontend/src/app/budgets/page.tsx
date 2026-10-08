@@ -178,44 +178,43 @@ export default async function BudgetsPage({
           </p>
         </div>
 
-        <Link href="/budgets/new" className={styles.addButton}>
-          <Plus size={18} />
-          Add Budget
-        </Link>
+        <div className={styles.headerActions}>
+          <div className={styles.periodControl}>
+            <span>Month</span>
+            <strong>{formatMonth(selectedMonth)}</strong>
+          </div>
+
+          <Link href="/budgets/new" className={styles.addButton}>
+            <Plus size={18} />
+            Add Budget
+          </Link>
+        </div>
       </header>
 
-      <section className={styles.monthFilter}>
-        <div>
-          <p className={styles.sectionEyebrow}>MONTHLY VIEW</p>
+      <nav className={styles.monthNavigationBar} aria-label="Budget month">
+        <Link
+          href={`/budgets?month=${previousMonth}`}
+          className={styles.monthNavigationLink}
+          aria-label="Previous month"
+        >
+          ← Previous
+        </Link>
 
-          <h2>{formatMonth(selectedMonth)}</h2>
-        </div>
+        <Link
+          href={`/budgets?month=${getCurrentMonth()}`}
+          className={styles.monthNavigationActive}
+        >
+          This Month
+        </Link>
 
-        <div className={styles.monthNavigation}>
-          <Link
-            href={`/budgets?month=${previousMonth}`}
-            className={styles.monthButton}
-            aria-label="Previous month"
-          >
-            ←
-          </Link>
-
-          <Link
-            href={`/budgets?month=${getCurrentMonth()}`}
-            className={styles.todayButton}
-          >
-            This month
-          </Link>
-
-          <Link
-            href={`/budgets?month=${nextMonth}`}
-            className={styles.monthButton}
-            aria-label="Next month"
-          >
-            →
-          </Link>
-        </div>
-      </section>
+        <Link
+          href={`/budgets?month=${nextMonth}`}
+          className={styles.monthNavigationLink}
+          aria-label="Next month"
+        >
+          Next →
+        </Link>
+      </nav>
 
       <section className={styles.summaryGrid}>
         <article className={styles.summaryCard}>
