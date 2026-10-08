@@ -19,7 +19,7 @@ import { getCurrentUser } from "@/lib/api/auth";
 import { getCashFlowForecast } from "@/lib/api/cashFlowForecast";
 import { getDashboard } from "@/lib/api/dashboard";
 import { getGoals } from "@/lib/api/goalsServer";
-import { getNetWorth } from "@/lib/api/netWorth";
+import { getServerNetWorth } from "@/lib/api/serverNetWorth";
 import { getServerBudgets } from "@/lib/api/serverBudgets";
 
 import type {
@@ -646,7 +646,7 @@ export default async function DashboardPage() {
   }
 
   try {
-    netWorth = await getNetWorth();
+    netWorth = await getServerNetWorth();
   } catch (error) {
     console.error(
       "Failed to load dashboard net worth:",
