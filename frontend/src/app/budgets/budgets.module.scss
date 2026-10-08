@@ -22,13 +22,21 @@
 .monthNavigationBar {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 20px;
   padding: 5px;
   overflow-x: auto;
   border: 1px solid #e6e0d5;
   border-radius: 13px;
   background: #fffdf8;
+}
+
+.monthNavigationLinks {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: max-content;
 }
 
 .monthNavigationLink,
@@ -41,6 +49,24 @@
   font-weight: 650;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.monthNavigationLink:hover {
+  background: #f1ede4;
+  color: #285a45;
+}
+
+.monthNavigationActive {
+  background: #285a45;
+  color: #ffffff;
+}
+
+.monthNavigationBar .addButton {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 9px;
+  box-shadow: none;
+  flex: 0 0 auto;
 }
 
 .monthNavigationLink:hover {
