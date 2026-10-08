@@ -18,7 +18,8 @@ class AccountCreate(BaseModel):
     )
     opening_balance: Decimal = Field(
         default=Decimal("0.00"),
-        ge=0,
+        max_digits=15,
+        decimal_places=2,
     )
     currency: str = Field(
         default="INR",
@@ -50,7 +51,8 @@ class AccountUpdate(BaseModel):
     )
     opening_balance: Decimal | None = Field(
         default=None,
-        ge=0,
+        max_digits=15,
+        decimal_places=2,
     )
     currency: str | None = Field(
         default=None,
