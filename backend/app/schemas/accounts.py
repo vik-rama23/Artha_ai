@@ -6,7 +6,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class AccountCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
-    account_type: str = Field(min_length=1, max_length=30)
+    account_type: str = Field(
+        pattern="^(BANK|CASH|INVESTMENT|CREDIT_CARD)$"
+    )
     institution_name: str | None = Field(
         default=None,
         max_length=150,
@@ -23,8 +25,7 @@ class AccountCreate(BaseModel):
     )
     currency: str = Field(
         default="INR",
-        min_length=3,
-        max_length=3,
+        pattern="^INR$",
     )
     notes: str | None = None
 
@@ -37,8 +38,7 @@ class AccountUpdate(BaseModel):
     )
     account_type: str | None = Field(
         default=None,
-        min_length=1,
-        max_length=30,
+        pattern="^(BANK|CASH|INVESTMENT|CREDIT_CARD)$",
     )
     institution_name: str | None = Field(
         default=None,
@@ -56,8 +56,7 @@ class AccountUpdate(BaseModel):
     )
     currency: str | None = Field(
         default=None,
-        min_length=3,
-        max_length=3,
+        pattern="^INR$",
     )
     notes: str | None = None
 
