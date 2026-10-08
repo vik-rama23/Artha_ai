@@ -438,51 +438,6 @@ function getFinancialHealth(
   return { score, label, message, primaryInsight };
 }
 
-function getMonthlyChange(current: number, previous: number) {
-  if (previous === 0) {
-    return current === 0 ? 0 : null;
-  }
-
-  return ((current - previous) / Math.abs(previous)) * 100;
-}
-
-function formatChange(change: number | null) {
-  if (change === null) {
-    return "New";
-  }
-
-  const rounded = Math.abs(change).toFixed(0);
-  return change > 0 ? "+" + rounded + "%" : rounded + "%";
-}
-
-function getMonthlyReviewInsight(
-  income: number,
-  expense: number,
-  previousExpense: number,
-  savingsRate: number,
-  topCategory: DashboardData["expenses_by_category"][number] | null
-) {
-  const expenseChange = getMonthlyChange(expense, previousExpense);
-
-  if (expenseChange !== null && expenseChange > 10) {
-    return "Expenses increased this month. Review your largest spending categories before adding new commitments.";
-  }
-
-  if (savingsRate >= 25) {
-    return "You kept a strong share of your income this month. Consider directing part of the surplus toward your highest-priority goal.";
-  }
-
-  if (expense > income) {
-    return "This month ended with expenses above income. Focus on reducing discretionary spending before increasing contributions.";
-  }
-
-  if (topCategory) {
-    return topCategory.category_name + " is your largest spending category this month at " + formatCurrency(topCategory.amount) + ".";
-  }
-
-  return "Keep recording transactions consistently to make your monthly review more useful.";
-}
-
 function getCashFlowMessage(
   net: number,
   savingsRate: number
@@ -738,32 +693,6 @@ export default async function DashboardPage() {
       ? getGoalAttention(attentionGoal)
       : null;
 
-  const previousMonth =
-    monthlyCashFlow.length > 1
-      ? monthlyCashFlow[monthlyCashFlow.length - 2]
-      : null;
-
-  const currentReviewIncome = latestMonth
-    ? Number(latestMonth.income) || 0
-    : income;
-  const currentReviewExpense = latestMonth
-    ? Number(latestMonth.expense) || 0
-    : expense;
-  const previousReviewExpense = previousMonth
-    ? Number(previousMonth.expense) || 0
-    : 0;
-  const currentReviewNet =
-    currentReviewIncome - currentReviewExpense;
-  const currentReviewSavingsRate =
-    getSavingsRate(
-      currentReviewIncome,
-      currentReviewExpense
-    );
-  const expenseChange = getMonthlyChange(
-    currentReviewExpense,
-    previousReviewExpense
-  );
-
   const recommendedGoal = activeGoals
     .map((goal) => ({
       goal,
@@ -821,6 +750,12 @@ export default async function DashboardPage() {
           </p>
         </div>
 
+        <div className={styles.dashboardHealth}>
+          <span>Financial health</span>
+          <strong>{financialHealth.score}/100</strong>
+          <small>{financialHealth.label}</small>
+        </div>
+
         <Link
           href="/transactions/new"
           className={styles.addButton}
@@ -828,103 +763,6 @@ export default async function DashboardPage() {
           + Add Transaction
         </Link>
       </header>
-
-      {/* ================================================== */}
-      {/* QUICK ACTIONS */}
-      {/* ================================================== */}
-
-      <section
-        className={styles.quickActions}
-        aria-label="Quick actions"
-      >
-        <Link
-          href="/transactions/new"
-          className={`${styles.quickAction} ${styles.quickActionExpense}`}
-        >
-          <span className={styles.quickActionIcon}>
-            <ArrowDownRight
-              size={18}
-              strokeWidth={2}
-            />
-          </span>
-
-          <span>
-            <strong>
-              Add Expense
-            </strong>
-
-            <small>
-              Record spending
-            </small>
-          </span>
-        </Link>
-
-        <Link
-          href="/transactions/new"
-          className={`${styles.quickAction} ${styles.quickActionIncome}`}
-        >
-          <span className={styles.quickActionIcon}>
-            <ArrowUpRight
-              size={18}
-              strokeWidth={2}
-            />
-          </span>
-
-          <span>
-            <strong>
-              Add Income
-            </strong>
-
-            <small>
-              Record earnings
-            </small>
-          </span>
-        </Link>
-
-        <Link
-          href="/transactions/new"
-          className={styles.quickAction}
-        >
-          <span className={styles.quickActionIcon}>
-            <Receipt
-              size={18}
-              strokeWidth={1.9}
-            />
-          </span>
-
-          <span>
-            <strong>
-              Add Transaction
-            </strong>
-
-            <small>
-              Capture money movement
-            </small>
-          </span>
-        </Link>
-
-        <Link
-          href="/accounts"
-          className={styles.quickAction}
-        >
-          <span className={styles.quickActionIcon}>
-            <Wallet
-              size={18}
-              strokeWidth={1.9}
-            />
-          </span>
-
-          <span>
-            <strong>
-              Manage Accounts
-            </strong>
-
-            <small>
-              View your accounts
-            </small>
-          </span>
-        </Link>
-      </section>
 
       {/* ================================================== */}
       {/* SUMMARY CARDS */}
@@ -1034,119 +872,6 @@ export default async function DashboardPage() {
             this month
           </p>
         </article>
-      </section>
-
-      {/* ================================================== */}
-      {/* FINANCIAL HEALTH */}
-      {/* ================================================== */}
-
-      <section className={styles.financialHealthCard} aria-label="Financial health">
-        <div className={styles.financialHealthHeader}>
-          <div className={styles.financialHealthTitle}>
-            <div className={styles.financialHealthIcon}>
-              <HeartPulse size={18} strokeWidth={1.9} />
-            </div>
-            <div>
-              <p className={styles.eyebrow}>Financial health</p>
-              <h2>Your financial health is {financialHealth.label.toLowerCase()}</h2>
-            </div>
-          </div>
-          <div className={styles.financialHealthScore}>
-            <strong>{financialHealth.score}</strong>
-            <span>/100</span>
-          </div>
-        </div>
-
-        <div className={styles.financialHealthBody}>
-          <div className={styles.financialHealthProgress}>
-            <div className={styles.financialHealthProgressBar} style={{ width: financialHealth.score + "%" }} />
-          </div>
-          <p>{financialHealth.message}</p>
-        </div>
-
-        <div className={styles.financialHealthMetrics}>
-          <div>
-            <span>Savings rate</span>
-            <strong>{Math.max(savingsRate, 0).toFixed(0)}%</strong>
-          </div>
-          <div>
-            <span>Monthly cash flow</span>
-            <strong>{formatCompactCurrency(net)}</strong>
-          </div>
-          <div>
-            <span>Goal progress</span>
-            <strong>{totalGoalTarget > 0 ? totalGoalProgress.toFixed(0) + "%" : "Not set"}</strong>
-          </div>
-          <div className={styles.financialHealthInsight}>
-            <span>Next focus</span>
-            <strong>{financialHealth.primaryInsight}</strong>
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================== */}
-      {/* MONTHLY FINANCIAL REVIEW */}
-      {/* ================================================== */}
-
-      <section className={styles.monthlyReviewCard} aria-label="Monthly financial review">
-        <div className={styles.monthlyReviewHeader}>
-          <div>
-            <p className={styles.eyebrow}>Monthly review</p>
-            <h2>
-              {latestMonth
-                ? formatMonthYear(latestMonth.month)
-                : "This month"}
-            </h2>
-            <p className={styles.monthlyReviewSubtitle}>
-              A quick look at how your money moved this month.
-            </p>
-          </div>
-
-          <div className={styles.monthlyReviewNet}>
-            <span>Net saved</span>
-            <strong className={currentReviewNet >= 0 ? styles.reviewPositive : styles.reviewNegative}>
-              {formatCurrency(currentReviewNet)}
-            </strong>
-          </div>
-        </div>
-
-        <div className={styles.monthlyReviewMetrics}>
-          <div>
-            <span>Income</span>
-            <strong>{formatCompactCurrency(currentReviewIncome)}</strong>
-          </div>
-          <div>
-            <span>Expenses</span>
-            <strong>{formatCompactCurrency(currentReviewExpense)}</strong>
-            <small>
-              {expenseChange === null
-                ? "No previous data"
-                : formatChange(expenseChange) + " vs previous month"}
-            </small>
-          </div>
-          <div>
-            <span>Savings rate</span>
-            <strong>{Math.max(currentReviewSavingsRate, 0).toFixed(0)}%</strong>
-          </div>
-        </div>
-
-        <div className={styles.monthlyReviewInsight}>
-          <div className={styles.monthlyReviewInsightIcon}>
-            <TrendingUp size={15} strokeWidth={1.9} />
-          </div>
-          <div>
-            <span>Artha insight</span>
-            <p>
-              {getMonthlyReviewInsight(
-                currentReviewIncome,
-                currentReviewExpense,
-                previousReviewExpense,
-                currentReviewSavingsRate,
-                topCategories[0] ?? null
-              )}
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* ================================================== */}
@@ -1626,73 +1351,21 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            {recommendedGoal && (
-              <Link
-                href={"/goals/" + recommendedGoal.goal.id}
-                className={styles.goalRecommendation}
-              >
-                <div className={styles.goalRecommendationIcon}>
-                  <TrendingUp
-                    size={16}
-                    strokeWidth={1.9}
-                  />
-                </div>
-
-                <div className={styles.goalRecommendationContent}>
-                  <div className={styles.goalRecommendationTop}>
-                    <span>Recommended contribution</span>
-                    <strong>
-                      {formatCurrency(
-                        recommendedGoal.monthly
-                      )}
-                      /month
-                    </strong>
-                  </div>
-
-                  <p>
-                    Save this amount regularly to stay on track for{" "}
-                    {recommendedGoal.goal.name}.
-                  </p>
-                </div>
-
-                <ArrowRight
-                  size={15}
-                  className={styles.goalRecommendationArrow}
-                />
-              </Link>
-            )}
-
-            {attentionGoal && attention && (
+            {attentionGoal && (
               <Link
                 href={"/goals/" + attentionGoal.id}
-                className={
-                  styles.goalAttention +
-                  " " +
-                  styles["goalAttention" + attention.tone]
-                }
+                className={styles.goalNextAction}
               >
-                <div className={styles.goalAttentionIcon}>
-                  <AlertTriangle
-                    size={16}
-                    strokeWidth={1.9}
-                  />
+                <div>
+                  <span>Next goal action</span>
+                  <strong>{attentionGoal.name}</strong>
                 </div>
-
-                <div className={styles.goalAttentionContent}>
-                  <div className={styles.goalAttentionTop}>
-                    <span>{attention.label}</span>
-                    <strong>{attentionGoal.name}</strong>
-                  </div>
-
-                  <p>{attention.message}</p>
-
-                  <small>{attention.detail}</small>
+                <div className={styles.goalNextActionMeta}>
+                  <small>
+                    {attention?.label ?? "Keep building"}
+                  </small>
+                  <ArrowRight size={14} />
                 </div>
-
-                <ArrowRight
-                  size={15}
-                  className={styles.goalAttentionArrow}
-                />
               </Link>
             )}
 
