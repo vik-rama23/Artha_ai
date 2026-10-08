@@ -78,6 +78,10 @@ class BudgetResponse(BaseModel):
 
     projected_spend: Decimal | None
     projected_overspend: Decimal
+    days_remaining: int
+    daily_spend_rate: Decimal
+    safe_daily_spend: Decimal
+    insight: str
 
     status: str
 
