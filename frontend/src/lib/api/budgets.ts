@@ -17,6 +17,10 @@ export type Budget = {
   warning_percentage: string;
   projected_spend: string | null;
   projected_overspend: string;
+  days_remaining: number;
+  daily_spend_rate: string;
+  safe_daily_spend: string;
+  insight: string;
   status: BudgetStatus;
   created_at: string;
   updated_at: string;
