@@ -51,6 +51,12 @@ class NetWorthItem(Base):
         index=True,
     )
 
+    history_start_date: Mapped[date] = mapped_column(
+        Date,
+        nullable=False,
+        index=True,
+    )
+
     notes: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
