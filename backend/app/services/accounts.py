@@ -62,6 +62,12 @@ def get_account_balance(
             Transaction.transaction_date <= as_of_date
         )
 
+    if as_of_date is None:
+        as_of_date = date.today()
+        transaction_query = transaction_query.filter(
+            Transaction.transaction_date <= as_of_date
+        )
+
     balance_change = transaction_query.scalar()
 
     return account.opening_balance + balance_change
