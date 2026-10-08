@@ -9,11 +9,11 @@ from sqlalchemy.orm import Session
 
 from app.models.accounts import Account
 from app.models.net_worth import NetWorthItem
-from app.models.transactions import Transaction
 from app.schemas.net_worth import NetWorthItemCreate, NetWorthItemUpdate
+from app.services.accounts import get_account_balance
 
 
-ASSET_ACCOUNT_TYPES = {"BANK", "CASH", "INVESTMENT"}
+ASSET_ACCOUNT_TYPES = {"BANK", "SAVINGS", "CASH", "INVESTMENT"}
 LIABILITY_ACCOUNT_TYPES = {"CREDIT_CARD"}
 
 
@@ -22,23 +22,11 @@ def _account_balance_at(
     account: Account,
     as_of_date: date,
 ) -> Decimal:
-    transactions = db.scalars(
-        select(Transaction)
-        .where(Transaction.account_id == account.id)
-        .where(Transaction.transaction_date <= as_of_date)
-        .order_by(Transaction.transaction_date.asc())
-    ).all()
-
-    balance = account.opening_balance
-    is_liability = account.account_type.upper() in LIABILITY_ACCOUNT_TYPES
-
-    for transaction in transactions:
-        if transaction.transaction_type == "INCOME":
-            balance += -transaction.amount if is_liability else transaction.amount
-        elif transaction.transaction_type == "EXPENSE":
-            balance += transaction.amount if is_liability else -transaction.amount
-
-    return balance
+    return get_account_balance(
+        db=db,
+        account_id=account.id,
+        as_of_date=as_of_date,
+    )
 
 
 def _manual_items_at(
