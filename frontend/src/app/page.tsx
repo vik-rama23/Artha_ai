@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { getCurrentUser } from "@/lib/api/auth";
+import { getCashFlowForecast } from "@/lib/api/cashFlowForecast";
 import { getDashboard } from "@/lib/api/dashboard";
 import { getGoals } from "@/lib/api/goalsServer";
 
@@ -23,6 +24,7 @@ import type {
   DashboardData,
   DashboardTransaction,
 } from "@/types/dashboard";
+import type { CashFlowForecast } from "@/types/cashFlowForecast";
 import type { Goal } from "@/types/goal";
 
 import styles from "./page.module.scss";
@@ -497,6 +499,7 @@ export default async function DashboardPage() {
   let dashboard: DashboardData | null = null;
   let currentUser = null;
   let goals: Goal[] = [];
+  let forecast: CashFlowForecast | null = null;
   let errorMessage = "";
 
   try {
@@ -537,6 +540,15 @@ export default async function DashboardPage() {
   } catch (error) {
     console.error(
       "Failed to load dashboard goals:",
+      error
+    );
+  }
+
+  try {
+    forecast = await getCashFlowForecast();
+  } catch (error) {
+    console.error(
+      "Failed to load cash flow forecast:",
       error
     );
   }
@@ -1380,6 +1392,90 @@ export default async function DashboardPage() {
           <span>{reviewInsight}</span>
         </div>
       </section>
+
+      {/* ================================================== */}
+      {/* CASH FLOW FORECAST */}
+      {/* ================================================== */}
+
+      {forecast && (
+        <section className={styles.forecastStrip}>
+          <div className={styles.forecastHeader}>
+            <div>
+              <span>Cash flow forecast</span>
+              <strong>
+                Projected month-end balance
+              </strong>
+            </div>
+
+            <span
+              className={`${styles.forecastStatus} ${styles["forecastStatus" + forecast.status]}`}
+            >
+              {forecast.status === "HEALTHY"
+                ? "Healthy"
+                : forecast.status === "WATCH"
+                  ? "Watch"
+                  : "At risk"}
+            </span>
+          </div>
+
+          <div className={styles.forecastBalance}>
+            <strong>
+              {formatCurrency(
+                forecast.projected_month_end_balance
+              )}
+            </strong>
+
+            <span>
+              {forecast.days_remaining === 0
+                ? "Month ends today"
+                : `${forecast.days_remaining} days remaining`}
+            </span>
+          </div>
+
+          <div className={styles.forecastMetrics}>
+            <div>
+              <span>Current balance</span>
+              <strong>
+                {formatCompactCurrency(
+                  forecast.current_balance
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>Expected income</span>
+              <strong>
+                {formatCompactCurrency(
+                  forecast.expected_recurring_income
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>Expected expenses</span>
+              <strong>
+                {formatCompactCurrency(
+                  forecast.projected_expense
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>Daily variable spend</span>
+              <strong>
+                {formatCompactCurrency(
+                  forecast.average_daily_variable_expense
+                )}
+              </strong>
+            </div>
+          </div>
+
+          <div className={styles.forecastInsight}>
+            <TrendingUp size={14} strokeWidth={1.9} />
+            <span>{forecast.insight}</span>
+          </div>
+        </section>
+      )}
 
       {/* ================================================== */}
       {/* FINANCIAL GOALS */}
