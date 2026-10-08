@@ -2310,3 +2310,176 @@
     max-width: 110px;
   }
 }
+
+.forecastStrip {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.1fr) minmax(130px, 0.8fr) minmax(360px, 2fr);
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 20px;
+  padding: 14px 15px;
+  border: 1px solid #e1e7e1;
+  border-radius: 13px;
+  background: #fbfdfb;
+}
+
+.forecastHeader {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.forecastHeader > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.forecastHeader span:first-child {
+  color: #8d968f;
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.forecastHeader strong {
+  color: #315a49;
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.forecastStatus {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-size: 7px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.forecastStatusHEALTHY {
+  color: #2f6947;
+  background: #edf7ef;
+}
+
+.forecastStatusWATCH {
+  color: #9a722d;
+  background: #fbf4df;
+}
+
+.forecastStatusRISK {
+  color: #a84d3b;
+  background: #fdf0ed;
+}
+
+.forecastBalance {
+  min-width: 0;
+  padding-left: 14px;
+  border-left: 1px solid #e7ece7;
+}
+
+.forecastBalance strong {
+  display: block;
+  color: #1f5a43;
+  font-size: 17px;
+  font-weight: 780;
+  letter-spacing: -0.02em;
+}
+
+.forecastBalance span {
+  display: block;
+  margin-top: 3px;
+  color: #8b938d;
+  font-size: 7px;
+  font-weight: 650;
+}
+
+.forecastMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.forecastMetrics > div {
+  min-width: 0;
+  padding-left: 9px;
+  border-left: 1px solid #e7ece7;
+}
+
+.forecastMetrics span {
+  display: block;
+  overflow: hidden;
+  color: #969d97;
+  font-size: 7px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.forecastMetrics strong {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: #385347;
+  font-size: 10px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.forecastInsight {
+  grid-column: 1 / -1;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  padding-top: 9px;
+  border-top: 1px solid #e7ece7;
+  color: #69766e;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.forecastInsight svg {
+  flex: 0 0 auto;
+  color: #39704d;
+}
+
+@media (max-width: 900px) {
+  .forecastStrip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .forecastMetrics {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .forecastStrip {
+    grid-template-columns: 1fr;
+    gap: 11px;
+    padding: 12px;
+  }
+
+  .forecastBalance {
+    padding: 9px 0 0;
+    border-top: 1px solid #e7ece7;
+    border-left: 0;
+  }
+
+  .forecastMetrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .forecastInsight {
+    grid-column: auto;
+  }
+}
