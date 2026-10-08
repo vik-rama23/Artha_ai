@@ -6,6 +6,7 @@ import {
   Landmark,
   Loader2,
   Minus,
+  Pencil,
   Plus,
   Trash2,
   Wallet,
@@ -18,6 +19,7 @@ import {
   deleteNetWorthItem,
   getNetWorth,
   getNetWorthItems,
+  updateNetWorthItem,
   type NetWorthItem,
   type NetWorthResponse,
 } from "@/lib/api/netWorth";
@@ -46,6 +48,10 @@ function formatCategory(value: string): string {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+function todayDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export default function NetWorthPage() {
   const [data, setData] = useState<NetWorthResponse | null>(null);
   const [items, setItems] = useState<NetWorthItem[]>([]);
@@ -54,14 +60,14 @@ export default function NetWorthPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [itemType, setItemType] = useState<"ASSET" | "LIABILITY">("ASSET");
-  const [category, setCategory] = useState("OTHER");
+  const [category, setCategory] = useState("PROPERTY");
   const [value, setValue] = useState("");
-  const [asOfDate, setAsOfDate] = useState(
-    new Date().toISOString().slice(0, 10)
-  );
+  const [asOfDate, setAsOfDate] = useState(todayDate);
+  const [historyStartDate, setHistoryStartDate] = useState(todayDate);
   const [notes, setNotes] = useState("");
 
   async function loadData() {
@@ -98,6 +104,43 @@ export default function NetWorthPage() {
     return "flat";
   }, [data]);
 
+  function resetForm() {
+    const today = todayDate();
+
+    setName("");
+    setItemType("ASSET");
+    setCategory("PROPERTY");
+    setValue("");
+    setAsOfDate(today);
+    setHistoryStartDate(today);
+    setNotes("");
+    setEditingItemId(null);
+    setShowForm(false);
+  }
+
+  function openCreateForm() {
+    resetForm();
+    setShowForm(true);
+  }
+
+  function openEditForm(item: NetWorthItem) {
+    setName(item.name);
+    setItemType(item.item_type);
+    setCategory(item.category);
+    setValue(item.value);
+    setAsOfDate(item.as_of_date);
+    setHistoryStartDate(item.history_start_date);
+    setNotes(item.notes ?? "");
+    setEditingItemId(item.id);
+    setError(null);
+    setShowForm(true);
+  }
+
+  function handleTypeChange(nextType: "ASSET" | "LIABILITY") {
+    setItemType(nextType);
+    setCategory(nextType === "ASSET" ? "PROPERTY" : "HOME_LOAN");
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -108,30 +151,40 @@ export default function NetWorthPage() {
       return;
     }
 
+    if (historyStartDate > asOfDate) {
+      setError("Track from date cannot be after the as-of date.");
+      return;
+    }
+
     try {
       setSaving(true);
       setError(null);
 
-      await createNetWorthItem({
+      const payload = {
         name: name.trim(),
         item_type: itemType,
         category,
         value: numericValue,
         as_of_date: asOfDate,
+        history_start_date: historyStartDate,
         notes: notes.trim() || null,
-      });
+      };
 
-      setName("");
-      setValue("");
-      setNotes("");
-      setShowForm(false);
+      if (editingItemId) {
+        await updateNetWorthItem(editingItemId, payload);
+      } else {
+        await createNetWorthItem(payload);
+      }
 
+      resetForm();
       await loadData();
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Unable to save this item."
+          : editingItemId
+            ? "Unable to update this item."
+            : "Unable to save this item."
       );
     } finally {
       setSaving(false);
@@ -183,7 +236,7 @@ export default function NetWorthPage() {
         <button
           type="button"
           className={styles.primaryButton}
-          onClick={() => setShowForm(true)}
+          onClick={openCreateForm}
         >
           <Plus size={17} />
           Add asset or liability
@@ -208,7 +261,11 @@ export default function NetWorthPage() {
                 {formatCurrency(data.net_worth)}
               </strong>
 
-              <div className={`${styles.change} ${styles[`change${netWorthChangeLabel}`]}`}>
+              <div
+                className={
+                  `${styles.change} ${styles[`change${netWorthChangeLabel}`]}`
+                }
+              >
                 {netWorthChangeLabel === "up" ? (
                   <ArrowUpRight size={16} />
                 ) : netWorthChangeLabel === "down" ? (
@@ -346,7 +403,10 @@ export default function NetWorthPage() {
             <div className={styles.cardHeader}>
               <div>
                 <h2>Manual assets & liabilities</h2>
-                <p>Track property, investments, loans and other wealth items.</p>
+                <p>
+                  Track current values and when they should start appearing in
+                  your net worth history.
+                </p>
               </div>
             </div>
 
@@ -373,7 +433,8 @@ export default function NetWorthPage() {
                       <div>
                         <strong>{item.name}</strong>
                         <span>
-                          {formatCategory(item.category)} · as of {item.as_of_date}
+                          {formatCategory(item.category)} · value as of {item.as_of_date}
+                          {" · "}history from {item.history_start_date}
                         </span>
                       </div>
                     </div>
@@ -388,19 +449,30 @@ export default function NetWorthPage() {
                       {formatCurrency(item.value)}
                     </strong>
 
-                    <button
-                      type="button"
-                      className={styles.deleteButton}
-                      disabled={deletingId === item.id}
-                      onClick={() => handleDelete(item)}
-                      aria-label={`Delete ${item.name}`}
-                    >
-                      {deletingId === item.id ? (
-                        <Loader2 size={16} className={styles.spinner} />
-                      ) : (
-                        <Trash2 size={16} />
-                      )}
-                    </button>
+                    <div className={styles.itemActions}>
+                      <button
+                        type="button"
+                        className={styles.iconButton}
+                        onClick={() => openEditForm(item)}
+                        aria-label={`Edit ${item.name}`}
+                      >
+                        <Pencil size={15} />
+                      </button>
+
+                      <button
+                        type="button"
+                        className={styles.deleteButton}
+                        disabled={deletingId === item.id}
+                        onClick={() => handleDelete(item)}
+                        aria-label={`Delete ${item.name}`}
+                      >
+                        {deletingId === item.id ? (
+                          <Loader2 size={16} className={styles.spinner} />
+                        ) : (
+                          <Trash2 size={16} />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -415,12 +487,16 @@ export default function NetWorthPage() {
             <div className={styles.modalHeader}>
               <div>
                 <p className={styles.eyebrow}>WEALTH ITEM</p>
-                <h2>Add asset or liability</h2>
+                <h2>
+                  {editingItemId
+                    ? "Edit asset or liability"
+                    : "Add asset or liability"}
+                </h2>
               </div>
               <button
                 type="button"
                 className={styles.closeButton}
-                onClick={() => setShowForm(false)}
+                onClick={resetForm}
                 disabled={saving}
               >
                 <X size={19} />
@@ -445,7 +521,9 @@ export default function NetWorthPage() {
                   <select
                     value={itemType}
                     onChange={(event) =>
-                      setItemType(event.target.value as "ASSET" | "LIABILITY")
+                      handleTypeChange(
+                        event.target.value as "ASSET" | "LIABILITY"
+                      )
                     }
                   >
                     <option value="ASSET">Asset</option>
@@ -497,7 +575,7 @@ export default function NetWorthPage() {
                 </label>
 
                 <label>
-                  As of date
+                  Value as of
                   <input
                     type="date"
                     value={asOfDate}
@@ -506,6 +584,22 @@ export default function NetWorthPage() {
                   />
                 </label>
               </div>
+
+              <label>
+                Include in history from
+                <input
+                  type="date"
+                  value={historyStartDate}
+                  max={asOfDate}
+                  onChange={(event) => setHistoryStartDate(event.target.value)}
+                  required
+                />
+                <span className={styles.fieldHint}>
+                  Use the date you want this current value to start appearing
+                  in the 12-month net worth history. For example, set your
+                  Home to the date you started tracking or owned it.
+                </span>
+              </label>
 
               <label>
                 Notes
@@ -521,7 +615,7 @@ export default function NetWorthPage() {
                 <button
                   type="button"
                   className={styles.secondaryButton}
-                  onClick={() => setShowForm(false)}
+                  onClick={resetForm}
                   disabled={saving}
                 >
                   Cancel
@@ -536,6 +630,8 @@ export default function NetWorthPage() {
                       <Loader2 size={16} className={styles.spinner} />
                       Saving...
                     </>
+                  ) : editingItemId ? (
+                    "Save changes"
                   ) : (
                     "Add item"
                   )}
