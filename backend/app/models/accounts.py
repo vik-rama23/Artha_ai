@@ -1,8 +1,8 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text, func
+from sqlalchemy import Date, DateTime, ForeignKey, Numeric, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -49,6 +49,12 @@ class Account(Base):
         Numeric(15, 2),
         nullable=False,
         default=0,
+    )
+
+    opening_balance_date: Mapped[date] = mapped_column(
+        Date,
+        nullable=False,
+        default=date.today,
     )
 
     current_balance: Mapped[Decimal] = mapped_column(
