@@ -1178,3 +1178,211 @@
     align-items: flex-start;
   }
 }
+
+
+.budgetActualSection {
+  margin-bottom: 14px;
+  padding: 18px 20px;
+  border: 1px solid #e5dfd4;
+  border-radius: 14px;
+  background: #fffdf9;
+}
+
+.budgetActualHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.budgetActualHeader h2 {
+  margin: 4px 0 0;
+  color: #385347;
+  font-size: 15px;
+}
+
+.budgetActualHeader p:last-child {
+  margin: 4px 0 0;
+  color: #909790;
+  font-size: 9px;
+}
+
+.budgetActualLink {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border: 1px solid #d8e2da;
+  border-radius: 8px;
+  background: #edf5ef;
+  color: #285e40;
+  font-size: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.budgetActualMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 14px;
+  border: 1px solid #ece7de;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.budgetActualMetrics > div {
+  padding: 11px 12px;
+  border-left: 1px solid #eee9df;
+}
+
+.budgetActualMetrics > div:first-child {
+  border-left: 0;
+}
+
+.budgetActualMetrics span {
+  display: block;
+  color: #969d97;
+  font-size: 7px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.budgetActualMetrics strong {
+  display: block;
+  margin-top: 4px;
+  color: #315a49;
+  font-size: 11px;
+}
+
+.budgetVariancePositive {
+  color: #357657 !important;
+}
+
+.budgetVarianceNegative {
+  color: #a54a38 !important;
+}
+
+.budgetActualList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.budgetActualRow {
+  display: grid;
+  grid-template-columns: 145px minmax(100px, 1fr) 70px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.budgetActualName {
+  min-width: 0;
+}
+
+.budgetActualName strong,
+.budgetActualName span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.budgetActualName strong {
+  color: #385347;
+  font-size: 9px;
+}
+
+.budgetActualName span {
+  margin-top: 2px;
+  color: #969d97;
+  font-size: 8px;
+}
+
+.budgetActualTrack {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eee9df;
+}
+
+.budgetActualBar {
+  height: 100%;
+  min-width: 2px;
+  border-radius: inherit;
+}
+
+.budgetActualBarGood {
+  background: #39704d;
+}
+
+.budgetActualBarWarning {
+  background: #bd8d2d;
+}
+
+.budgetActualBarDanger {
+  background: #b95542;
+}
+
+.budgetActualMeta {
+  text-align: right;
+}
+
+.budgetActualMeta span,
+.budgetActualMeta strong {
+  display: block;
+}
+
+.budgetActualMeta span {
+  color: #8f978f;
+  font-size: 7px;
+}
+
+.budgetActualMeta strong {
+  margin-top: 2px;
+  color: #52685b;
+  font-size: 8px;
+}
+
+.budgetActualEmpty {
+  padding: 14px;
+  border-radius: 9px;
+  background: #f7f3ea;
+  color: #8a928c;
+  font-size: 9px;
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .budgetActualMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .budgetActualMetrics > div:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid #eee9df;
+  }
+
+  .budgetActualMetrics > div:nth-child(4) {
+    border-top: 1px solid #eee9df;
+  }
+}
+
+@media (max-width: 600px) {
+  .budgetActualHeader {
+    flex-direction: column;
+  }
+
+  .budgetActualRow {
+    grid-template-columns: 1fr 72px;
+  }
+
+  .budgetActualTrack {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .budgetActualMeta {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
