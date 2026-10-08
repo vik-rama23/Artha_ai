@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class AccountCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     account_type: str = Field(
-        pattern="^(BANK|CASH|INVESTMENT|CREDIT_CARD)$"
+        pattern="^(BANK|SAVINGS|CASH|INVESTMENT|CREDIT_CARD)$"
     )
     institution_name: str | None = Field(
         default=None,
@@ -38,7 +38,7 @@ class AccountUpdate(BaseModel):
     )
     account_type: str | None = Field(
         default=None,
-        pattern="^(BANK|CASH|INVESTMENT|CREDIT_CARD)$",
+        pattern="^(BANK|SAVINGS|CASH|INVESTMENT|CREDIT_CARD)$",
     )
     institution_name: str | None = Field(
         default=None,
