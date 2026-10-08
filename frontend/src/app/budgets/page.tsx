@@ -142,6 +142,18 @@ export default async function BudgetsPage({
         )
       : 0;
 
+  const totalProjectedOverspend = budgets.reduce(
+    (total, budget) =>
+      total + Math.max(Number(budget.projected_overspend), 0),
+    0,
+  );
+
+  const totalSafeDailySpend = budgets.reduce(
+    (total, budget) =>
+      total + Math.max(Number(budget.safe_daily_spend), 0),
+    0,
+  );
+
   const previousMonth = getMonthNavigation(selectedMonth, -1);
   const nextMonth = getMonthNavigation(selectedMonth, 1);
 
@@ -206,7 +218,32 @@ export default async function BudgetsPage({
             Available across your budgets
           </div>
         </article>
+
+        <article className={styles.summaryCard}>
+          <div className={styles.summaryLabel}>Safe Daily Spend</div>
+
+          <div className={styles.summaryValue}>
+            {formatCurrency(totalSafeDailySpend)}
+          </div>
+
+          <div className={styles.summaryDescription}>
+            Combined amount you can spend per day
+          </div>
+        </article>
       </section>
+
+      {totalProjectedOverspend > 0 && (
+        <section className={styles.intelligenceBanner}>
+          <div className={styles.intelligenceIcon}>!</div>
+          <div>
+            <strong>Budget forecast needs attention</strong>
+            <span>
+              Current spending trends could put you about{" "}
+              {formatCurrency(totalProjectedOverspend)} over budget this month.
+            </span>
+          </div>
+        </section>
+      )
 
       <section className={styles.card}>
         <div className={styles.monthHeader}>
@@ -331,16 +368,44 @@ export default async function BudgetsPage({
                   <div className={styles.budgetBottom}>
                     <span>
                       {Number(budget.remaining) >= 0
-                        ? `${formatCurrency(
-                            budget.remaining,
-                          )} remaining`
-                        : `${formatCurrency(
-                            Math.abs(Number(budget.remaining)),
-                          )} over budget`}
+                        ? `${formatCurrency(budget.remaining)} remaining`
+                        : `${formatCurrency(Math.abs(Number(budget.remaining)))} over budget`}
                     </span>
 
+                    <span>
+                      {budget.days_remaining > 0
+                        ? `${budget.days_remaining} days left`
+                        : "Period ended"}
+                    </span>
                   </div>
 
+                  <div className={styles.intelligenceRow}>
+                    <div>
+                      <span>Safe daily spend</span>
+                      <strong>{formatCurrency(budget.safe_daily_spend)}</strong>
+                    </div>
+
+                    <div>
+                      <span>Projected spend</span>
+                      <strong>
+                        {budget.projected_spend
+                          ? formatCurrency(budget.projected_spend)
+                          : "—"}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`${styles.budgetInsight} ${
+                      budget.status === "EXCEEDED"
+                        ? styles.budgetInsightDanger
+                        : budget.status === "WARNING"
+                          ? styles.budgetInsightWarning
+                          : ""
+                    }`}
+                  >
+                    {budget.insight}
+                  </div>
                   <div className={styles.budgetActions}>
                     <Link
                       href={`/budgets/${budget.id}/edit`}
