@@ -21,6 +21,7 @@ class NetWorthItemUpdate(BaseModel):
     category: str | None = Field(default=None, min_length=1, max_length=50)
     value: Decimal | None = Field(default=None, gt=0, max_digits=15, decimal_places=2)
     as_of_date: date | None = None
+    history_start_date: date | None = None
     notes: str | None = None
 
 
@@ -34,6 +35,7 @@ class NetWorthItemResponse(BaseModel):
     category: str
     value: Decimal
     as_of_date: date
+    history_start_date: date
     notes: str | None = None
 
 
