@@ -7,6 +7,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   CalendarDays,
+  CreditCard,
   IndianRupee,
   PiggyBank,
   Target,
