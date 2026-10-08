@@ -128,8 +128,8 @@ export default function NetWorthPage() {
     setItemType(item.item_type);
     setCategory(item.category);
     setValue(item.value);
-    setAsOfDate(item.as_of_date);
-    setHistoryStartDate(item.history_start_date);
+    setAsOfDate(item.as_of_date ?? todayDate());
+    setHistoryStartDate(item.history_start_date ?? item.as_of_date ?? todayDate());
     setNotes(item.notes ?? "");
     setEditingItemId(item.id);
     setError(null);
