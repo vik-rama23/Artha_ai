@@ -140,3 +140,26 @@ class AnalyticsInsightsResponse(BaseModel):
     savings_rate: Decimal
 
     insights: list[AnalyticsInsight]
+
+class BudgetVsActualItem(BaseModel):
+    budget_id: UUID
+    category_id: UUID | None
+    category_name: str
+    budget_amount: Decimal
+    actual_amount: Decimal
+    variance: Decimal
+    percentage_used: Decimal
+    projected_amount: Decimal | None
+    projected_variance: Decimal
+    status: str
+
+
+class BudgetVsActualResponse(BaseModel):
+    month_start: date
+    month_end: date
+    total_budget: Decimal
+    total_actual: Decimal
+    total_variance: Decimal
+    total_projected: Decimal
+    total_projected_variance: Decimal
+    items: list[BudgetVsActualItem]
