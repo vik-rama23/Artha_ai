@@ -163,6 +163,9 @@ export default function AccountForm({
             <option value="BANK">
               Bank Account
             </option>
+            <option value="SAVINGS">
+              Savings Account
+            </option>
             <option value="CREDIT_CARD">
               Credit Card
             </option>
