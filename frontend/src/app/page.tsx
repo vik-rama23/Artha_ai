@@ -319,6 +319,31 @@ function getGoalDeadline(goal: Goal) {
   }).format(target);
 }
 
+function getGoalMonthsRemaining(goal: Goal) {
+  const days = getGoalDaysRemaining(goal);
+
+  if (days === null || days <= 0) {
+    return null;
+  }
+
+  return Math.max(days / 30.4375, 1);
+}
+
+function getRecommendedMonthlyContribution(goal: Goal) {
+  const current = Number(goal.current_amount) || 0;
+  const target = Number(goal.target_amount) || 0;
+  const remaining = Math.max(target - current, 0);
+  const months = getGoalMonthsRemaining(goal);
+
+  if (remaining <= 0 || months === null) {
+    return null;
+  }
+
+  return Math.ceil(
+    remaining / months / 100
+  ) * 100;
+}
+
 function getGoalDaysRemaining(goal: Goal) {
   if (!goal.target_date) {
     return null;
@@ -643,6 +668,24 @@ export default async function DashboardPage() {
     attentionGoal
       ? getGoalAttention(attentionGoal)
       : null;
+
+  const recommendedGoal = activeGoals
+    .map((goal) => ({
+      goal,
+      monthly: getRecommendedMonthlyContribution(goal),
+    }))
+    .filter(
+      (
+        item
+      ): item is {
+        goal: Goal;
+        monthly: number;
+      } => item.monthly !== null
+    )
+    .sort(
+      (a, b) =>
+        b.monthly - a.monthly
+    )[0] ?? null;
 
   const topCategories =
     [...categories]
@@ -1374,6 +1417,42 @@ export default async function DashboardPage() {
                 </div>
               </div>
             </div>
+
+            {recommendedGoal && (
+              <Link
+                href={"/goals/" + recommendedGoal.goal.id}
+                className={styles.goalRecommendation}
+              >
+                <div className={styles.goalRecommendationIcon}>
+                  <TrendingUp
+                    size={16}
+                    strokeWidth={1.9}
+                  />
+                </div>
+
+                <div className={styles.goalRecommendationContent}>
+                  <div className={styles.goalRecommendationTop}>
+                    <span>Recommended contribution</span>
+                    <strong>
+                      {formatCurrency(
+                        recommendedGoal.monthly
+                      )}
+                      /month
+                    </strong>
+                  </div>
+
+                  <p>
+                    Save this amount regularly to stay on track for{" "}
+                    {recommendedGoal.goal.name}.
+                  </p>
+                </div>
+
+                <ArrowRight
+                  size={15}
+                  className={styles.goalRecommendationArrow}
+                />
+              </Link>
+            )}
 
             {attentionGoal && attention && (
               <Link
