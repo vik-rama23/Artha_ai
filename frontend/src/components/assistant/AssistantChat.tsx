@@ -67,6 +67,12 @@ function createMessageId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function createSessionId(): string {
+  return typeof window !== "undefined" && window.crypto?.randomUUID
+    ? window.crypto.randomUUID()
+    : createMessageId();
+}
+
 function formatPeriodDate(value: string): string {
   const date = new Date(`${value}T00:00:00`);
 
@@ -148,6 +154,7 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
   const [error, setError] = useState<string | null>(null);
   const [disclaimer, setDisclaimer] = useState<string | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
+  const [sessionId, setSessionId] = useState("");
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -155,9 +162,16 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
     try {
       const saved = window.sessionStorage.getItem("artha-ai-chat-session-v1");
       if (saved) {
-        const parsed = JSON.parse(saved) as { messages?: ChatMessage[]; disclaimer?: string | null };
+        const parsed = JSON.parse(saved) as {
+          sessionId?: string;
+          messages?: ChatMessage[];
+          disclaimer?: string | null;
+        };
         if (Array.isArray(parsed.messages)) setMessages(parsed.messages);
         if (typeof parsed.disclaimer === "string") setDisclaimer(parsed.disclaimer);
+        setSessionId(parsed.sessionId || createSessionId());
+      } else {
+        setSessionId(createSessionId());
       }
     } catch {
       window.sessionStorage.removeItem("artha-ai-chat-session-v1");
@@ -171,12 +185,12 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
     try {
       window.sessionStorage.setItem(
         "artha-ai-chat-session-v1",
-        JSON.stringify({ messages, disclaimer })
+        JSON.stringify({ sessionId, messages, disclaimer })
       );
     } catch {
       // Chat remains usable if session storage is unavailable or full.
     }
-  }, [messages, disclaimer, sessionReady]);
+  }, [messages, disclaimer, sessionId, sessionReady]);
 
   useEffect(() => {
     conversationEndRef.current?.scrollIntoView({
@@ -281,11 +295,27 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
       return;
     }
 
+    if (
+      (messages.length > 0 || question.trim()) &&
+      !window.confirm("Clear this conversation and start a new chat? This cannot be undone.")
+    ) {
+      return;
+    }
+
+    const nextSessionId = createSessionId();
+    setSessionId(nextSessionId);
     setMessages([]);
-    window.sessionStorage.removeItem("artha-ai-chat-session-v1");
     setError(null);
     setDisclaimer(null);
     setQuestion("");
+    try {
+      window.sessionStorage.setItem(
+        "artha-ai-chat-session-v1",
+        JSON.stringify({ sessionId: nextSessionId, messages: [], disclaimer: null })
+      );
+    } catch {
+      // A new chat can still start if session storage is unavailable.
+    }
     inputRef.current?.focus();
   }
 
