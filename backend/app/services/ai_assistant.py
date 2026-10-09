@@ -68,6 +68,7 @@ def ask_financial_question(
     db: Session,
     user_id: UUID,
     question: str,
+    history: list[dict[str, str]] | None = None,
     today: date | None = None,
 ) -> dict:
     snapshot_date = today or date.today()
@@ -118,12 +119,26 @@ def ask_financial_question(
             response = client.responses.create(
                 model=settings.openai_model,
                 instructions=ASSISTANT_INSTRUCTIONS,
-                input=(
-                    "User question:\\n"
-                    f"{question}\\n\\n"
-                    "Verified baseline financial context (JSON):\\n"
-                    f"{json.dumps(context, ensure_ascii=False)}"
-                ),
+                input=[
+                    *[
+                        {
+                            "role": item["role"],
+                            "content": item["content"][:4000],
+                        }
+                        for item in (history or [])[-12:]
+                        if item.get("role") in {"user", "assistant"}
+                        and isinstance(item.get("content"), str)
+                    ],
+                    {
+                        "role": "user",
+                        "content": (
+                            "User question:\\n"
+                            f"{question}\\n\\n"
+                            "Verified baseline financial context (JSON):\\n"
+                            f"{json.dumps(context, ensure_ascii=False)}"
+                        ),
+                    },
+                ],
                 tools=FINANCIAL_TOOLS,
                 tool_choice="auto",
                 reasoning={"effort": "low"},
