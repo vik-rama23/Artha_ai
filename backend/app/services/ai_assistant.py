@@ -1,7 +1,6 @@
 import json
 import logging
 from datetime import date, timedelta
-from urllib import response
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -9,6 +8,10 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.services.financial_context import build_financial_context
+from app.services.financial_tools import (
+    FINANCIAL_TOOLS,
+    execute_financial_tool,
+)
 
 logger = logging.getLogger("artha.ai_assistant")
 
@@ -107,15 +110,53 @@ def ask_financial_question(
                 model=settings.openai_model,
                 instructions=ASSISTANT_INSTRUCTIONS,
                 input=(
-                    "User question:\n"
-                    f"{question}\n\n"
-                    "Verified financial context (JSON):\n"
+                    "User question:\\n"
+                    f"{question}\\n\\n"
+                    "Verified baseline financial context (JSON):\\n"
                     f"{json.dumps(context, ensure_ascii=False)}"
                 ),
+                tools=FINANCIAL_TOOLS,
+                tool_choice="auto",
                 reasoning={"effort": "low"},
-                max_output_tokens=1200,
+                max_output_tokens=1800,
                 store=False,
             )
+
+            # Allow a bounded number of read-only tool rounds. Every tool
+            # receives the authenticated user_id from the API dependency;
+            # the model cannot provide or override a user ID.
+            for _ in range(4):
+                tool_calls = [
+                    item for item in response.output
+                    if getattr(item, "type", None) == "function_call"
+                ]
+                if not tool_calls:
+                    break
+
+                tool_outputs = []
+                for tool_call in tool_calls:
+                    tool_result = execute_financial_tool(
+                        db=db,
+                        user_id=user_id,
+                        tool_name=tool_call.name,
+                        arguments_json=tool_call.arguments,
+                    )
+                    tool_outputs.append({
+                        "type": "function_call_output",
+                        "call_id": tool_call.call_id,
+                        "output": tool_result,
+                    })
+
+                response = client.responses.create(
+                    model=settings.openai_model,
+                    instructions=ASSISTANT_INSTRUCTIONS,
+                    input=list(response.output) + tool_outputs,
+                    tools=FINANCIAL_TOOLS,
+                    tool_choice="auto",
+                    reasoning={"effort": "low"},
+                    max_output_tokens=1800,
+                    store=False,
+                )
         answer = (response.output_text or "").strip()
 
         # Log response metadata without logging the user's financial context.
