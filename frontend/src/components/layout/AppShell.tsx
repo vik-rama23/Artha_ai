@@ -14,6 +14,7 @@ import {
   Repeat,
   Settings,
   Sparkles,
+  MessageCircle,
   Tags,
   Target,
   Wallet,
@@ -22,6 +23,7 @@ import {
 import { useEffect, useState } from "react";
 
 import NotificationBell from "@/components/notifications/NotificationBell";
+import AssistantChat from "@/components/assistant/AssistantChat";
 
 import styles from "./AppShell.module.scss";
 
@@ -97,6 +99,7 @@ export default function AppShell({
   const router = useRouter();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [userLoading, setUserLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -164,6 +167,14 @@ export default function AppShell({
   useEffect(() => {
     setSidebarOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setAssistantOpen(false);
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   async function handleLogout() {
     if (loggingOut) {
@@ -387,6 +398,35 @@ export default function AppShell({
             </span>
           </button>
         </div>
+      </aside>
+
+      <button
+        type="button"
+        className={`${styles.assistantFab} ${assistantOpen ? styles.assistantFabOpen : ""}`}
+        onClick={() => setAssistantOpen((open) => !open)}
+        aria-label={assistantOpen ? "Close Artha AI assistant" : "Open Artha AI assistant"}
+        aria-expanded={assistantOpen}
+        aria-controls="artha-ai-drawer"
+      >
+        {assistantOpen ? <X size={21} /> : <Sparkles size={21} />}
+        <span>{assistantOpen ? "Close" : "Ask Artha AI"}</span>
+      </button>
+
+      <button
+        type="button"
+        className={`${styles.assistantOverlay} ${assistantOpen ? styles.assistantOverlayVisible : ""}`}
+        aria-label="Close Artha AI assistant"
+        onClick={() => setAssistantOpen(false)}
+        tabIndex={assistantOpen ? 0 : -1}
+      />
+
+      <aside
+        id="artha-ai-drawer"
+        className={`${styles.assistantDrawer} ${assistantOpen ? styles.assistantDrawerOpen : ""}`}
+        aria-label="Artha AI assistant panel"
+        aria-hidden={!assistantOpen}
+      >
+        <AssistantChat compact />
       </aside>
 
       <div className={styles.main}>
