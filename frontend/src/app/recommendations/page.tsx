@@ -29,6 +29,8 @@ type Recommendation = {
   action: string;
   amount?: string;
   href: string;
+  secondaryAction?: string;
+  secondaryHref?: string;
   icon: typeof Lightbulb;
 };
 
@@ -59,9 +61,21 @@ function buildRecommendations(
       priority: "High priority",
       description: "Your recorded spending is over the limit or is projected to exceed it. Review recent transactions and adjust the remaining month's spending if needed.",
       evidence: `Budget: ${currency(Number(budget.amount))} · Recorded spend: ${currency(Number(budget.spent))} · Status: ${budget.status === "EXCEEDED" ? "Exceeded" : "Projected overspend"}`,
-      action: "Review budget and transactions",
+      action: "Open this month's budgets",
+      secondaryAction: "Review related expenses",
+      secondaryHref: (() => {
+        const params = new URLSearchParams({
+          transaction_type: "EXPENSE",
+          start_date: budget.month_start,
+          end_date: budget.month_end,
+        });
+        if (budget.category_id) {
+          params.set("category_id", budget.category_id);
+        }
+        return `/transactions?${params.toString()}`;
+      })(),
       ...(projectedOverspend > 0 ? { amount: `${currency(projectedOverspend)} projected overspend` } : {}),
-      href: "/budgets",
+      href: `/budgets?month=${encodeURIComponent(budget.month_start)}`,
       icon: CircleAlert,
     });
   }
@@ -76,8 +90,18 @@ function buildRecommendations(
       priority: "Worth reviewing",
       description: "This is the largest expense category in the dashboard's current reporting period. Check the underlying transactions for optional or unusual spending before deciding whether to change anything.",
       evidence: `Recorded spending: ${currency(Number(largestCategory.amount))} · Share of expenses: ${Number(largestCategory.percentage).toFixed(1)}%`,
-      action: "Review transactions",
-      href: "/transactions",
+      action: "Review this category's expenses",
+      href: (() => {
+        const params = new URLSearchParams({
+          transaction_type: "EXPENSE",
+        });
+        if (largestCategory.category_id) {
+          params.set("category_id", largestCategory.category_id);
+        }
+        if (dashboard.start_date) params.set("start_date", dashboard.start_date);
+        if (dashboard.end_date) params.set("end_date", dashboard.end_date);
+        return `/transactions?${params.toString()}`;
+      })(),
       icon: TrendingUp,
     });
   }
@@ -112,8 +136,8 @@ function buildRecommendations(
         ? `Your goal has a target date of ${targetDate}. Review your contribution plan to decide how to close the remaining gap.`
         : "Your goal does not have a target date yet. Adding a realistic deadline can help you plan contributions.",
       evidence: `Target: ${currency(Number(goal.target_amount))} · Saved so far: ${currency(Number(goal.current_amount))} · Remaining: ${currency(remaining)}`,
-      action: "Open financial goals",
-      href: "/goals",
+      action: "Open this goal",
+      href: `/goals/${goal.id}`,
       icon: Target,
     });
   }
@@ -223,7 +247,12 @@ export default async function RecommendationsPage() {
                     <p>{recommendation.evidence}</p>
                   </div>
                   {recommendation.amount && <p className={styles.amount}><ArrowDownRight size={16} /> {recommendation.amount}</p>}
-                  <Link href={recommendation.href} className={styles.actionLink}>{recommendation.action} <ArrowRight size={16} /></Link>
+                  <div className={styles.cardActions}>
+                    <Link href={recommendation.href} className={styles.actionLink}>{recommendation.action} <ArrowRight size={16} /></Link>
+                    {recommendation.secondaryAction && recommendation.secondaryHref && (
+                      <Link href={recommendation.secondaryHref} className={styles.secondaryActionLink}>{recommendation.secondaryAction} <ArrowRight size={15} /></Link>
+                    )}
+                  </div>
                 </article>
               );
             })}
