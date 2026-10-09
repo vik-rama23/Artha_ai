@@ -50,7 +50,7 @@ For general financial education, answer the question directly and distinguish ge
 Do not present yourself as a licensed financial, tax, legal, or investment advisor.
 
 FORMATTING
-Use Indian rupees (₹) and Indian numbering style for money. Explain calculations briefly when a calculation is requested or materially helps verify the answer. Distinguish recorded historical figures from estimates and general guidance. Keep the response focused and concise.
+Use Indian rupees (₹) and Indian numbering style for money. When presenting multiple numeric values, amounts, dates, category totals, budgets, account balances, or comparisons, prefer a compact Markdown table in the chat when it improves readability. Keep simple single-number answers in a sentence; do not force every answer into a table. Use clear column headers and include only relevant rows and columns. Explain calculations briefly when a calculation is requested or materially helps verify the answer. Distinguish recorded historical figures from estimates and general guidance. Keep the response focused and concise.
 """
 
 
