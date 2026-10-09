@@ -29,6 +29,8 @@ type Recommendation = {
   action: string;
   amount?: string;
   savingsPlan?: string;
+  affordability?: "On track" | "Stretch goal" | "Not affordable at current savings capacity" | "Not enough history";
+  affordabilityDetail?: string;
   href: string;
   secondaryAction?: string;
   secondaryHref?: string;
@@ -49,6 +51,22 @@ function buildRecommendations(
   goals: Goal[],
 ): Recommendation[] {
   const recommendations: Recommendation[] = [];
+
+  // Use only completed calendar months so a partial current month does not
+  // distort the user's estimated monthly savings capacity.
+  const today = new Date();
+  const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+  const completedMonths = dashboard.monthly_cash_flow
+    .filter((month) => /^\\d{4}-\\d{2}/.test(month.month) && month.month.slice(0, 7) < currentMonthKey)
+    .sort((a, b) => b.month.localeCompare(a.month))
+    .slice(0, 3);
+
+  const averageMonthlySurplus = completedMonths.length > 0
+    ? completedMonths.reduce((total, month) => total + Number(month.net), 0) / completedMonths.length
+    : null;
+  const usableMonthlySurplus = averageMonthlySurplus === null
+    ? null
+    : Math.max(0, averageMonthlySurplus);
 
   const exceeded = budgets
     .filter((budget) => budget.status === "EXCEEDED" || Number(budget.projected_overspend) > 0)
@@ -160,15 +178,39 @@ function buildRecommendations(
         ? `Set aside money each month until ${targetDate} to cover the remaining gap.`
         : "The target date has passed. Update the deadline to calculate a new monthly savings plan.";
 
+    let affordability: Recommendation["affordability"];
+    let affordabilityDetail: string | undefined;
+
+    if (monthlySavingsPlan && usableMonthlySurplus !== null && completedMonths.length >= 2) {
+      if (usableMonthlySurplus <= 0) {
+        affordability = "Not affordable at current savings capacity";
+        affordabilityDetail = "Recorded completed months show no positive average surplus. Review expenses or extend the goal deadline.";
+      } else if (monthlySavingsPlan.monthlyAmount <= usableMonthlySurplus * 0.8) {
+        affordability = "On track";
+        affordabilityDetail = `Required monthly saving is within 80% of your average surplus of ${currency(usableMonthlySurplus)} across ${completedMonths.length} completed months.`;
+      } else if (monthlySavingsPlan.monthlyAmount <= usableMonthlySurplus) {
+        affordability = "Stretch goal";
+        affordabilityDetail = `The required contribution uses most of your average monthly surplus of ${currency(usableMonthlySurplus)}.`;
+      } else {
+        affordability = "Not affordable at current savings capacity";
+        affordabilityDetail = `Required saving exceeds your average monthly surplus of ${currency(usableMonthlySurplus)} by ${currency(monthlySavingsPlan.monthlyAmount - usableMonthlySurplus)} per month.`;
+      }
+    } else if (monthlySavingsPlan) {
+      affordability = "Not enough history";
+      affordabilityDetail = "Record at least two completed months of income and expenses for an affordability estimate.";
+    }
+
     recommendations.push({
       id: `goal-${goal.id}`,
       title: `Keep moving toward ${goal.name}`,
       priority: "Goal planning",
       description: goalDescription,
-      evidence: `Target: ${currency(Number(goal.target_amount))} · Saved so far: ${currency(Number(goal.current_amount))} · Remaining: ${currency(remaining)}${monthlySavingsPlan ? ` · Time available: ${monthlySavingsPlan.monthsRemaining} ${monthlySavingsPlan.monthsRemaining === 1 ? "month" : "months"}` : ""}`,
+      evidence: `Target: ${currency(Number(goal.target_amount))} · Saved so far: ${currency(Number(goal.current_amount))} · Remaining: ${currency(remaining)}${monthlySavingsPlan ? ` · Time available: ${monthlySavingsPlan.monthsRemaining} ${monthlySavingsPlan.monthsRemaining === 1 ? "month" : "months"}` : ""}${usableMonthlySurplus !== null && completedMonths.length >= 2 ? ` · Average monthly surplus: ${currency(usableMonthlySurplus)}` : ""}`,
       ...(monthlySavingsPlan
         ? { savingsPlan: `${currency(monthlySavingsPlan.monthlyAmount)} per month` }
         : {}),
+      ...(affordability ? { affordability } : {}),
+      ...(affordabilityDetail ? { affordabilityDetail } : {}),
       action: "Open this goal",
       href: `/goals/${goal.id}`,
       icon: Target,
@@ -287,6 +329,12 @@ export default async function RecommendationsPage() {
                         <span>MONTHLY SAVINGS PLAN</span>
                         <strong>{recommendation.savingsPlan}</strong>
                       </div>
+                    </div>
+                  )}
+                  {recommendation.affordability && (
+                    <div className={`${styles.affordability} ${recommendation.affordability === "On track" ? styles.affordabilityOnTrack : recommendation.affordability === "Stretch goal" ? styles.affordabilityStretch : recommendation.affordability === "Not enough history" ? styles.affordabilityUnknown : styles.affordabilityUnavailable}`}>
+                      <strong>{recommendation.affordability}</strong>
+                      {recommendation.affordabilityDetail && <p>{recommendation.affordabilityDetail}</p>}
                     </div>
                   )}
                   <div className={styles.cardActions}>
