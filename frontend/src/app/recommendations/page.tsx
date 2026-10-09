@@ -165,7 +165,6 @@ export default async function RecommendationsPage() {
       <header className={styles.header}>
         <div className={styles.headingIcon}><Lightbulb size={22} /></div>
         <div className={styles.headingText}>
-          <p className={styles.eyebrow}>PHASE 8 · PERSONAL FINANCE INSIGHTS</p>
           <h1>Recommendations</h1>
           <p className={styles.subtitle}>Practical next steps based on the financial data recorded in Artha.</p>
         </div>
