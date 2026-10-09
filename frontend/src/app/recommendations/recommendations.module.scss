@@ -83,3 +83,40 @@
   outline-offset: 4px;
   border-radius: 4px;
 }
+
+
+.savingsPlan {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 15px;
+  padding: 13px 14px;
+  border: 1px solid #d7e6d8;
+  border-radius: 11px;
+  background: #f1f7ef;
+  color: #285a45;
+}
+
+.savingsPlan > svg {
+  flex: 0 0 auto;
+}
+
+.savingsPlan > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.savingsPlan span {
+  color: #6e8a72;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.savingsPlan strong {
+  color: #24553f;
+  font-size: 17px;
+  line-height: 1.3;
+}
