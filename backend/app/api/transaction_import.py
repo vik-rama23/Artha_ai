@@ -46,6 +46,7 @@ def _parse_rows(db: Session, user_id: UUID, payload: ImportRequest):
     try:
         reader = csv.DictReader(StringIO(payload.csv_content.lstrip("\ufeff")))
         headers = [str(header or "").strip() for header in (reader.fieldnames or [])]
+        reader.fieldnames = headers
         if not headers or any(not header for header in headers):
             raise HTTPException(status_code=400, detail="CSV must contain a header row with column names.")
         if len(set(headers)) != len(headers):
