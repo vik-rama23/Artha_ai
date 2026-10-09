@@ -152,6 +152,11 @@ def _transaction_data(
         "returned_transactions": len(items),
         "limit": bounded_limit,
         "truncated": total > len(items),
+        "note": (
+            "Amounts are returned in the account's recorded currency. "
+            "Do not add amounts across currencies or treat the returned rows "
+            "as the complete set when truncated is true."
+        ),
         "transactions": items,
     }
 
@@ -309,7 +314,12 @@ def _savings_trend_data(
         "average_savings_rate_percent": trend["average_savings_rate"],
         "monthly_breakdown": trend["items"],
         "currency": "INR",
-        "note": "Calculated from transactions recorded in Artha. Months with no transactions inside a requested date range are included as zero-value months.",
+        "note": (
+            "Calculated from transactions recorded in Artha. Months with no "
+            "transactions inside a requested date range are included as zero-value "
+            "months. The average savings rate is the backend-provided average of "
+            "monthly rates; it is not necessarily the combined-period savings rate."
+        ),
     }
 
 
