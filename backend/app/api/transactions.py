@@ -135,7 +135,7 @@ def export_transactions_csv(
         )
 
     query = (
-        db.query(Transaction, Account.name, Category.name)
+        db.query(Transaction, Account.name, Account.currency, Category.name)
         .join(Account, Account.id == Transaction.account_id)
         .outerjoin(Category, Category.id == Transaction.category_id)
         .filter(
@@ -181,21 +181,13 @@ def export_transactions_csv(
         "notes",
     ])
 
-    for transaction, account_name, category_name in rows:
-        account = (
-            db.query(Account)
-            .filter(
-                Account.id == transaction.account_id,
-                Account.user_id == current_user.id,
-            )
-            .first()
-        )
+    for transaction, account_name, account_currency, category_name in rows:
         writer.writerow([
             str(transaction.id),
             transaction.transaction_date.isoformat(),
             transaction.transaction_type,
             format(transaction.amount, ".2f"),
-            account.currency if account else "",
+            account_currency,
             _csv_safe_text(account_name),
             _csv_safe_text(category_name or "Uncategorized"),
             _csv_safe_text(transaction.merchant),
