@@ -187,6 +187,15 @@ export default function AppShell({
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
+      // Chat history is scoped to the authenticated session. Remove it on
+      // logout so another login starts with a clean AI conversation.
+      try {
+        window.sessionStorage.removeItem("artha-ai-chat-session-v1");
+      } catch {
+        // Logout must continue even if browser storage is unavailable.
+      }
+
+      setAssistantOpen(false);
       setUser(null);
       setLoggingOut(false);
       router.push("/login");
