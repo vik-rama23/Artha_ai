@@ -48,3 +48,38 @@
 .footer svg { flex: 0 0 auto; }
 @media (max-width: 850px) { .recommendationGrid { grid-template-columns: 1fr; } .page { padding: 26px 22px 40px; } }
 @media (max-width: 520px) { .page { padding: 22px 14px 32px; } .header h1 { font-size: 26px; } .headingIcon { width: 44px; height: 44px; flex-basis: 44px; } .sectionHeading { align-items: flex-start; flex-direction: column; } .recommendationCard { padding: 18px; } }
+
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.cardActions .actionLink {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.secondaryActionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #7b806f;
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.secondaryActionLink:hover {
+  color: #a47b22;
+}
+
+.secondaryActionLink:focus-visible {
+  outline: 2px solid #b28a2e;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
