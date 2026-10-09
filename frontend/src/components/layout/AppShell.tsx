@@ -13,6 +13,7 @@ import {
   Receipt,
   Repeat,
   Settings,
+  Sparkles,
   Tags,
   Target,
   Wallet,
@@ -81,6 +82,11 @@ const navigation = [
     label: "Net Worth",
     icon: Scale,
     href: "/net-worth",
+  },
+  {
+    label: "AI Assistant",
+    icon: Sparkles,
+    href: "/assistant",
   },
 ];
 
