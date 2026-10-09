@@ -178,6 +178,19 @@ def ask_financial_question(
                     max_output_tokens=900,
                     store=False,
                 )
+
+            # Do not return a partial or invented answer if the provider keeps
+            # requesting tools after the bounded execution budget is exhausted.
+            if any(
+                getattr(item, "type", None) == "function_call"
+                for item in response.output
+            ):
+                logger.warning("AI tool-call round limit reached.")
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail="Artha AI could not finish retrieving the requested data. Please try again.",
+                )
+
         answer = (response.output_text or "").strip()
 
         # Log response metadata without logging the user's financial context.
@@ -191,8 +204,6 @@ def ask_financial_question(
             ),
             [item.type for item in response.output],
         )
-
-        answer = (response.output_text or "").strip()
 
         if not answer:
             logger.warning("OpenAI returned no user-visible text.")
