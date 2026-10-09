@@ -1,4 +1,6 @@
+import csv
 from datetime import date
+from io import StringIO
 from uuid import UUID
 
 from fastapi import (
@@ -17,6 +19,7 @@ from app.api.dependencies import (
 )
 from app.models.accounts import Account
 from app.models.categories import Category
+from app.models.transactions import Transaction
 from app.models.users import User
 from app.schemas.transactions import (
     TransactionCreate,
@@ -48,7 +51,6 @@ def build_transaction_response(
     db: Session,
     transaction,
 ) -> TransactionResponse:
-
     account = (
         db.query(Account)
         .filter(
@@ -61,9 +63,7 @@ def build_transaction_response(
     if account is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                "Transaction account could not be loaded."
-            ),
+            detail="Transaction account could not be loaded.",
         )
 
     category = None
@@ -71,9 +71,7 @@ def build_transaction_response(
     if transaction.category_id is not None:
         category = (
             db.query(Category)
-            .filter(
-                Category.id == transaction.category_id,
-            )
+            .filter(Category.id == transaction.category_id)
             .first()
         )
 
@@ -82,15 +80,9 @@ def build_transaction_response(
         user_id=transaction.user_id,
         account_id=transaction.account_id,
         account_name=account.name,
-        account_institution_name=(
-            account.institution_name
-        ),
+        account_institution_name=account.institution_name,
         category_id=transaction.category_id,
-        category_name=(
-            category.name
-            if category is not None
-            else "Uncategorized"
-        ),
+        category_name=category.name if category is not None else "Uncategorized",
         recurring_transaction_id=transaction.recurring_transaction_id,
         transaction_type=transaction.transaction_type,
         amount=transaction.amount,
@@ -100,6 +92,125 @@ def build_transaction_response(
         notes=transaction.notes,
         created_at=transaction.created_at,
         updated_at=transaction.updated_at,
+    )
+
+
+def _csv_safe_text(value: str | None) -> str:
+    """Prevent spreadsheet formula execution for user-controlled text cells."""
+    text_value = value or ""
+    if text_value.lstrip().startswith(("=", "+", "-", "@", "\t", "\r")):
+        return "'" + text_value
+    return text_value
+
+
+# ============================================================
+# EXPORT TRANSACTIONS AS CSV
+# Keep this route before /{transaction_id}, since "export" is a
+# literal path segment and must not be parsed as a transaction UUID.
+# ============================================================
+
+
+@router.get(
+    "/export",
+    response_class=Response,
+    status_code=status.HTTP_200_OK,
+)
+def export_transactions_csv(
+    account_id: UUID | None = None,
+    category_id: UUID | None = None,
+    transaction_type: str | None = Query(
+        default=None,
+        pattern="^(INCOME|EXPENSE)$",
+    ),
+    start_date: date | None = None,
+    end_date: date | None = None,
+    search: str | None = Query(default=None, max_length=100),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> Response:
+    if start_date is not None and end_date is not None and start_date > end_date:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="start_date cannot be after end_date.",
+        )
+
+    query = (
+        db.query(Transaction, Account.name, Category.name)
+        .join(Account, Account.id == Transaction.account_id)
+        .outerjoin(Category, Category.id == Transaction.category_id)
+        .filter(
+            Transaction.user_id == current_user.id,
+            Account.user_id == current_user.id,
+        )
+    )
+
+    if account_id is not None:
+        query = query.filter(Transaction.account_id == account_id)
+    if category_id is not None:
+        query = query.filter(Transaction.category_id == category_id)
+    if transaction_type is not None:
+        query = query.filter(Transaction.transaction_type == transaction_type)
+    if start_date is not None:
+        query = query.filter(Transaction.transaction_date >= start_date)
+    if end_date is not None:
+        query = query.filter(Transaction.transaction_date <= end_date)
+    if search and search.strip():
+        pattern = f"%{search.strip()}%"
+        query = query.filter(
+            Transaction.description.ilike(pattern)
+            | Transaction.merchant.ilike(pattern)
+        )
+
+    rows = query.order_by(
+        Transaction.transaction_date.desc(),
+        Transaction.created_at.desc(),
+    ).all()
+
+    output = StringIO(newline="")
+    writer = csv.writer(output, lineterminator="\r\n")
+    writer.writerow([
+        "transaction_id",
+        "transaction_date",
+        "transaction_type",
+        "amount",
+        "currency",
+        "account",
+        "category",
+        "merchant",
+        "description",
+        "notes",
+    ])
+
+    for transaction, account_name, category_name in rows:
+        account = (
+            db.query(Account)
+            .filter(
+                Account.id == transaction.account_id,
+                Account.user_id == current_user.id,
+            )
+            .first()
+        )
+        writer.writerow([
+            str(transaction.id),
+            transaction.transaction_date.isoformat(),
+            transaction.transaction_type,
+            format(transaction.amount, ".2f"),
+            account.currency if account else "",
+            _csv_safe_text(account_name),
+            _csv_safe_text(category_name or "Uncategorized"),
+            _csv_safe_text(transaction.merchant),
+            _csv_safe_text(transaction.description),
+            _csv_safe_text(transaction.notes),
+        ])
+
+    filename = f"artha-transactions-{date.today().isoformat()}.csv"
+    return Response(
+        content="\ufeff" + output.getvalue(),
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-store",
+        },
     )
 
 
@@ -124,12 +235,7 @@ def create_transaction_endpoint(
             user_id=current_user.id,
             transaction_data=transaction_data,
         )
-
-        return build_transaction_response(
-            db=db,
-            transaction=transaction,
-        )
-
+        return build_transaction_response(db=db, transaction=transaction)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -158,12 +264,7 @@ def get_transaction_endpoint(
             user_id=current_user.id,
             transaction_id=transaction_id,
         )
-
-        return build_transaction_response(
-            db=db,
-            transaction=transaction,
-        )
-
+        return build_transaction_response(db=db, transaction=transaction)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -194,21 +295,14 @@ def update_transaction_endpoint(
             transaction_id=transaction_id,
             transaction_data=transaction_data,
         )
-
-        return build_transaction_response(
-            db=db,
-            transaction=transaction,
-        )
-
+        return build_transaction_response(db=db, transaction=transaction)
     except ValueError as exc:
         message = str(exc)
-
         if message == "Transaction not found.":
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=message,
             ) from exc
-
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=message,
@@ -235,11 +329,7 @@ def delete_transaction_endpoint(
             user_id=current_user.id,
             transaction_id=transaction_id,
         )
-
-        return Response(
-            status_code=status.HTTP_204_NO_CONTENT
-        )
-
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -266,41 +356,17 @@ def list_transactions(
     ),
     start_date: date | None = None,
     end_date: date | None = None,
-    search: str | None = Query(
-        default=None,
-        max_length=100,
-    ),
-    limit: int = Query(
-        default=50,
-        ge=1,
-        le=100,
-    ),
-    offset: int = Query(
-        default=0,
-        ge=0,
-    ),
+    search: str | None = Query(default=None, max_length=100),
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    # ---------------------------------------------------------
-    # Validate date range
-    # ---------------------------------------------------------
-
-    if (
-        start_date is not None
-        and end_date is not None
-        and start_date > end_date
-    ):
+    if start_date is not None and end_date is not None and start_date > end_date:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=(
-                "start_date cannot be after end_date."
-            ),
+            detail="start_date cannot be after end_date.",
         )
-
-    # ---------------------------------------------------------
-    # Get transactions
-    # ---------------------------------------------------------
 
     try:
         transactions, total = get_transactions(
@@ -315,27 +381,16 @@ def list_transactions(
             limit=limit,
             offset=offset,
         )
-
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
         ) from exc
 
-    # ---------------------------------------------------------
-    # Build transaction responses
-    # ---------------------------------------------------------
-
     items: list[TransactionResponse] = []
-
     for transaction in transactions:
         try:
-            items.append(
-                build_transaction_response(
-                    db=db,
-                    transaction=transaction,
-                )
-            )
+            items.append(build_transaction_response(db=db, transaction=transaction))
         except HTTPException:
             continue
 
