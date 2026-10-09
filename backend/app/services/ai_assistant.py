@@ -91,9 +91,9 @@ def ask_financial_question(
                 model=settings.openai_model,
                 instructions=ASSISTANT_INSTRUCTIONS,
                 input=(
-                    "User question:\\n"
-                    f"{question}\\n\\n"
-                    "Verified financial context (JSON):\\n"
+                    "User question:\n"
+                    f"{question}\n\n"
+                    "Verified financial context (JSON):\n"
                     f"{json.dumps(context, ensure_ascii=False)}"
                 ),
                 max_output_tokens=600,
