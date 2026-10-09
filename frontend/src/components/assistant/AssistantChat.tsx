@@ -194,7 +194,7 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
   async function submitQuestion(rawQuestion: string) {
     const trimmedQuestion = rawQuestion.trim();
 
-    if (!trimmedQuestion || isLoading) {
+    if (trimmedQuestion.length < 3 || isLoading) {
       return;
     }
 
@@ -253,7 +253,7 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
 
-      if (question.trim() && !isLoading) {
+      if (question.trim().length >= 3 && !isLoading) {
         void submitQuestion(question);
       }
     }
@@ -530,7 +530,7 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
                   type="submit"
                   className={styles.sendButton}
                   aria-label="Send question"
-                  disabled={!question.trim() || isLoading}
+                  disabled={question.trim().length < 3 || isLoading}
                 >
                   {isLoading ? (
                     <Loader2 size={18} className={styles.spinner} />
