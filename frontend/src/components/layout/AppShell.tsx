@@ -75,6 +75,11 @@ const navigation = [
     href: "/goals",
   },
   {
+    label: "Recommendations",
+    icon: Sparkles,
+    href: "/recommendations",
+  },
+  {
     label: "Analytics",
     icon: BarChart3,
     href: "/analytics",
