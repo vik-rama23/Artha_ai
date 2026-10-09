@@ -234,3 +234,34 @@
     gap: 6px;
   }
 }
+
+
+.detailAction {
+  margin-top: 12px;
+}
+
+.reviewLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #d4e3d6;
+  border-radius: 9px;
+  background: #edf5ef;
+  color: #285e40;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 150ms ease, border-color 150ms ease;
+
+  &:hover {
+    border-color: #b7d0bd;
+    background: #e2eee5;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #2b6746;
+    outline-offset: 3px;
+  }
+}
