@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Download, Plus } from "lucide-react";
+import { Download, FileUp, Plus } from "lucide-react";
 
 import {
   type TransactionFilters as TransactionFilterParams,
@@ -115,6 +115,10 @@ export default async function TransactionsPage({
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <Link href="/transactions/import" className={styles.addButton}>
+            <FileUp size={18} />
+            Import CSV
+          </Link>
           <a href={exportHref} className={styles.addButton}>
             <Download size={18} />
             Export CSV
