@@ -1,6 +1,7 @@
 import json
 import logging
 from datetime import date, timedelta
+from urllib import response
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -96,16 +97,34 @@ def ask_financial_question(
                     "Verified financial context (JSON):\n"
                     f"{json.dumps(context, ensure_ascii=False)}"
                 ),
-                max_output_tokens=600,
+                reasoning={"effort": "low"},
+                max_output_tokens=1200,
                 store=False,
             )
         answer = (response.output_text or "").strip()
 
+        # Log response metadata without logging the user's financial context.
+        logger.info(
+            "OpenAI response status=%s, incomplete_reason=%s, output_types=%s",
+            response.status,
+            (
+                response.incomplete_details.reason
+                if response.incomplete_details
+                else None
+            ),
+            [item.type for item in response.output],
+        )
+
+        answer = (response.output_text or "").strip()
+
         if not answer:
-            logger.warning("OpenAI returned an empty assistant response.")
+            logger.warning("OpenAI returned no user-visible text.")
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="The AI assistant returned an empty response. Please try again.",
+                detail=(
+                    "The AI provider returned no text. "
+                    "Please retry. Check backend logs for response status."
+                ),
             )
 
     except AuthenticationError as exc:
