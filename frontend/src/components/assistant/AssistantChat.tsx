@@ -288,7 +288,11 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
     }
 
     setMessages([]);
-    window.sessionStorage.removeItem("artha-ai-chat-session-v1");
+    try {
+      window.sessionStorage.removeItem("artha-ai-chat-session-v1");
+    } catch {
+      // Clearing the visible conversation should work even when storage is blocked.
+    }
     setError(null);
     setDisclaimer(null);
     setQuestion("");
@@ -519,9 +523,11 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
                 disabled={isLoading}
               />
               <div className={styles.composerFooter}>
-                <span className={styles.inputHint}>
+                <span className={styles.inputHint} id="assistant-input-hint">
                   <span className={styles.enterHint}>↵</span>
-                  Enter to send · Shift + Enter for a new line
+                  {question.trim().length < 3
+                    ? "Enter at least 3 characters to send"
+                    : "Enter to send · Shift + Enter for a new line"}
                 </span>
                 <span className={styles.characterCount}>
                   {question.length}/2000
@@ -531,6 +537,12 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
                   className={styles.sendButton}
                   aria-label="Send question"
                   disabled={question.trim().length < 3 || isLoading}
+                  aria-describedby="assistant-input-hint"
+                  title={
+                    question.trim().length < 3
+                      ? "Enter at least 3 characters"
+                      : "Send question"
+                  }
                 >
                   {isLoading ? (
                     <Loader2 size={18} className={styles.spinner} />
