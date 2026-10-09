@@ -7,14 +7,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.accounts import router as accounts_router
 from app.api.analytics import router as analytics_router
+from app.api.assistant import router as assistant_router
 from app.api.auth import router as auth_router
 from app.api.budgets import router as budgets_router
 from app.api.categories import router as categories_router
 from app.api.dashboard import router as dashboard_router
-from app.api.goals import router as goals_router
 from app.api.forecast import router as forecast_router
-from app.api.notifications import router as notifications_router
+from app.api.goals import router as goals_router
 from app.api.net_worth import router as net_worth_router
+from app.api.notifications import router as notifications_router
 from app.api.recurring_transactions import (
     router as recurring_transactions_router,
 )
@@ -122,6 +123,7 @@ def health_check():
 app.include_router(auth_router)
 app.include_router(accounts_router)
 app.include_router(analytics_router)
+app.include_router(assistant_router)
 app.include_router(budgets_router)
 app.include_router(dashboard_router)
 app.include_router(categories_router)
