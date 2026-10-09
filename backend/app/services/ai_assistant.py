@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import date
+from datetime import date, timedelta
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -44,9 +44,7 @@ def ask_financial_question(
 ) -> dict:
     snapshot_date = today or date.today()
     current_month_start = snapshot_date.replace(day=1)
-    previous_month_end = current_month_start.fromordinal(
-        current_month_start.toordinal() - 1
-    )
+    previous_month_end = current_month_start - timedelta(days=1)
     data_period_start = previous_month_end.replace(day=1)
 
     if not settings.openai_api_key:
