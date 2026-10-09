@@ -931,8 +931,8 @@
   .newChatButton { min-height: 34px; gap: 5px; padding: 0 9px; font-size: 10px; }
 }
 .drawerTrustStrip, .drawerFooter { display: none; }
-.drawerChatCard { display: flex; flex: 1; flex-direction: column; min-height: 0; border: 0; border-radius: 0; background: #fffefa; box-shadow: none; }
-.drawerPage .welcome { padding: 24px 16px 16px; }
+.drawerChatCard { display: flex; flex: 1; flex-direction: column; min-height: 0; overflow: hidden; border: 0; border-radius: 0; background: #fffefa; box-shadow: none; }
+.drawerPage .welcome { flex: 1; min-height: 0; overflow-y: auto; padding: 24px 16px 16px; }
 .drawerPage .welcomeIllustration { width: 64px; height: 62px; margin-bottom: 10px; }
 .drawerPage .welcomeOrb { width: 52px; height: 52px; border-radius: 18px; svg { width: 23px; height: 23px; } }
 .drawerPage .welcome h2 { font-size: 23px; }
