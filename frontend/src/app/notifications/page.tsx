@@ -2,11 +2,13 @@
 
 import {
   AlertTriangle,
+  ArrowUpRight,
   Bell,
   Check,
   CheckCircle2,
   Clock3,
   Trash2,
+  TrendingUp,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -25,6 +27,10 @@ function getIcon(notification: Notification) {
     return <AlertTriangle size={17} />;
   }
 
+  if (notification.type === "UNUSUAL_SPENDING") {
+    return <TrendingUp size={17} />;
+  }
+
   if (
     notification.type === "RECURRING_PAYMENT_DUE" ||
     notification.type === "RECURRING_PAYMENT_OVERDUE"
@@ -33,6 +39,38 @@ function getIcon(notification: Notification) {
   }
 
   return <CheckCircle2 size={17} />;
+}
+
+function getNotificationAction(notification: Notification) {
+  if (notification.type !== "UNUSUAL_SPENDING") {
+    return null;
+  }
+
+  const alertDate = new Date(
+    notification.scheduled_for ?? notification.created_at,
+  );
+
+  if (Number.isNaN(alertDate.getTime())) {
+    return "/transactions?transaction_type=EXPENSE";
+  }
+
+  const year = alertDate.getFullYear();
+  const month = String(alertDate.getMonth() + 1).padStart(2, "0");
+  const day = String(alertDate.getDate()).padStart(2, "0");
+  const params = new URLSearchParams({
+    transaction_type: "EXPENSE",
+    start_date: `${year}-${month}-01`,
+    end_date: `${year}-${month}-${day}`,
+  });
+
+  if (
+    notification.reference_type === "CATEGORY" &&
+    notification.reference_id
+  ) {
+    params.set("category_id", notification.reference_id);
+  }
+
+  return `/transactions?${params.toString()}`;
 }
 
 function formatDate(value: string) {
@@ -216,6 +254,18 @@ export default function NotificationsPage() {
                   </div>
 
                   <p>{notification.message}</p>
+
+                  {getNotificationAction(notification) && (
+                    <div className={styles.detailAction}>
+                      <Link
+                        href={getNotificationAction(notification)!}
+                        className={styles.reviewLink}
+                      >
+                        Review related transactions
+                        <ArrowUpRight size={15} />
+                      </Link>
+                    </div>
+                  )}
 
                   <div className={styles.actions}>
                     {!notification.is_read && (
