@@ -132,7 +132,7 @@ def ask_financial_question(
                 tools=FINANCIAL_TOOLS,
                 tool_choice="auto",
                 reasoning={"effort": "low"},
-                max_output_tokens=1800,
+                max_output_tokens=900,
                 store=False,
             )
 
@@ -168,7 +168,7 @@ def ask_financial_question(
                     tools=FINANCIAL_TOOLS,
                     tool_choice="auto",
                     reasoning={"effort": "low"},
-                    max_output_tokens=1800,
+                    max_output_tokens=900,
                     store=False,
                 )
         answer = (response.output_text or "").strip()
