@@ -17,6 +17,7 @@ import {
   Target,
   Wallet,
   X,
+  Sparkles,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
