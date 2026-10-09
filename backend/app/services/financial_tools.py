@@ -113,6 +113,7 @@ def _transaction_data(
         query = query.filter(
             Transaction.description.ilike(pattern)
             | Transaction.merchant.ilike(pattern)
+            | Category.name.ilike(pattern)
         )
 
     total = query.count()
