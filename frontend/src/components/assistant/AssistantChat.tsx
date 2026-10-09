@@ -61,6 +61,12 @@ const suggestedQuestions = [
     question:
       "Explain what my recorded income, expenses, and net cash flow say about this month.",
   },
+  {
+    icon: TrendingUp,
+    title: "Track savings trends",
+    question:
+      "Show my monthly income, expenses, and savings rate for the last six months.",
+  },
 ];
 
 function createMessageId(): string {
