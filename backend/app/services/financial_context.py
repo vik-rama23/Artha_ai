@@ -8,6 +8,7 @@ from app.services.analytics import (
     get_expenses_by_category,
     get_income_expense_summary,
 )
+from app.services.budgets import list_budgets
 
 
 def _money(value: Decimal | None) -> str:
@@ -50,6 +51,37 @@ def build_financial_context(
         end_date=snapshot_date,
     )
 
+    # Reuse Artha's budget service so the AI receives the same calculated
+    # amounts that the Budgets page displays (spent, remaining, safe daily spend).
+    current_budgets, _ = list_budgets(
+        db=db,
+        user_id=user_id,
+        month_start=snapshot_date,
+    )
+
+    budget_context = [
+        {
+            "budget_name": item["name"],
+            "category": item["category_name"] or item["name"],
+            "period_start": item["month_start"].isoformat(),
+            "period_end": item["month_end"].isoformat(),
+            "budget_amount_in_inr": _money(item["amount"]),
+            "spent_in_inr": _money(item["spent"]),
+            "remaining_in_inr": _money(item["remaining"]),
+            "percentage_used": str(item["percentage_used"]),
+            "safe_daily_spend_in_inr": _money(item["safe_daily_spend"]),
+            "days_remaining": item["days_remaining"],
+            "projected_spend_in_inr": (
+                _money(item["projected_spend"])
+                if item["projected_spend"] is not None
+                else None
+            ),
+            "status": item["status"],
+            "insight": item["insight"],
+        }
+        for item in current_budgets
+    ]
+
     top_categories = [
         {
             "category": item["category_name"],
@@ -78,6 +110,7 @@ def build_financial_context(
             ),
             "top_expense_categories": top_categories,
         },
+        "current_month_budgets": budget_context,
         "previous_completed_month": {
             "period_start": previous_month_start.isoformat(),
             "period_end": previous_month_end.isoformat(),
@@ -94,7 +127,8 @@ def build_financial_context(
         "limitations": [
             "Figures reflect transactions recorded in Artha, not necessarily every real-world transaction.",
             "The context contains current-month-to-date and previous-completed-month aggregates only.",
-            "Account balances, individual transactions, budgets, goals, and net worth are not included in this first version.",
+            "Account balances, individual transactions, goals, and net worth are not included in this version.",
+            "Current-month budget details are included separately in current_month_budgets. An empty list means no budget is configured for this month.",
             "Do not infer missing values or claim to have checked data that is not present.",
         ],
     }
