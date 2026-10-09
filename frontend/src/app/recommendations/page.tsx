@@ -57,7 +57,7 @@ function buildRecommendations(
   const today = new Date();
   const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
   const completedMonths = dashboard.monthly_cash_flow
-    .filter((month) => /^\\d{4}-\\d{2}/.test(month.month) && month.month.slice(0, 7) < currentMonthKey)
+    .filter((month) => /^\d{4}-\d{2}/.test(month.month) && month.month.slice(0, 7) < currentMonthKey)
     .sort((a, b) => b.month.localeCompare(a.month))
     .slice(0, 3);
 
