@@ -446,7 +446,7 @@
 }
 
 /* Sticky Artha AI launcher and right-side chat drawer */
-.assistantFab { position: fixed; top: 62%; right: 0; z-index: 61; display: inline-flex; align-items: center; justify-content: flex-start; gap: 9px; min-height: 48px; padding: 0 15px 0 13px; border: 1px solid rgba(231,199,124,.7); border-right: 0; border-radius: 14px 0 0 14px; background: #173d2f; color: #fff9e9; box-shadow: 0 8px 24px rgba(20,49,36,.2); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transform: translateY(-50%); transition: right .24s ease, background .18s ease, box-shadow .18s ease;
+.assistantFab { position: fixed; top: auto; right: 0; bottom: 28px; z-index: 61; display: inline-flex; align-items: center; justify-content: flex-start; gap: 9px; min-height: 48px; padding: 0 15px 0 13px; border: 1px solid rgba(231,199,124,.7); border-right: 0; border-radius: 14px 0 0 14px; background: #173d2f; color: #fff9e9; box-shadow: 0 8px 24px rgba(20,49,36,.2); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transform: none; transition: right .24s ease, background .18s ease, box-shadow .18s ease;
   svg { flex: 0 0 auto; color: #e7c77c; }
   &:hover { background: #24543c; box-shadow: 0 10px 28px rgba(20,49,36,.26); }
   &:focus-visible { outline: 3px solid rgba(199,162,79,.55); outline-offset: 3px; }
