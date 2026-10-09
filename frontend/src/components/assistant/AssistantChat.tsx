@@ -81,6 +81,62 @@ function formatPeriodDate(value: string): string {
   }).format(date);
 }
 
+function renderAssistantContent(content: string) {
+  const lines = content.split("\n");
+  const nodes: React.ReactNode[] = [];
+  let textLines: string[] = [];
+  let index = 0;
+
+  const flushText = () => {
+    if (textLines.length > 0) {
+      nodes.push(
+        <p className={styles.assistantTextBlock} key={"text-" + index++}>
+          {textLines.join("\n")}
+        </p>
+      );
+      textLines = [];
+    }
+  };
+
+  const parseCells = (line: string) =>
+    line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
+  const dividerPattern = /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/;
+
+  for (let i = 0; i < lines.length; i += 1) {
+    if (lines[i].includes("|") && i + 1 < lines.length && dividerPattern.test(lines[i + 1].trim())) {
+      flushText();
+      const tableRows = [parseCells(lines[i])];
+      i += 2;
+      while (i < lines.length && lines[i].includes("|") && lines[i].trim()) {
+        tableRows.push(parseCells(lines[i]));
+        i += 1;
+      }
+      i -= 1;
+      nodes.push(
+        <div className={styles.tableScroll} key={"table-" + index++}>
+          <table className={styles.answerTable}>
+            <thead>
+              <tr>{tableRows[0].map((cell, cellIndex) => <th key={cellIndex}>{cell}</th>)}</tr>
+            </thead>
+            <tbody>
+              {tableRows.slice(1).map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {tableRows[0].map((_, cellIndex) => <td key={cellIndex}>{row[cellIndex] || "—"}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    } else {
+      textLines.push(lines[i]);
+    }
+  }
+  flushText();
+
+  return <div className={styles.assistantRichContent}>{nodes}</div>;
+}
+
 type AssistantChatProps = {
   compact?: boolean;
 };
@@ -382,7 +438,7 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
                             : styles.assistantBubble
                         }
                       >
-                        {message.content}
+                        {message.role === "assistant" ? renderAssistantContent(message.content) : message.content}
                       </div>
 
                       {message.role === "assistant" &&
