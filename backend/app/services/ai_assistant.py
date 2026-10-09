@@ -82,23 +82,23 @@ def ask_financial_question(
     )
 
     try:
-        client = OpenAI(
+        with OpenAI(
             api_key=settings.openai_api_key,
             timeout=settings.openai_timeout_seconds,
             max_retries=1,
-        )
-        response = client.responses.create(
-            model=settings.openai_model,
-            instructions=ASSISTANT_INSTRUCTIONS,
-            input=(
-                "User question:\n"
-                f"{question}\n\n"
-                "Verified financial context (JSON):\n"
-                f"{json.dumps(context, ensure_ascii=False)}"
-            ),
-            max_output_tokens=600,
-            store=False,
-        )
+        ) as client:
+            response = client.responses.create(
+                model=settings.openai_model,
+                instructions=ASSISTANT_INSTRUCTIONS,
+                input=(
+                    "User question:\\n"
+                    f"{question}\\n\\n"
+                    "Verified financial context (JSON):\\n"
+                    f"{json.dumps(context, ensure_ascii=False)}"
+                ),
+                max_output_tokens=600,
+                store=False,
+            )
         answer = (response.output_text or "").strip()
 
         if not answer:
