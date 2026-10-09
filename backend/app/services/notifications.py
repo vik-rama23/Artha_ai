@@ -1,3 +1,4 @@
+import calendar
 from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal
 from uuid import UUID
@@ -7,7 +8,9 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from app.models.budgets import Budget
+from app.models.categories import Category
 from app.models.notifications import Notification
+from app.models.transactions import Transaction
 from app.models.recurring_transactions import RecurringTransaction
 from app.services.budgets import (
     calculate_projected_spend,
@@ -424,6 +427,118 @@ def _create_recurring_overdue_notification(
     return notification is not None
 
 
+def _previous_month_start(value: date, months_back: int) -> date:
+    month_index = value.year * 12 + value.month - 1 - months_back
+    return date(month_index // 12, month_index % 12 + 1, 1)
+
+
+def _create_unusual_spending_notifications(
+    db: Session,
+    *,
+    user_id: UUID,
+    processing_date: date,
+) -> int:
+    """
+    Flag month-to-date category spending at least 50% above the average
+    month-to-date spend for the same category across the prior three months.
+
+    Only categories with a positive historical baseline are considered.
+    Alerts are deduplicated per user, category, and calendar month.
+    """
+    today = processing_date
+    current_month_start = date(today.year, today.month, 1)
+
+    current_rows = (
+        db.query(
+            Transaction.category_id,
+            Category.name.label("category_name"),
+            func.sum(Transaction.amount).label("amount"),
+        )
+        .outerjoin(Category, Category.id == Transaction.category_id)
+        .filter(
+            Transaction.user_id == user_id,
+            Transaction.transaction_type == "EXPENSE",
+            Transaction.transaction_date >= current_month_start,
+            Transaction.transaction_date <= today,
+        )
+        .group_by(Transaction.category_id, Category.name)
+        .all()
+    )
+
+    created = 0
+    for row in current_rows:
+        current_spend = Decimal(row.amount or 0)
+        if current_spend <= 0:
+            continue
+
+        previous_spends: list[Decimal] = []
+        for months_back in (1, 2, 3):
+            prior_month_start = _previous_month_start(today, months_back)
+            prior_month_last_day = calendar.monthrange(
+                prior_month_start.year,
+                prior_month_start.month,
+            )[1]
+            cutoff_day = min(today.day, prior_month_last_day)
+            prior_cutoff = date(
+                prior_month_start.year,
+                prior_month_start.month,
+                cutoff_day,
+            )
+
+            query = db.query(
+                func.coalesce(func.sum(Transaction.amount), Decimal("0.00"))
+            ).filter(
+                Transaction.user_id == user_id,
+                Transaction.transaction_type == "EXPENSE",
+                Transaction.transaction_date >= prior_month_start,
+                Transaction.transaction_date <= prior_cutoff,
+            )
+            if row.category_id is None:
+                query = query.filter(Transaction.category_id.is_(None))
+            else:
+                query = query.filter(
+                    Transaction.category_id == row.category_id
+                )
+
+            previous_spends.append(Decimal(query.scalar() or 0))
+
+        baseline = sum(previous_spends, Decimal("0.00")) / Decimal("3")
+        if baseline <= 0 or current_spend < baseline * Decimal("1.5"):
+            continue
+
+        increase_percent = (
+            (current_spend - baseline) / baseline * Decimal("100")
+        ).quantize(Decimal("0.1"))
+        category_name = row.category_name or "Uncategorized"
+        category_key = str(row.category_id) if row.category_id else "uncategorized"
+
+        notification = create_notification(
+            db=db,
+            user_id=user_id,
+            notification_type="UNUSUAL_SPENDING",
+            title=f"Unusual spending: {category_name}",
+            message=(
+                f"Spending in {category_name} so far this month is "
+                f"{_format_amount(current_spend)}, compared with an average "
+                f"of {_format_amount(baseline)} over the same dates in the "
+                f"previous three months ({increase_percent}% higher). "
+                "Review the transactions to see whether anything needs attention."
+            ),
+            priority=PRIORITY_MEDIUM,
+            dedupe_key=(
+                f"UNUSUAL_SPENDING:{user_id}:{category_key}:"
+                f"{current_month_start.isoformat()}"
+            ),
+            reference_type="CATEGORY" if row.category_id else None,
+            reference_id=row.category_id,
+            scheduled_for=_utc_datetime_for_date(today),
+        )
+        if notification is not None:
+            created += 1
+
+    return created
+
+
 def process_notifications_for_user(
     db: Session,
     user_id: UUID,
@@ -462,6 +577,12 @@ def process_notifications_for_user(
                 processing_date=today,
             ):
                 created += 1
+
+        created += _create_unusual_spending_notifications(
+            db=db,
+            user_id=user_id,
+            processing_date=today,
+        )
 
         tomorrow = today + timedelta(days=1)
 
