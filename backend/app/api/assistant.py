@@ -29,5 +29,6 @@ def chat_with_assistant(
         db=db,
         user_id=current_user.id,
         question=payload.question,
+        history=[message.model_dump() for message in payload.history],
     )
     return AssistantChatResponse(**result)
