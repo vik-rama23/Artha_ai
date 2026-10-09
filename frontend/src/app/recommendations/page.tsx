@@ -28,6 +28,7 @@ type Recommendation = {
   evidence: string;
   action: string;
   amount?: string;
+  savingsPlan?: string;
   href: string;
   secondaryAction?: string;
   secondaryHref?: string;
@@ -128,14 +129,46 @@ function buildRecommendations(
     const targetDate = goal.target_date
       ? new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(`${goal.target_date}T00:00:00`))
       : null;
+    const monthlySavingsPlan = (() => {
+      if (!goal.target_date) return null;
+
+      const [targetYear, targetMonth, targetDay] = goal.target_date
+        .split("-")
+        .map(Number);
+      const target = new Date(targetYear, targetMonth - 1, targetDay);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (!Number.isFinite(target.getTime()) || target < today) return null;
+
+      const monthsRemaining =
+        (targetYear - today.getFullYear()) * 12 +
+        (targetMonth - (today.getMonth() + 1)) +
+        1;
+
+      if (monthsRemaining <= 0) return null;
+
+      return {
+        monthsRemaining,
+        monthlyAmount: Math.ceil(remaining / monthsRemaining),
+      };
+    })();
+
+    const goalDescription = !goal.target_date
+      ? "Add a target date to get a monthly savings plan for this goal."
+      : monthlySavingsPlan
+        ? `Set aside money each month until ${targetDate} to cover the remaining gap.`
+        : "The target date has passed. Update the deadline to calculate a new monthly savings plan.";
+
     recommendations.push({
       id: `goal-${goal.id}`,
       title: `Keep moving toward ${goal.name}`,
       priority: "Goal planning",
-      description: targetDate
-        ? `Your goal has a target date of ${targetDate}. Review your contribution plan to decide how to close the remaining gap.`
-        : "Your goal does not have a target date yet. Adding a realistic deadline can help you plan contributions.",
-      evidence: `Target: ${currency(Number(goal.target_amount))} · Saved so far: ${currency(Number(goal.current_amount))} · Remaining: ${currency(remaining)}`,
+      description: goalDescription,
+      evidence: `Target: ${currency(Number(goal.target_amount))} · Saved so far: ${currency(Number(goal.current_amount))} · Remaining: ${currency(remaining)}${monthlySavingsPlan ? ` · Time available: ${monthlySavingsPlan.monthsRemaining} ${monthlySavingsPlan.monthsRemaining === 1 ? "month" : "months"}` : ""}`,
+      ...(monthlySavingsPlan
+        ? { savingsPlan: `${currency(monthlySavingsPlan.monthlyAmount)} per month` }
+        : {}),
       action: "Open this goal",
       href: `/goals/${goal.id}`,
       icon: Target,
@@ -247,6 +280,15 @@ export default async function RecommendationsPage() {
                     <p>{recommendation.evidence}</p>
                   </div>
                   {recommendation.amount && <p className={styles.amount}><ArrowDownRight size={16} /> {recommendation.amount}</p>}
+                  {recommendation.savingsPlan && (
+                    <div className={styles.savingsPlan}>
+                      <PiggyBank size={18} />
+                      <div>
+                        <span>MONTHLY SAVINGS PLAN</span>
+                        <strong>{recommendation.savingsPlan}</strong>
+                      </div>
+                    </div>
+                  )}
                   <div className={styles.cardActions}>
                     <Link href={recommendation.href} className={styles.actionLink}>{recommendation.action} <ArrowRight size={16} /></Link>
                     {recommendation.secondaryAction && recommendation.secondaryHref && (
