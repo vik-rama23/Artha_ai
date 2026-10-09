@@ -9,6 +9,7 @@ import {
   PiggyBank,
   ShieldCheck,
   Sparkles,
+  Trash2,
   TrendingUp,
   Wallet,
 } from "lucide-react";
@@ -90,8 +91,36 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [disclaimer, setDisclaimer] = useState<string | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = window.sessionStorage.getItem("artha-ai-chat-session-v1");
+      if (saved) {
+        const parsed = JSON.parse(saved) as { messages?: ChatMessage[]; disclaimer?: string | null };
+        if (Array.isArray(parsed.messages)) setMessages(parsed.messages);
+        if (typeof parsed.disclaimer === "string") setDisclaimer(parsed.disclaimer);
+      }
+    } catch {
+      window.sessionStorage.removeItem("artha-ai-chat-session-v1");
+    } finally {
+      setSessionReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!sessionReady) return;
+    try {
+      window.sessionStorage.setItem(
+        "artha-ai-chat-session-v1",
+        JSON.stringify({ messages, disclaimer })
+      );
+    } catch {
+      // Chat remains usable if session storage is unavailable or full.
+    }
+  }, [messages, disclaimer, sessionReady]);
 
   useEffect(() => {
     conversationEndRef.current?.scrollIntoView({
@@ -122,7 +151,10 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
 
     try {
       const response: AssistantChatResponse =
-        await askAssistant(trimmedQuestion);
+        await askAssistant(
+          trimmedQuestion,
+          messages.slice(-12).map(({ role, content }) => ({ role, content }))
+        );
 
       setMessages((current) => [
         ...current,
@@ -194,6 +226,7 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
     }
 
     setMessages([]);
+    window.sessionStorage.removeItem("artha-ai-chat-session-v1");
     setError(null);
     setDisclaimer(null);
     setQuestion("");
@@ -220,17 +253,17 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
             </div>
           </div>
 
-          {hasMessages && (
-            <button
-              type="button"
-              className={styles.newChatButton}
-              onClick={handleNewChat}
-              disabled={isLoading}
-            >
-              <Sparkles size={16} />
-              New chat
-            </button>
-          )}
+          <button
+            type="button"
+            className={styles.newChatButton}
+            onClick={handleNewChat}
+            disabled={isLoading || (!hasMessages && !question)}
+            aria-label="Clear chat history"
+            title="Clear chat history for this tab"
+          >
+            <Trash2 size={15} />
+            Clear chat
+          </button>
         </header>
 
         <section className={`${styles.trustStrip} ${compact ? styles.drawerTrustStrip : ""}`} aria-label="AI assistant information">
