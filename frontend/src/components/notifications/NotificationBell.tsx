@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Clock3,
   X,
+  TrendingUp,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -22,6 +23,10 @@ import styles from "./NotificationBell.module.scss";
 function getIcon(notification: Notification) {
   if (notification.type === "BUDGET_EXCEEDED") {
     return <AlertTriangle size={16} />;
+  }
+
+  if (notification.type === "UNUSUAL_SPENDING") {
+    return <TrendingUp size={16} />;
   }
 
   if (
