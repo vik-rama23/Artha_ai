@@ -161,6 +161,29 @@ export default function AssistantPage() {
     }
   }
 
+  function handleRetry() {
+    const retryQuestion = question.trim();
+
+    if (!retryQuestion || isLoading) {
+      return;
+    }
+
+    setMessages((current) => {
+      const lastMessage = current[current.length - 1];
+
+      if (
+        lastMessage?.role === "user" &&
+        lastMessage.content === retryQuestion
+      ) {
+        return current.slice(0, -1);
+      }
+
+      return current;
+    });
+
+    void submitQuestion(retryQuestion);
+  }
+
   function handleNewChat() {
     if (isLoading) {
       return;
@@ -372,7 +395,7 @@ export default function AssistantPage() {
               <button
                 type="button"
                 className={styles.retryButton}
-                onClick={() => void submitQuestion(question)}
+                onClick={handleRetry}
                 disabled={!question.trim() || isLoading}
               >
                 Retry
