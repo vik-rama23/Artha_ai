@@ -13,6 +13,7 @@ from app.models.goals import Goal
 from app.models.recurring_transactions import RecurringTransaction
 from app.models.transactions import Transaction
 from app.services.accounts import get_account_balance
+from app.services.analytics import get_savings_trend
 from app.services.budgets import list_budgets
 from app.services.net_worth import get_net_worth
 from app.services.recurring_transactions import get_recurring_transaction_list
@@ -25,7 +26,7 @@ MAX_TRANSACTION_RESULTS = 50
 def _json_value(value: Any) -> Any:
     if isinstance(value, Decimal):
         return str(value)
-    if isinstance(value, (date,)):
+    if isinstance(value, date):
         return value.isoformat()
     if isinstance(value, UUID):
         return str(value)
@@ -88,6 +89,9 @@ def _transaction_data(
         )
     )
 
+    parsed_start = None
+    parsed_end = None
+
     if start_date:
         try:
             parsed_start = date.fromisoformat(start_date)
@@ -102,7 +106,7 @@ def _transaction_data(
             raise ValueError("end_date must use YYYY-MM-DD format.") from exc
         query = query.filter(Transaction.transaction_date <= parsed_end)
 
-    if start_date and end_date and parsed_start > parsed_end:
+    if parsed_start and parsed_end and parsed_start > parsed_end:
         raise ValueError("start_date must be on or before end_date.")
 
     if transaction_type:
@@ -262,6 +266,53 @@ def _recurring_data(db: Session, user_id: UUID, active_only: bool = False) -> di
     return {"total_recurring_items": total, "items": items}
 
 
+def _savings_trend_data(
+    db: Session,
+    user_id: UUID,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> dict:
+    parsed_start = None
+    parsed_end = None
+
+    if start_date:
+        try:
+            parsed_start = date.fromisoformat(start_date)
+        except ValueError as exc:
+            raise ValueError("start_date must use YYYY-MM-DD format.") from exc
+
+    if end_date:
+        try:
+            parsed_end = date.fromisoformat(end_date)
+        except ValueError as exc:
+            raise ValueError("end_date must use YYYY-MM-DD format.") from exc
+
+    if bool(parsed_start) != bool(parsed_end):
+        raise ValueError("Provide both start_date and end_date, or leave both null.")
+
+    if parsed_start and parsed_end and parsed_start > parsed_end:
+        raise ValueError("start_date must be on or before end_date.")
+
+    trend = get_savings_trend(
+        db=db,
+        user_id=user_id,
+        start_date=parsed_start,
+        end_date=parsed_end,
+    )
+
+    return {
+        "period_start": parsed_start.isoformat() if parsed_start else None,
+        "period_end": parsed_end.isoformat() if parsed_end else None,
+        "total_income": trend["total_income"],
+        "total_expenses": trend["total_expense"],
+        "total_net_savings": trend["total_savings"],
+        "average_savings_rate_percent": trend["average_savings_rate"],
+        "monthly_breakdown": trend["items"],
+        "currency": "INR",
+        "note": "Calculated from transactions recorded in Artha. Months with no transactions inside a requested date range are included as zero-value months.",
+    }
+
+
 FINANCIAL_TOOLS = [
     {
         "type": "function",
@@ -325,9 +376,23 @@ FINANCIAL_TOOLS = [
         "description": "Read the authenticated user's recurring income and expenses.",
         "parameters": {
             "type": "object",
-            "properties": {"active_only": {"type": "boolean"},
-            },
+            "properties": {"active_only": {"type": "boolean"}},
             "required": ["active_only"],
+            "additionalProperties": False,
+        },
+        "strict": True,
+    },
+    {
+        "type": "function",
+        "name": "get_savings_trend",
+        "description": "Return backend-calculated month-by-month income, expenses, net savings, and savings rate from the authenticated user's recorded transactions. Use this for savings-rate questions, monthly cash-flow trends, and multi-month income/expense comparisons. For a specific period, provide inclusive start_date and end_date in YYYY-MM-DD format. For an all-recorded-history request, leave both dates null. Results are grouped by calendar month and missing months in a bounded date range are zero-filled.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "start_date": {"type": ["string", "null"], "description": "Inclusive period start YYYY-MM-DD, or null."},
+                "end_date": {"type": ["string", "null"], "description": "Inclusive period end YYYY-MM-DD, or null."},
+            },
+            "required": ["start_date", "end_date"],
             "additionalProperties": False,
         },
         "strict": True,
@@ -359,6 +424,8 @@ def execute_financial_tool(
             result = _net_worth_data(db, user_id, **arguments)
         elif tool_name == "get_recurring_transactions":
             result = _recurring_data(db, user_id, **arguments)
+        elif tool_name == "get_savings_trend":
+            result = _savings_trend_data(db, user_id, **arguments)
         else:
             raise ValueError("This financial tool is not available.")
 
