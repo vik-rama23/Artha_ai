@@ -127,7 +127,7 @@ def build_financial_context(
         "limitations": [
             "Figures reflect transactions recorded in Artha, not necessarily every real-world transaction.",
             "The context contains current-month-to-date and previous-completed-month aggregates only.",
-            "Account balances, individual transactions, goals, and net worth are not included in this version.",
+            "Detailed account balances, transaction records, goals, net worth, and recurring transactions are available through authenticated read-only assistant tools when needed.",
             "Current-month budget details are included separately in current_month_budgets. An empty list means no budget is configured for this month.",
             "Do not infer missing values or claim to have checked data that is not present.",
         ],
