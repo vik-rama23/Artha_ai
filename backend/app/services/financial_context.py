@@ -1,4 +1,3 @@
-from calendar import monthrange
 from datetime import date, timedelta
 from decimal import Decimal
 from uuid import UUID
@@ -13,14 +12,6 @@ from app.services.analytics import (
 
 def _money(value: Decimal | None) -> str:
     return str(value if value is not None else Decimal("0.00"))
-
-
-def _month_end(value: date) -> date:
-    return date(
-        value.year,
-        value.month,
-        monthrange(value.year, value.month)[1],
-    )
 
 
 def build_financial_context(
