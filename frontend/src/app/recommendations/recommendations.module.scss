@@ -1,0 +1,50 @@
+.page {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 32px 36px 48px;
+  box-sizing: border-box;
+  color: #203f34;
+}
+.header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.headingIcon { display: grid; place-items: center; width: 52px; height: 52px; flex: 0 0 52px; border-radius: 15px; background: #edf3ed; color: #1f5a43; }
+.headingText { min-width: 0; }
+.eyebrow { margin: 0 0 7px; color: #a47b22; font-size: 10px; font-weight: 800; letter-spacing: .14em; }
+.header h1 { margin: 0; color: #193d30; font-size: 31px; line-height: 1.2; letter-spacing: -.03em; }
+.subtitle { margin: 7px 0 0; color: #898f88; font-size: 14px; line-height: 1.5; }
+.notice { display: flex; align-items: flex-start; gap: 12px; padding: 16px 18px; margin-bottom: 28px; border: 1px solid #dce8dc; border-radius: 13px; background: #f3f7f0; color: #38604b; }
+.notice svg { flex: 0 0 auto; margin-top: 1px; }
+.notice p { margin: 0; font-size: 13px; line-height: 1.6; }
+.notice strong { color: #1f5a43; }
+.partialNotice { margin: -12px 0 22px; padding: 12px 15px; border: 1px solid #ead8bd; border-radius: 10px; background: #fff9ed; color: #84672d; font-size: 12px; line-height: 1.5; }
+.sectionHeading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 17px; }
+.sectionHeading h2 { margin: 0; color: #203f34; font-size: 20px; letter-spacing: -.02em; }
+.sectionHeading p { margin: 6px 0 0; color: #92958d; font-size: 12px; }
+.count { padding: 7px 10px; border: 1px solid #e7e0d4; border-radius: 999px; background: #fffdf9; color: #69776d; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.recommendationGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; }
+.recommendationCard { display: flex; min-width: 0; flex-direction: column; padding: 22px; border: 1px solid #e7e0d4; border-radius: 16px; background: #fffdf9; box-shadow: 0 8px 24px rgba(57, 47, 32, .045); }
+.cardTop { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.number { color: #b4ad9e; font-size: 12px; font-weight: 800; letter-spacing: .08em; }
+.priority { padding: 6px 9px; border-radius: 999px; font-size: 10px; font-weight: 750; white-space: nowrap; }
+.priorityHigh { background: #faeee7; color: #a6532c; }
+.priorityReview { background: #f8f1dd; color: #8b6a20; }
+.priorityGoal { background: #edf3ed; color: #2b6b4d; }
+.cardIcon { display: grid; place-items: center; width: 43px; height: 43px; margin-top: 20px; border-radius: 12px; background: #edf3ed; color: #1f5a43; }
+.recommendationCard h3 { margin: 15px 0 8px; color: #203f34; font-size: 17px; line-height: 1.4; }
+.description { margin: 0; color: #707a71; font-size: 13px; line-height: 1.65; }
+.evidence { margin-top: 19px; padding: 13px 14px; border: 1px solid #eee7dc; border-radius: 10px; background: #faf7f0; }
+.evidence span { color: #a47b22; font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+.evidence p { margin: 6px 0 0; color: #526057; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.amount { display: flex; align-items: center; gap: 5px; margin: 12px 0 0; color: #a6532c; font-size: 12px; font-weight: 750; }
+.actionLink, .primaryLink { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; align-self: flex-start; margin-top: auto; padding-top: 20px; color: #1f5a43; font-size: 12px; font-weight: 750; text-decoration: none; }
+.actionLink:hover, .primaryLink:hover { color: #a47b22; }
+.actionLink:focus-visible, .primaryLink:focus-visible { outline: 2px solid #b28a2e; outline-offset: 4px; border-radius: 4px; }
+.emptyState { display: flex; flex-direction: column; align-items: center; padding: 48px 24px; border: 1px solid #e7e0d4; border-radius: 16px; background: #fffdf9; text-align: center; }
+.emptyState > svg { color: #39704d; }
+.emptyState h2 { margin: 14px 0 0; color: #203f34; font-size: 19px; }
+.emptyState p { max-width: 470px; margin: 8px 0 0; color: #858b83; font-size: 13px; line-height: 1.6; }
+.emptyState .primaryLink { align-self: center; margin-top: 4px; }
+.footer { display: flex; align-items: flex-start; gap: 8px; margin-top: 25px; color: #96958c; font-size: 11px; line-height: 1.5; }
+.footer svg { flex: 0 0 auto; }
+@media (max-width: 850px) { .recommendationGrid { grid-template-columns: 1fr; } .page { padding: 26px 22px 40px; } }
+@media (max-width: 520px) { .page { padding: 22px 14px 32px; } .header h1 { font-size: 26px; } .headingIcon { width: 44px; height: 44px; flex-basis: 44px; } .sectionHeading { align-items: flex-start; flex-direction: column; } .recommendationCard { padding: 18px; } }
