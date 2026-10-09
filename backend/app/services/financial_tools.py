@@ -102,6 +102,9 @@ def _transaction_data(
             raise ValueError("end_date must use YYYY-MM-DD format.") from exc
         query = query.filter(Transaction.transaction_date <= parsed_end)
 
+    if start_date and end_date and parsed_start > parsed_end:
+        raise ValueError("start_date must be on or before end_date.")
+
     if transaction_type:
         normalized_type = transaction_type.upper()
         if normalized_type not in {"INCOME", "EXPENSE"}:
