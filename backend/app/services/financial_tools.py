@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.models.accounts import Account
@@ -80,7 +81,7 @@ def _transaction_data(
     limit: int = 20,
 ) -> dict:
     query = (
-        db.query(Transaction, Account.name, Category.name)
+        db.query(Transaction, Account.name, Account.currency, Category.name)
         .join(Account, Account.id == Transaction.account_id)
         .outerjoin(Category, Category.id == Transaction.category_id)
         .filter(
@@ -135,12 +136,12 @@ def _transaction_data(
     )
 
     items = []
-    for transaction, account_name, category_name in rows:
+    for transaction, account_name, account_currency, category_name in rows:
         items.append({
             "date": transaction.transaction_date.isoformat(),
             "type": transaction.transaction_type,
             "amount": _json_value(transaction.amount),
-            "currency": "account currency",
+            "currency": account_currency,
             "account": account_name,
             "category": category_name,
             "merchant": transaction.merchant,
@@ -158,6 +159,101 @@ def _transaction_data(
             "as the complete set when truncated is true."
         ),
         "transactions": items,
+    }
+
+
+
+def _transaction_summary(
+    db: Session,
+    user_id: UUID,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    transaction_type: str | None = None,
+    search: str | None = None,
+) -> dict:
+    """Return exact transaction totals grouped by the account currency."""
+    query = (
+        db.query(
+            Account.currency,
+            func.count(Transaction.id),
+            func.coalesce(func.sum(Transaction.amount), Decimal("0.00")),
+        )
+        .join(Account, Account.id == Transaction.account_id)
+        .outerjoin(Category, Category.id == Transaction.category_id)
+        .filter(
+            Transaction.user_id == user_id,
+            Account.user_id == user_id,
+        )
+    )
+
+    parsed_start = None
+    parsed_end = None
+
+    if start_date:
+        try:
+            parsed_start = date.fromisoformat(start_date)
+        except ValueError as exc:
+            raise ValueError("start_date must use YYYY-MM-DD format.") from exc
+        query = query.filter(Transaction.transaction_date >= parsed_start)
+
+    if end_date:
+        try:
+            parsed_end = date.fromisoformat(end_date)
+        except ValueError as exc:
+            raise ValueError("end_date must use YYYY-MM-DD format.") from exc
+        query = query.filter(Transaction.transaction_date <= parsed_end)
+
+    if parsed_start and parsed_end and parsed_start > parsed_end:
+        raise ValueError("start_date must be on or before end_date.")
+
+    normalized_type = None
+    if transaction_type:
+        normalized_type = transaction_type.upper()
+        if normalized_type not in {"INCOME", "EXPENSE"}:
+            raise ValueError("transaction_type must be INCOME or EXPENSE.")
+        query = query.filter(Transaction.transaction_type == normalized_type)
+
+    normalized_search = search.strip() if search and search.strip() else None
+    if normalized_search:
+        pattern = f"%{normalized_search}%"
+        query = query.filter(
+            or_(
+                Transaction.description.ilike(pattern),
+                Transaction.merchant.ilike(pattern),
+                Category.name.ilike(pattern),
+            )
+        )
+
+    rows = (
+        query
+        .group_by(Account.currency)
+        .order_by(Account.currency.asc())
+        .all()
+    )
+
+    totals_by_currency = [
+        {
+            "currency": currency or "UNKNOWN",
+            "transaction_count": int(count or 0),
+            "amount_total": _json_value(amount or Decimal("0.00")),
+        }
+        for currency, count, amount in rows
+    ]
+
+    return {
+        "start_date": parsed_start.isoformat() if parsed_start else None,
+        "end_date": parsed_end.isoformat() if parsed_end else None,
+        "transaction_type": normalized_type or "ALL",
+        "search": normalized_search,
+        "total_matching_transactions": sum(
+            item["transaction_count"] for item in totals_by_currency
+        ),
+        "totals_by_currency": totals_by_currency,
+        "note": (
+            "Totals and counts are calculated by the database across all matching "
+            "transactions, not a capped sample. Totals are grouped by account currency; "
+            "do not add different currencies together or assume a currency conversion."
+        ),
     }
 
 
@@ -351,6 +447,23 @@ FINANCIAL_TOOLS = [
     },
     {
         "type": "function",
+        "name": "summarize_transactions",
+        "description": "Return exact database-calculated transaction totals and counts, grouped by account currency. Use for questions asking how much was spent or earned, including totals by merchant/category keyword and date range. Use search_transactions for individual transaction examples.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "start_date": {"type": ["string", "null"], "description": "Inclusive date YYYY-MM-DD, or null for all recorded dates."},
+                "end_date": {"type": ["string", "null"], "description": "Inclusive date YYYY-MM-DD, or null for all recorded dates."},
+                "transaction_type": {"type": ["string", "null"], "enum": ["INCOME", "EXPENSE", null], "description": "INCOME, EXPENSE, or null for both types."},
+                "search": {"type": ["string", "null"], "description": "Optional keyword matched against merchant, description, or category name."}
+            },
+            "required": ["start_date", "end_date", "transaction_type", "search"],
+            "additionalProperties": false
+        },
+        "strict": true
+    },
+    {
+        "type": "function",
         "name": "get_budgets",
         "description": "Read the authenticated user's budgets for a month, including amount, spent, remaining, safe daily spend and status. Defaults to the current month.",
         "parameters": {
@@ -426,6 +539,8 @@ def execute_financial_tool(
             result = _account_data(db, user_id)
         elif tool_name == "search_transactions":
             result = _transaction_data(db, user_id, **arguments)
+        elif tool_name == "summarize_transactions":
+            result = _transaction_summary(db, user_id, **arguments)
         elif tool_name == "get_budgets":
             result = _budget_data(db, user_id, **arguments)
         elif tool_name == "get_goals":
