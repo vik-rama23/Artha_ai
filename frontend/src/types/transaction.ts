@@ -1,3 +1,5 @@
+export type TransactionSource = "MANUAL" | "CSV_IMPORT" | "OCR" | "SMS" | "RECURRING";
+
 export type TransactionType =
   | "INCOME"
   | "EXPENSE";
@@ -30,6 +32,7 @@ export type Transaction = {
    * null means this is a normal/manual transaction.
    */
   recurring_transaction_id: string | null;
+  source?: TransactionSource;
 };
 
 export type CreateTransactionPayload = {
