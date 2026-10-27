@@ -252,9 +252,14 @@ def ask_financial_question(
             detail="Could not reach the AI service. Please try again shortly.",
         ) from exc
     except APIStatusError as exc:
+        # Capture provider diagnostics so HTTP 400 errors can be traced without
+        # logging prompts, financial context, API keys, or authorization headers.
         logger.error(
-            "OpenAI request failed with status code %s.",
+            "OpenAI request failed: status=%s code=%s param=%s message=%s",
             exc.status_code,
+            getattr(exc, "code", None),
+            getattr(exc, "param", None),
+            str(getattr(exc, "message", exc))[:1000],
         )
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
