@@ -84,6 +84,7 @@ def build_transaction_response(
         category_id=transaction.category_id,
         category_name=category.name if category is not None else "Uncategorized",
         recurring_transaction_id=transaction.recurring_transaction_id,
+        source=transaction.source or "MANUAL",
         transaction_type=transaction.transaction_type,
         amount=transaction.amount,
         transaction_date=transaction.transaction_date,
@@ -170,6 +171,7 @@ def export_transactions_csv(
     writer = csv.writer(output, lineterminator="\r\n")
     writer.writerow([
         "transaction_id",
+        "source",
         "transaction_date",
         "transaction_type",
         "amount",
@@ -184,6 +186,7 @@ def export_transactions_csv(
     for transaction, account_name, account_currency, category_name in rows:
         writer.writerow([
             str(transaction.id),
+            transaction.source or "MANUAL",
             transaction.transaction_date.isoformat(),
             transaction.transaction_type,
             format(transaction.amount, ".2f"),
