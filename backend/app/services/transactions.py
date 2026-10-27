@@ -189,6 +189,7 @@ def create_transaction(
         db=db,
         user_id=user_id,
         category_id=transaction_data.category_id,
+        source="MANUAL",
         transaction_type=transaction_data.transaction_type,
     )
 
