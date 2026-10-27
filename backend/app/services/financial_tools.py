@@ -460,7 +460,7 @@ FINANCIAL_TOOLS = [
             "required": ["start_date", "end_date", "transaction_type", "search"],
             "additionalProperties": False
         },
-        "strict": true
+        "strict": True
     },
     {
         "type": "function",
