@@ -250,6 +250,7 @@ def confirm_import(
                 user_id=current_user.id,
                 account_id=account_id,
                 category_id=category_id,
+                source="CSV_IMPORT",
                 transaction_type=row["transaction_type"],
                 amount=Decimal(row["amount"]),
                 transaction_date=date.fromisoformat(row["transaction_date"]),
