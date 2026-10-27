@@ -30,6 +30,7 @@
     minmax(145px, 1fr)
     minmax(190px, 1.25fr)
     125px
+    minmax(115px, 0.8fr)
     125px
     125px;
 
@@ -272,6 +273,36 @@
   font-weight: 550;
 
   white-space: nowrap;
+}
+
+/* -------------------------------------------------- */
+/* Transaction source */
+/* -------------------------------------------------- */
+
+.sourceCell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.sourceBadge {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid #e3e8dc;
+  border-radius: 8px;
+  background: #f7f8f2;
+  color: #52645a;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.sourceBadge svg {
+  flex: 0 0 auto;
+  color: #54745b;
 }
 
 /* -------------------------------------------------- */
