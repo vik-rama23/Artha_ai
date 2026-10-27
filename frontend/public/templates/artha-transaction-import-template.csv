@@ -1,1 +1,3 @@
 transaction_date,transaction_type,amount,account,category,merchant,description,notes
+2026-10-20,EXPENSE,250,REPLACE_WITH_YOUR_ACCOUNT,REPLACE_WITH_EXPENSE_CATEGORY,Local Store,Example expense,EXAMPLE - replace or delete this row
+2026-10-21,INCOME,5000,REPLACE_WITH_YOUR_ACCOUNT,REPLACE_WITH_INCOME_CATEGORY,Employer,Example income,EXAMPLE - replace or delete this row
