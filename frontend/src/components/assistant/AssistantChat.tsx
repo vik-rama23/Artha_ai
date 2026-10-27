@@ -5,6 +5,8 @@ import {
   ArrowUp,
   Bot,
   ChartNoAxesCombined,
+  Check,
+  Copy,
   Loader2,
   PiggyBank,
   ShieldCheck,
@@ -154,6 +156,8 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
   const [error, setError] = useState<string | null>(null);
   const [disclaimer, setDisclaimer] = useState<string | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [copyErrorMessageId, setCopyErrorMessageId] = useState<string | null>(null);
   const conversationEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -280,6 +284,20 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
     });
 
     void submitQuestion(retryQuestion);
+  }
+
+  async function handleCopyMessage(message: ChatMessage) {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopiedMessageId(message.id);
+      setCopyErrorMessageId(null);
+      window.setTimeout(() => {
+        setCopiedMessageId((current) => current === message.id ? null : current);
+      }, 1800);
+    } catch {
+      setCopyErrorMessageId(message.id);
+      setCopiedMessageId(null);
+    }
   }
 
   function handleNewChat() {
@@ -450,6 +468,26 @@ export default function AssistantChat({ compact = false }: AssistantChatProps) {
                       >
                         {message.role === "assistant" ? renderAssistantContent(message.content) : message.content}
                       </div>
+
+                      {message.role === "assistant" && (
+                        <div className={styles.messageActions}>
+                          <button
+                            type="button"
+                            className={styles.copyButton}
+                            onClick={() => void handleCopyMessage(message)}
+                            aria-label={copiedMessageId === message.id ? "Copied answer" : "Copy answer"}
+                            title={copiedMessageId === message.id ? "Copied" : "Copy answer"}
+                          >
+                            {copiedMessageId === message.id ? <Check size={14} /> : <Copy size={14} />}
+                            <span>{copiedMessageId === message.id ? "Copied" : "Copy"}</span>
+                          </button>
+                          {copyErrorMessageId === message.id && (
+                            <span className={styles.copyError} role="status">
+                              Clipboard unavailable. Select and copy the answer text.
+                            </span>
+                          )}
+                        </div>
+                      )}
 
                       {message.role === "assistant" &&
                         message.dataPeriodStart &&
