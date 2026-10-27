@@ -79,6 +79,52 @@
 .mappingGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .field { display: flex; flex-direction: column; gap: 7px; color: #4c5c52; font-size: 13px; font-weight: 650; }
 .field select { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid #dcded4; border-radius: 10px; background: #fff; color: #19352a; font: inherit; }
+.categoryOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid #e8e2d7;
+  border-radius: 11px;
+  background: #fcfaf5;
+  color: #345344;
+  cursor: pointer;
+}
+
+.categoryOption input {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: #1f5a43;
+  flex: 0 0 auto;
+}
+
+.categoryOption span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.categoryOption strong {
+  font-size: 13px;
+}
+
+.categoryOption small {
+  color: #7b847e;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.warningList {
+  min-width: 180px;
+  margin: 7px 0 0;
+  padding-left: 16px;
+  color: #916b1b;
+  line-height: 1.5;
+}
+
 .mappingNote { margin: 16px 0; color: #7b847e; font-size: 12px; line-height: 1.6; }
 .primaryButton, .secondaryButton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 11px; font-size: 13px; font-weight: 700; cursor: pointer; }
 .primaryButton { border: 1px solid #1f5a43; background: #1f5a43; color: #fffdf7; }
