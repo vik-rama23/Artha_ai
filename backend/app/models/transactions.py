@@ -68,6 +68,13 @@ class Transaction(Base):
         index=True,
     )
 
+    source: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="MANUAL",
+        server_default="MANUAL",
+    )
+
     transaction_type: Mapped[str] = mapped_column(
         String(20),
         nullable=False,
