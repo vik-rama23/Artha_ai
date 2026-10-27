@@ -79,6 +79,7 @@ class TransactionResponse(BaseModel):
     category_name: str
 
     recurring_transaction_id: UUID | None = None
+    source: str = "MANUAL"
 
     transaction_type: str
     amount: Decimal
