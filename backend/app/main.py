@@ -25,6 +25,9 @@ from app.api.top_transactions import (
 from app.api.transactions import (
     router as transactions_router,
 )
+from app.api.transaction_import import (
+    router as transaction_import_router,
+)
 from app.core.config import settings
 from app.services.recurring_scheduler import (
     recurring_scheduler_loop,
@@ -139,4 +142,7 @@ app.include_router(
 )
 app.include_router(
     transactions_router
+)
+app.include_router(
+    transaction_import_router
 )
