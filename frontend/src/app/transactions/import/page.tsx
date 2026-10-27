@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, FileUp, LoaderCircle, Upload } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Download, FileUp, LoaderCircle, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { apiClient } from "@/lib/api/client";
@@ -196,6 +196,18 @@ export default function ImportTransactionsPage() {
 
       <section className={styles.card}>
         <div className={styles.stepHeading}><span>1</span><div><h2>Choose your CSV file</h2><p>CSV only · Up to 2 MB · Maximum 5,000 rows</p></div></div>
+        <div className={styles.templateHelp}>
+          <div>
+            <strong>Not sure which columns to use?</strong>
+            <p>Download the Artha CSV template. Keep the header names, then enter your own transaction details. Use the exact account and category names already in Artha.</p>
+          </div>
+          <a className={styles.templateButton} href="/templates/artha-transaction-import-template.csv" download>
+            <Download size={16} /> Download CSV template
+          </a>
+        </div>
+        <p className={styles.csvInstructions}>
+          Required: <strong>transaction_date</strong> (YYYY-MM-DD), <strong>transaction_type</strong> (INCOME or EXPENSE), <strong>amount</strong> (positive number), and <strong>account</strong> (your Artha account name). Category is optional; if provided, it must match an active category for that transaction type.
+        </p>
         <label className={styles.dropzone}>
           <FileUp size={30} />
           <strong>{fileName || "Choose a CSV file"}</strong>
