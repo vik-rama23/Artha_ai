@@ -199,7 +199,7 @@ export default function ImportTransactionsPage() {
         <div className={styles.templateHelp}>
           <div>
             <strong>Not sure which columns to use?</strong>
-            <p>Download the Artha CSV template. Keep the header names, then enter your own transaction details. Use the exact account and category names already in Artha.</p>
+            <p>Download the Artha CSV template. It includes example income and expense rows. Replace the example rows with your own transactions or delete them first. Keep the header names and use exact account and category names from Artha.</p>
           </div>
           <a className={styles.templateButton} href="/templates/artha-transaction-import-template.csv" download>
             <Download size={16} /> Download CSV template
@@ -231,7 +231,7 @@ export default function ImportTransactionsPage() {
                 </label>
               ))}
             </div>
-            <p className={styles.mappingNote}>Date format: YYYY-MM-DD. Type must be INCOME or EXPENSE. Account names must match an account in Artha. Categories are optional and must match an active category of the same type.</p>
+            <p className={styles.mappingNote}>Date format: YYYY-MM-DD. Type must be INCOME or EXPENSE. Account names must match an account in Artha. Categories are optional and must match an active category of the same type. Replace or delete the clearly marked example rows before importing.</p>
             <button className={styles.primaryButton} type="button" disabled={!requiredMapped || loading} onClick={() => void handlePreview()}>
               {loading ? <LoaderCircle size={18} className={styles.spin} /> : <Upload size={18} />}
               {loading ? "Validating CSV…" : "Preview import"}
