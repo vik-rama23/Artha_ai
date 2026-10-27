@@ -454,11 +454,11 @@ FINANCIAL_TOOLS = [
             "properties": {
                 "start_date": {"type": ["string", "null"], "description": "Inclusive date YYYY-MM-DD, or null for all recorded dates."},
                 "end_date": {"type": ["string", "null"], "description": "Inclusive date YYYY-MM-DD, or null for all recorded dates."},
-                "transaction_type": {"type": ["string", "null"], "enum": ["INCOME", "EXPENSE", null], "description": "INCOME, EXPENSE, or null for both types."},
+                "transaction_type": {"type": ["string", "null"], "enum": ["INCOME", "EXPENSE", None], "description": "INCOME, EXPENSE, or null for both types."},
                 "search": {"type": ["string", "null"], "description": "Optional keyword matched against merchant, description, or category name."}
             },
             "required": ["start_date", "end_date", "transaction_type", "search"],
-            "additionalProperties": false
+            "additionalProperties": False
         },
         "strict": true
     },
