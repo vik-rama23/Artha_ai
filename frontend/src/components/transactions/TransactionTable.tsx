@@ -16,6 +16,11 @@ import {
   AlertTriangle,
   Loader2,
   Repeat2,
+  FileSpreadsheet,
+  ScanText,
+  Smartphone,
+  Hand,
+  Tag,
 } from "lucide-react";
 
 import type { Transaction } from "@/types/transaction";
@@ -27,6 +32,28 @@ import styles from "./TransactionTable.module.scss";
 type TransactionTableProps = {
   transactions: Transaction[];
 };
+
+function getSourceLabel(source?: string) {
+  switch (source) {
+    case "CSV_IMPORT": return "CSV import";
+    case "OCR": return "OCR";
+    case "SMS": return "SMS";
+    case "RECURRING": return "Recurring";
+    case "MANUAL":
+    default: return "Manual";
+  }
+}
+
+function getSourceIcon(source?: string) {
+  switch (source) {
+    case "CSV_IMPORT": return <FileSpreadsheet size={14} />;
+    case "OCR": return <ScanText size={14} />;
+    case "SMS": return <Smartphone size={14} />;
+    case "RECURRING": return <Repeat2 size={14} />;
+    case "MANUAL":
+    default: return <Hand size={14} />;
+  }
+}
 
 function formatCurrency(value: string | number) {
   const amount =
@@ -154,6 +181,8 @@ export default function TransactionTable({
           <div>Account</div>
 
           <div>Date</div>
+
+          <div>Added via</div>
 
           <div className={styles.amountHeader}>
             Amount
@@ -320,6 +349,17 @@ export default function TransactionTable({
                   {formatDate(
                     transaction.transaction_date
                   )}
+                </div>
+
+                {/* ---------------------------------------- */}
+                {/* Transaction source */}
+                {/* ---------------------------------------- */}
+
+                <div className={styles.sourceCell}>
+                  <span className={styles.sourceBadge} title={getSourceLabel(transaction.source)}>
+                    {getSourceIcon(transaction.source)}
+                    {getSourceLabel(transaction.source)}
+                  </span>
                 </div>
 
                 {/* ---------------------------------------- */}
