@@ -887,6 +887,8 @@ def generate_recurring_transaction(
 
         recurring_transaction_id=recurring_transaction.id,
 
+        source="RECURRING",
+
         transaction_type=recurring_transaction.transaction_type,
 
         amount=recurring_transaction.amount,
