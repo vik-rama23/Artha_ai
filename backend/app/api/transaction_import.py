@@ -37,6 +37,7 @@ class ImportMapping(BaseModel):
 class ImportRequest(BaseModel):
     csv_content: str = Field(min_length=1)
     mapping: ImportMapping
+    create_missing_categories: bool = False
 
 
 def _parse_rows(db: Session, user_id: UUID, payload: ImportRequest):
@@ -73,6 +74,29 @@ def _parse_rows(db: Session, user_id: UUID, payload: ImportRequest):
     ).all()
     account_by_name = {a.name.strip().casefold(): a for a in accounts}
     category_by_name_type = {(c.name.strip().casefold(), c.category_type): c for c in categories}
+
+    def normalize_name(name: str) -> str:
+        return " ".join(name.casefold().split())
+
+    def match_account(name: str):
+        normalized = normalize_name(name)
+        if not normalized:
+            return None, None
+        exact = account_by_name.get(normalized)
+        if exact is not None:
+            return exact, None
+        # Suggest a match only when the shorter name is a whole-word prefix
+        # and exactly one account qualifies. Never guess between multiple accounts.
+        candidates = [
+            account for account in accounts
+            if normalize_name(account.name).startswith(normalized + " ")
+            or normalized.startswith(normalize_name(account.name) + " ")
+        ]
+        if len(candidates) == 1:
+            return candidates[0], f"Account '{name}' was matched to your existing account '{candidates[0].name}'."
+        if len(candidates) > 1:
+            return None, f"Account '{name}' matches multiple accounts. Use the exact account name: {', '.join(sorted(a.name for a in candidates))}."
+        return None, None
     output = []
     seen = set()
 
@@ -97,13 +121,24 @@ def _parse_rows(db: Session, user_id: UUID, payload: ImportRequest):
         except (InvalidOperation, ValueError):
             amount = None
             errors.append("Amount must be a positive number with up to 2 decimal places.")
-        account = account_by_name.get(value("account").casefold())
+        account, account_warning = match_account(value("account"))
         if account is None:
-            errors.append(f"Account '{value('account') or '(blank)'}' does not match an account you own.")
+            if value("account"):
+                errors.append(account_warning or f"Account '{value('account')}' does not match an account you own.")
+            else:
+                errors.append("Account name is required.")
         category_name = value("category")
-        category = category_by_name_type.get((category_name.casefold(), tx_type)) if category_name and tx_type in {"INCOME", "EXPENSE"} else None
+        category = category_by_name_type.get((normalize_name(category_name), tx_type)) if category_name and tx_type in {"INCOME", "EXPENSE"} else None
+        warnings = []
+        if account_warning and account is not None:
+            warnings.append(account_warning)
         if category_name and category is None:
-            errors.append(f"Category '{category_name}' does not match an active {tx_type.lower()} category.")
+            if tx_type not in {"INCOME", "EXPENSE"}:
+                errors.append(f"Category '{category_name}' cannot be matched until transaction type is valid.")
+            elif payload.create_missing_categories:
+                warnings.append(f"Category '{category_name}' will be created as a new {tx_type.lower()} category after you confirm the import.")
+            else:
+                errors.append(f"Category '{category_name}' does not match an active {tx_type.lower()} category. Enable 'Create missing categories' to add it during confirmation.")
         description = value("description") or None
         merchant = value("merchant") or None
         notes = value("notes") or None
@@ -146,6 +181,7 @@ def _parse_rows(db: Session, user_id: UUID, payload: ImportRequest):
             "description": description,
             "notes": notes,
             "errors": errors,
+            "warnings": warnings,
             "valid": not errors,
             "duplicate": duplicate,
         })
@@ -180,9 +216,34 @@ def confirm_import(
 
     account_ids = {UUID(row["account_id"]) for row in valid_rows}
     try:
+        created_categories = {}
         for row in valid_rows:
             account_id = UUID(row["account_id"])
             category_id = UUID(row["category_id"]) if row["category_id"] else None
+            if category_id is None and row["category"] != "Uncategorized" and payload.create_missing_categories:
+                category_key = (row["category"].strip().casefold(), row["transaction_type"])
+                existing_category = db.query(Category).filter(
+                    Category.is_active.is_(True),
+                    Category.category_type == row["transaction_type"],
+                    ((Category.user_id == current_user.id) | (Category.is_system.is_(True))),
+                ).all()
+                matched = next((item for item in existing_category if item.name.strip().casefold() == category_key[0]), None)
+                if matched is not None:
+                    category_id = matched.id
+                else:
+                    category = created_categories.get(category_key)
+                    if category is None:
+                        category = Category(
+                            user_id=current_user.id,
+                            name=row["category"].strip(),
+                            category_type=row["transaction_type"],
+                            is_system=False,
+                            is_active=True,
+                        )
+                        db.add(category)
+                        db.flush()
+                        created_categories[category_key] = category
+                    category_id = category.id
             validate_account(db, current_user.id, account_id)
             validate_category(db, current_user.id, category_id, row["transaction_type"])
             db.add(Transaction(
