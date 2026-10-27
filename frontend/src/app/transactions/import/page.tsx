@@ -23,6 +23,7 @@ type PreviewRow = {
   description: string | null;
   notes: string | null;
   errors: string[];
+  warnings: string[];
   valid: boolean;
   duplicate: boolean;
 };
@@ -98,6 +99,7 @@ export default function ImportTransactionsPage() {
   const [preview, setPreview] = useState<PreviewResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [createMissingCategories, setCreateMissingCategories] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -147,7 +149,7 @@ export default function ImportTransactionsPage() {
     try {
       const result = await apiClient<PreviewResponse>("/api/v1/transactions/import/preview", {
         method: "POST",
-        body: JSON.stringify({ csv_content: csvContent, mapping }),
+        body: JSON.stringify({ csv_content: csvContent, mapping, create_missing_categories: createMissingCategories }),
       });
       setPreview(result);
     } catch (err) {
@@ -169,7 +171,7 @@ export default function ImportTransactionsPage() {
     try {
       const result = await apiClient<ConfirmResponse>("/api/v1/transactions/import/confirm", {
         method: "POST",
-        body: JSON.stringify({ csv_content: csvContent, mapping }),
+        body: JSON.stringify({ csv_content: csvContent, mapping, create_missing_categories: createMissingCategories }),
       });
       setSuccess(result.message + ` ${result.skipped_count} row(s) skipped.`);
       setPreview(null);
@@ -231,6 +233,20 @@ export default function ImportTransactionsPage() {
                 </label>
               ))}
             </div>
+            <label className={styles.categoryOption}>
+              <input
+                type="checkbox"
+                checked={createMissingCategories}
+                onChange={(event) => {
+                  setCreateMissingCategories(event.target.checked);
+                  setPreview(null);
+                }}
+              />
+              <span>
+                <strong>Create missing categories during import</strong>
+                <small>New categories are created only after you confirm. Account matches are suggested only when there is one clear match; ambiguous names need the exact account name.</small>
+              </span>
+            </label>
             <p className={styles.mappingNote}>Date format: YYYY-MM-DD. Type must be INCOME or EXPENSE. Account names must match an account in Artha. Categories are optional and must match an active category of the same type. Replace or delete the clearly marked example rows before importing.</p>
             <button className={styles.primaryButton} type="button" disabled={!requiredMapped || loading} onClick={() => void handlePreview()}>
               {loading ? <LoaderCircle size={18} className={styles.spin} /> : <Upload size={18} />}
@@ -257,7 +273,7 @@ export default function ImportTransactionsPage() {
                 {preview.rows.slice(0, 100).map((row) => (
                   <tr key={row.row_number}>
                     <td>{row.row_number}</td><td>{row.transaction_date}</td><td>{row.transaction_type}</td><td>{row.amount}</td><td>{row.account}</td><td>{row.category}</td><td>{row.description || row.merchant || "—"}</td>
-                    <td><span className={row.valid ? styles.validBadge : styles.invalidBadge}>{row.valid ? "Ready" : row.duplicate ? "Duplicate" : "Skipped"}</span>{row.errors.length > 0 && <ul>{row.errors.map((item, index) => <li key={index}>{item}</li>)}</ul>}</td>
+                    <td><span className={row.valid ? styles.validBadge : styles.invalidBadge}>{row.valid ? "Ready" : row.duplicate ? "Duplicate" : "Skipped"}</span>{row.errors.length > 0 && <ul>{row.errors.map((item, index) => <li key={index}>{item}</li>)}</ul>}{row.warnings?.length > 0 && <ul className={styles.warningList}>{row.warnings.map((item, index) => <li key={index}>{item}</li>)}</ul>}</td>
                   </tr>
                 ))}
               </tbody>
